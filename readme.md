@@ -8,3 +8,5 @@ Nothing to see here. Yet. Except some ideas...
 *   [Language features](design/language.md)
 *   [Things to be determined](design/open questions.md)
 *   [VM design](design/vm.md)
+
+Licensed as [MIT](license.md)
