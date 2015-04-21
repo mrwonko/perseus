@@ -27,11 +27,11 @@
 
 Operands are implicity taken from the top of the stack.
 
-Opcodes are suffixed with their type, e.g. `_((i|u)(8|16|32|64)|(f(32|64))|b)`. This is also how a boolean and (`and_b`) is differentiated from a bitwise one (e.g. `and_i32`)
+Opcodes are suffixed with their type, e.g. `_((i|u)(8|16|32|64)|(f(32|64))|b)`. This is also how a boolean "and" (`and_b`) is differentiated from a bitwise one (e.g. `and_i32`)
 
-Initially, only 32 bit signed types are supported.
+Initially, only one size of signed types are supported, no unsigned types.
 
-Parameters are 32 bit, unless otherwise stated.
+Parameters are 32 bit, unless otherwise stated, with the exception of addresses, which are 64 bit.
 
 Machine instruction operands are pushed left to right. They are marked `[stack-operand]`, while parameters in the code use `<opcode-operand>`
 
