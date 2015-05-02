@@ -22,7 +22,7 @@ Bytecode generator
 
 # 2015-06-03 - 2015-06-17
 
-Iteration, Puffer
+Iteration, Buffer
 
 # 2015-06-17 - 2015-07-01
 
