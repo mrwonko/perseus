@@ -21,7 +21,7 @@
 ### think about
 
 *   stack frames - external vs embedded in stack
-*   exception handling - needs information about entered scoped
+*   exception handling - needs information about entered scopes
 
 ## opcodes
 
