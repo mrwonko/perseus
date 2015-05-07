@@ -46,6 +46,12 @@ Machine instruction operands are pushed left to right. They are marked `[stack-o
     *   `call <address>`
     *   `indirect_call [address]` (function pointers)
     *   `return`
+*   coroutines
+    *   creating a new coroutine; this pushes the 32bit identifier onto the stack
+        *   `absolute_coroutine <address>`
+        *   `indirect_coroutine [address]`
+    *   `call_coroutine <parameter size> [coroutine]`: pop `parameter size` bytes off the stack, push them on the coroutine's stack, push the coroutine on the coroutine stack and call it
+    *   `yield <parameter size>`: pop `parameter size` bytes of the stack, pop the current coroutine off the stack, push the bytes on the stack of the coroutine below and continue it
 *   one each for each size of integer and float:
     *   `push <value>`
     *   `add [op1] [op2]`
@@ -81,7 +87,7 @@ Machine instruction operands are pushed left to right. They are marked `[stack-o
 *   `relative_store_stack <size> <offset> [value]`
 *   (`store_heap <size> [value] [address]`)
 *   `pop <size>`
-*   `syscall <index>`: a table of syscalls is created during compilation, so they are by index
+*   `syscall <index>`: a table of syscalls is created during compilation, so they are by index 
 *   there are explicitly _no type casts between signed and unsigned and between types of varying size_. These are prone to overflows, underflows and other potentially undefined or weird behaviour. If the user really needs them, he can provide a conversion function via the FFI. (This may turn out to be a horrible idea, in which case it will be revisited.)
 
 ## functions
