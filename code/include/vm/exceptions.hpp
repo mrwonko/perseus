@@ -19,4 +19,14 @@ namespace perseus
   {
     using segmentation_fault::segmentation_fault;
   };
+
+  /**
+  @brief Read an invalid opcode.
+  
+  Tried reading an @ref detail::opcode "opcode" from the @ref detail::code_segment "code_segment" but received an invalid one.
+  */
+  struct invalid_opcode : std::domain_error
+  {
+    using std::domain_error::domain_error;
+  };
 }

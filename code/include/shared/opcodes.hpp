@@ -52,7 +52,15 @@ namespace perseus
 
       Terminates execution.
       */
-      exit
+      exit,
+      /**
+      @brief end marker
+      
+      Not a valid opcode, just used as an end marker.
+
+      Useful for testing the handling of invalid opcodes.
+      **/
+      opcode_end
     };
 
     /// Maximum number of bytes for multibyte opcode encoding

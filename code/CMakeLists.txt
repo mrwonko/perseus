@@ -25,6 +25,8 @@ set( VM_FILES
 
 set( TEST_FILES
     "test/test_init.cpp"
+    "test/execution.cpp"
+    "test/write_code_segment.hpp"
     "test/instruction_pointer.cpp"
 )
 

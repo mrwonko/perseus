@@ -1,6 +1,7 @@
 #pragma once
 
 #include "code_segment.hpp"
+#include "instruction_pointer.hpp"
 
 namespace perseus
 {
@@ -31,7 +32,9 @@ namespace perseus
 
       /**
       @brief Start execution at address 0 in the bytecode.
+
       @throws code_segmentation_fault if the instruction pointer reaches the end of the @ref code_segment.
+      @throws invalid_opcode if the instruction pointer points to an invalid instruction.
       **/
       void execute();
     private:
@@ -42,6 +45,7 @@ namespace perseus
 
       /// Memory segment containing the code to be executed.
       code_segment _code;
+      instruction_pointer _instruction_pointer;
     };
   }
 }

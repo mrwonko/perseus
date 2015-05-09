@@ -16,7 +16,7 @@ struct instruction_pointer_fixture
   perseus::detail::instruction_pointer pointer;
 };
 
-BOOST_FIXTURE_TEST_CASE( moving, instruction_pointer_fixture )
+BOOST_FIXTURE_TEST_CASE( moving_test, instruction_pointer_fixture )
 {
   using perseus::detail::instruction_pointer;
   segment.push< char >( 'a' );
@@ -47,7 +47,7 @@ BOOST_FIXTURE_TEST_CASE( moving, instruction_pointer_fixture )
   BOOST_CHECK_EQUAL( 3, static_cast< instruction_pointer::value_type >( pointer ) );
 }
 
-BOOST_FIXTURE_TEST_CASE( singlebyte_encoding, instruction_pointer_fixture )
+BOOST_FIXTURE_TEST_CASE( singlebyte_encoding_test, instruction_pointer_fixture )
 {
   using perseus::detail::opcode;
   opcode code = static_cast< opcode >( 42 ); // something that fits into a single byte
@@ -57,7 +57,7 @@ BOOST_FIXTURE_TEST_CASE( singlebyte_encoding, instruction_pointer_fixture )
   BOOST_CHECK_THROW( pointer.read< char >(), perseus::code_segmentation_fault );
 }
 
-BOOST_FIXTURE_TEST_CASE( multibyte_encoding, instruction_pointer_fixture )
+BOOST_FIXTURE_TEST_CASE( multibyte_encoding_test, instruction_pointer_fixture )
 {
   using perseus::detail::opcode;
   opcode code = static_cast< opcode >( 12345 ); // something that would not fit into a single byte
