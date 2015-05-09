@@ -25,6 +25,7 @@ namespace perseus
       @brief Writes a value to the end of the @ref code_segment
       @tparam T type of value to push back
       @param value the value to push back
+      @todo Write bytes in reverse on big endian for cross-platform bytecode
       */
       template< typename T >
       void push( const T value )

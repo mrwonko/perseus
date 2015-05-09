@@ -75,6 +75,7 @@ namespace perseus
       @tparam T type of value to read
       @returns The read value
       @throws code_segmentation_fault if the read goes past the end of the @ref code_segment. The pointer will still be incremented.
+      @todo Reverse read bytes on big endian for cross-platform bytecode
       */
       template< typename T >
       T read()
