@@ -1,0 +1,13 @@
+# Encoding of this file
+DOXYFILE_ENCODING       = UTF-8
+
+PROJECT_NAME            = Perseus
+PROJECT_NUMBER          = 
+PROJECT_BRIEF           = "Compiler/VM for the Perseus programming language"
+PROJECT_LOGO            = 
+OUTPUT_DIRECTORY        = doc
+TAB_SIZE                = 2
+# maybe src should be dropped?
+INPUT                   = @CMAKE_CURRENT_SOURCE_DIR@/src @CMAKE_CURRENT_SOURCE_DIR@/include
+RECURSIVE               = YES
+BUILTIN_STL_SUPPORT     = YES
