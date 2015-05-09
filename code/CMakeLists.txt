@@ -25,7 +25,7 @@ set( VM_FILES
 
 set( TEST_FILES
     "test/test_init.cpp"
-    "test/opcode_encoding.cpp"
+    "test/instruction_pointer.cpp"
 )
 
 source_group( "src" REGULAR_EXPRESSION "src/.*" )
