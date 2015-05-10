@@ -21,7 +21,7 @@ set( VM_FILES
     "src/vm/processor.cpp" "include/vm/processor.hpp"
     "src/vm/code_segment.cpp" "include/vm/code_segment.hpp"
     "src/vm/instruction_pointer.cpp" "include/vm/instruction_pointer.hpp"
-    "include/vm/stack.hpp"
+    "src/vm/stack.cpp" "include/vm/stack.hpp"
 )
 
 set( TEST_FILES
