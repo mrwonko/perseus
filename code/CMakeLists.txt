@@ -21,6 +21,7 @@ set( VM_FILES
     "src/vm/processor.cpp" "include/vm/processor.hpp"
     "src/vm/code_segment.cpp" "include/vm/code_segment.hpp"
     "src/vm/instruction_pointer.cpp" "include/vm/instruction_pointer.hpp"
+    "include/vm/stack.hpp"
 )
 
 set( TEST_FILES
@@ -28,6 +29,7 @@ set( TEST_FILES
     "test/execution.cpp"
     "test/write_code_segment.hpp"
     "test/instruction_pointer.cpp"
+    "test/stack.cpp"
 )
 
 source_group( "src" REGULAR_EXPRESSION "src/.*" )

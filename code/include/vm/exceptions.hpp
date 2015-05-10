@@ -29,4 +29,14 @@ namespace perseus
   {
     using std::domain_error::domain_error;
   };
+
+  /**
+  @brief Pop from an empty stack
+
+  Tried to pop more from a stack than is on it.
+  */
+  struct stack_underflow : std::out_of_range
+  {
+    using std::out_of_range::out_of_range;
+  };
 }
