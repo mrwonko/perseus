@@ -35,7 +35,8 @@ Parameters are 32 bit, unless otherwise stated, with the exception of addresses,
 
 Machine instruction operands are pushed left to right. They are marked `[stack-operand]`, while parameters in the code use `<opcode-operand>`
 
-*   `exit <status>`
+*   `exit <return size>`
+*   `exit_returning_everything`
 *   jumps; choose bit patterns such that unified handling is possible
     *   `absolute_jump <address>`
     *   `relative_jump <offset>`
@@ -50,8 +51,14 @@ Machine instruction operands are pushed left to right. They are marked `[stack-o
     *   creating a new coroutine; this pushes the 32bit identifier onto the stack
         *   `absolute_coroutine <address>`
         *   `indirect_coroutine [address]`
-    *   `call_coroutine <parameter size> [coroutine]`: pop `parameter size` bytes off the stack, push them on the coroutine's stack, push the coroutine on the coroutine stack and call it
+    *   `resume_coroutine <parameter size> [coroutine]`: pop `parameter size` bytes off the stack, push them on the coroutine's stack, push the coroutine on the coroutine stack and resume it
     *   `yield <parameter size>`: pop `parameter size` bytes of the stack, pop the current coroutine off the stack, push the bytes on the stack of the coroutine below and continue it
+    *   `coroutine_return <parameter size>`: like yield, but also marks this coroutine as dead
+    *   `coroutine_status [coroutine]`: Pushes the status of the coroutine with the given identifier (which must be valid) onto the stack:
+        *   `0`: live - a non-suspended, non-dead coroutine, i.e. the current coroutine or one waiting on it
+        *   `1`: suspended - a coroutine that has yielded or not yet been started
+        *   `2`: dead - a coroutine that executed `coroutine_return`
+    *   `delete_coroutine [coroutine]`: Destroys the given coroutine. It must be a valid coroutine itentifier and the coroutine must not be active.
 *   one each for each size of integer and float:
     *   `push <value>`
     *   `add [op1] [op2]`
