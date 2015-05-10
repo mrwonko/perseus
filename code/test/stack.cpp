@@ -1,5 +1,6 @@
 #include "vm/stack.hpp"
 #include "vm/exceptions.hpp"
+#include "vm/processor.hpp"
 
 #include <boost/test/unit_test.hpp>
 #include <array>
@@ -102,6 +103,17 @@ BOOST_AUTO_TEST_CASE( split_0_test_2 )
 
   BOOST_CHECK_EQUAL( stack1.size(), 1 );
   BOOST_CHECK_EQUAL( stack2.size(), 0 );
+}
+
+BOOST_AUTO_TEST_CASE( processor_result )
+{
+  perseus::stack stack1;
+  stack1.push< int >( 42 );
+  auto stack2 = stack1.split( sizeof( int ) );
+  BOOST_CHECK( stack1.empty() );
+  perseus::detail::processor::execution_result result{ true, std::move( stack2 ) };
+  BOOST_CHECK( stack2.empty() );
+  BOOST_CHECK( result.stack.size() == sizeof( int ) );
 }
 
 BOOST_AUTO_TEST_SUITE_END()

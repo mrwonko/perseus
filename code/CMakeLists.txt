@@ -22,6 +22,8 @@ set( VM_FILES
     "src/vm/code_segment.cpp" "include/vm/code_segment.hpp"
     "src/vm/instruction_pointer.cpp" "include/vm/instruction_pointer.hpp"
     "src/vm/stack.cpp" "include/vm/stack.hpp"
+    "src/vm/coroutine.cpp" "include/vm/coroutine.hpp"
+    "src/vm/coroutine_manager.cpp" "include/vm/coroutine_manager.hpp"
 )
 
 set( TEST_FILES

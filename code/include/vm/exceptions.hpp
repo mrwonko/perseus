@@ -25,9 +25,9 @@ namespace perseus
   
   Tried reading an @ref detail::opcode "opcode" from the @ref detail::code_segment "code_segment" but received an invalid one.
   */
-  struct invalid_opcode : std::domain_error
+  struct invalid_opcode : std::invalid_argument
   {
-    using std::domain_error::domain_error;
+    using std::invalid_argument::invalid_argument;
   };
 
   /**
@@ -38,5 +38,40 @@ namespace perseus
   struct stack_underflow : std::out_of_range
   {
     using std::out_of_range::out_of_range;
+  };
+
+  /**
+  @brief Tried to continue execution of a @ref detail::processor "processor" where execution was over
+
+  The root @ref detail::coroutine "coroutine" of a @ref detail::processor "processor" may yield, suspending itself and leaving values on the root @ref stack of the processor. In this case, 
+  */
+  struct execution_finished : std::logic_error
+  {
+    using std::logic_error::logic_error;
+  };
+
+  /**
+  @brief Supplied a @ref detail::coroutine::identifier "coroutine identifier" with no corresponding coroutine
+  */
+  struct invalid_coroutine_identifer : std::out_of_range
+  {
+    using std::out_of_range::out_of_range;
+  };
+
+  /**
+  @brief Used @ref detail::opcode::delete_coroutine "delete_coroutine" on a live coroutine
+  */
+  struct deleting_live_coroutine : std::invalid_argument
+  {
+    using std::invalid_argument::invalid_argument;
+  };
+
+  /**
+  @brief Tried to have more coroutines simultaneously than fit into @ref detail::coroutine::identifier
+  @note Realistically this will never happen during normal usage
+  */
+  struct too_many_coroutines : std::logic_error
+  {
+    using std::logic_error::logic_error;
   };
 }
