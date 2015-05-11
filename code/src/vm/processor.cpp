@@ -35,17 +35,21 @@ namespace perseus
         case opcode::exit:
         {
           stack::size_type result_size = ip.read< std::uint32_t >();
-          stack result = active_coroutine->stack.split( result_size );
+          stack result_stack = active_coroutine->stack.split( result_size );
           _active_coroutine_stack.clear();
           _coroutine_manager.clear();
-          return{ true, std::move( result ) };
+          // workaround for MSVC14RC bug where destructors would not get called
+          execution_result result { true, std::move( result_stack ) };
+          return std::move( result );
         }
         case opcode::exit_returning_everything:
         {
-          stack result = std::move( active_coroutine->stack );
+          stack result_stack = std::move( active_coroutine->stack );
           _active_coroutine_stack.clear();
           _coroutine_manager.clear();
-          return{ true, std::move( result ) };
+          // workaround for MSVC14RC bug where destructors would not get called
+          execution_result result{ true, std::move( result_stack ) };
+          return std::move( result );
         }
         default:
           throw invalid_opcode( "Invalid opcode " + std::to_string( static_cast< std::underlying_type_t< opcode > >( instruction ) ) );

@@ -105,19 +105,6 @@ BOOST_AUTO_TEST_CASE( split_0_test_2 )
   BOOST_CHECK_EQUAL( stack2.size(), 0 );
 }
 
-// This happens in the context of the processor processing opcode::exit* and leaked memory at some point. Isolating it in a small testcase to fix it.
-static perseus::detail::processor::execution_result mk_leaky_result()
-{
-  perseus::stack stack1;
-  return{ true, std::move( stack1 ) };
-}
-
-BOOST_AUTO_TEST_CASE( leaky_result )
-{
-  perseus::detail::processor::execution_result result = mk_leaky_result();
-  BOOST_CHECK( result.stack.size() == 0 );
-}
-
 BOOST_AUTO_TEST_SUITE_END()
 
 BOOST_AUTO_TEST_SUITE_END()
