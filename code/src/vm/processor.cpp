@@ -21,12 +21,12 @@ namespace perseus
       {
         throw execution_finished( "Trying to continue_execution() of a finished program!" );
       }
-      coroutine* active_coroutine = _active_coroutine_stack.back();
-      active_coroutine->stack.append( parameters );
+      _active_coroutine_stack.back()->stack.append( parameters );
       parameters.clear();
       while( true )
       {
-        instruction_pointer& ip = active_coroutine->instruction_pointer;
+        coroutine& co = *_active_coroutine_stack.back();
+        instruction_pointer& ip = co.instruction_pointer;
         const opcode instruction = ip.read< opcode >();
         switch( instruction )
         {
@@ -35,7 +35,7 @@ namespace perseus
         case opcode::exit:
         {
           stack::size_type result_size = ip.read< std::uint32_t >();
-          stack result_stack = active_coroutine->stack.split( result_size );
+          stack result_stack = co.stack.split( result_size );
           _active_coroutine_stack.clear();
           _coroutine_manager.clear();
           // workaround for MSVC14RC bug where destructors would not get called - create a temporary object and move that.
@@ -44,7 +44,7 @@ namespace perseus
         }
         case opcode::exit_returning_everything:
         {
-          stack result_stack = std::move( active_coroutine->stack );
+          stack result_stack = std::move( co.stack );
           _active_coroutine_stack.clear();
           _coroutine_manager.clear();
           // workaround for MSVC14RC bug where destructors would not get called - create a temporary object and move that.
