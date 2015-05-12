@@ -65,11 +65,36 @@ namespace perseus
   };
 
   /**
+  @brief Used @ref detail::opcode::resume_coroutine "resume_coroutine" on a dead coroutine
+  */
+  struct resuming_dead_coroutine : std::invalid_argument
+  {
+    using std::invalid_argument::invalid_argument;
+  };
+
+  /**
+  @brief Used @ref detail::opcode::resume_coroutine "resume_coroutine" on a live coroutine
+  */
+  struct resuming_live_coroutine : std::invalid_argument
+  {
+    using std::invalid_argument::invalid_argument;
+  };
+
+  /**
   @brief Tried to have more coroutines simultaneously than fit into @ref detail::coroutine::identifier
   @note Realistically this will never happen during normal usage
   */
   struct too_many_coroutines : std::logic_error
   {
     using std::logic_error::logic_error;
+  };
+
+  /**
+  @brief Yielded/returned outside a coroutine.
+  @note Use @ref detail::opcode::exit "exit" to terminate your program.
+  */
+  struct no_coroutine : std::invalid_argument
+  {
+    using std::invalid_argument::invalid_argument;
   };
 }

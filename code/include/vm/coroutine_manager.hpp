@@ -63,6 +63,11 @@ namespace perseus
       /// @ref delete_coroutine() for const coroutine_manager.
       const coroutine& get_coroutine( const coroutine::identifier index ) const;
 
+      bool empty() const
+      {
+        return _coroutines.empty();
+      }
+
       /**
       @brief Deletes all coroutines.
       */
