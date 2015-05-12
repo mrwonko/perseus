@@ -22,7 +22,7 @@ BOOST_AUTO_TEST_SUITE( vm )
 
 BOOST_AUTO_TEST_SUITE( execution )
 
-BOOST_AUTO_TEST_CASE( exit_0_test ) // X
+BOOST_AUTO_TEST_CASE( exit_0_test )
 {
   auto code = create_code_segment( opcode::exit, std::uint32_t( 0 ) );
   processor proc( std::move( code ) );
@@ -32,7 +32,7 @@ BOOST_AUTO_TEST_CASE( exit_0_test ) // X
   BOOST_CHECK_THROW( proc.continue_execution(), execution_finished );
 }
 
-BOOST_AUTO_TEST_CASE( exit_2_test ) // X
+BOOST_AUTO_TEST_CASE( exit_2_test )
 {
   auto code = create_code_segment( opcode::exit, std::uint32_t( 2 ) );
   stack input;
@@ -51,7 +51,7 @@ BOOST_AUTO_TEST_CASE( exit_underflow_test )
   BOOST_CHECK_THROW( processor( std::move( code ) ).continue_execution(), stack_underflow );
 }
 
-BOOST_AUTO_TEST_CASE( exit_all_test ) // X
+BOOST_AUTO_TEST_CASE( exit_all_test )
 {
   auto code = create_code_segment( opcode::exit_returning_everything );
   stack input;
@@ -63,7 +63,7 @@ BOOST_AUTO_TEST_CASE( exit_all_test ) // X
   BOOST_CHECK_EQUAL( result.stack.pop< char >(), 'c' );
 }
 
-BOOST_AUTO_TEST_CASE( noop_test ) // X
+BOOST_AUTO_TEST_CASE( noop_test )
 {
   auto code = create_code_segment( opcode::no_operation, opcode::exit, std::uint32_t( 0 ) );
   BOOST_CHECK( processor( std::move( code ) ).continue_execution().execution_finished );
