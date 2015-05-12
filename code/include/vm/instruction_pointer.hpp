@@ -80,6 +80,7 @@ namespace perseus
       template< typename T >
       T read()
       {
+        static_assert( std::is_trivially_copyable< T >::value, "instruction_pointer data must be trivially copyable!" );
         const T* result = reinterpret_cast< const T* >( _code->data() + _offset );
         _offset += sizeof( T );
         if( _offset > _code->size() )

@@ -3,6 +3,7 @@
 #include "exceptions.hpp"
 
 #include <vector>
+#include <type_traits>
 
 namespace perseus
 {
@@ -44,6 +45,7 @@ namespace perseus
     template< typename T >
     void push( const T& value )
     {
+      static_assert( std::is_trivially_copyable< T >::value, "stack data must be trivially copyable!" );
       // this code is copied from code_segment::push() - it could be factored out, but that seems like overkill to me
       const_pointer begin = reinterpret_cast< const_pointer >( &value );
       const_pointer end = begin + sizeof( T );
@@ -59,6 +61,7 @@ namespace perseus
     template< typename T >
     T pop()
     {
+      static_assert( std::is_trivially_copyable< T >::value, "stack data must be trivially copyable!" );
       if( size() < sizeof( T ) )
       {
         throw stack_underflow( "Stack underflow" );
