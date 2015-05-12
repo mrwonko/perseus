@@ -8,7 +8,7 @@ namespace perseus
 {
   namespace detail
   {
-    coroutine& coroutine_manager::new_coroutine( const code_segment& code, const instruction_pointer::value_type start_address )
+    coroutine& coroutine_manager::new_coroutine( const code_segment& code, const instruction_pointer::value_type start_address, stack&& initial_stack )
     {
       coroutine::identifier index = _next_index;
       // reuse indices of deleted coroutines, if any
@@ -26,7 +26,7 @@ namespace perseus
         index = _free_indices.back();
         _free_indices.pop_back();
       }
-      auto result = _coroutines.emplace( std::make_pair( index, coroutine( index, code, start_address ) ) );
+      auto result = _coroutines.emplace( std::make_pair( index, coroutine( index, code, start_address, std::move( initial_stack ) ) ) );
       assert( result.second );
       return result.first->second;
     }

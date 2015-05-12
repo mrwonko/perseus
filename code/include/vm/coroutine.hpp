@@ -42,7 +42,7 @@ namespace perseus
       @param code the @ref code_segment this coroutine executes
       @param start_address where in the code this coroutine starts execution
       */
-      coroutine( const identifier index, const code_segment& code, const instruction_pointer::value_type start_address );
+      coroutine( const identifier index, const code_segment& code, const instruction_pointer::value_type start_address, stack&& initial_stack );
       
       /// identifier given by the @ref coroutine_manager
       const identifier index;

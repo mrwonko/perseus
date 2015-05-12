@@ -50,29 +50,13 @@ namespace perseus
       /**
       # Exit
 
-      Terminates execution, returning the given number of bytes from the top of the current @ref coroutine's @ref stack.
+      Terminates execution, returning the stack in its current state to the environment.
 
-      ## Parameters
+      May only be called in the root coroutine, i.e. the one where execution began, to make it harder to write leaking code.
 
-      -   result_size (4 bytes) - number of bytes to take off the stack and return
-
-      ## Input
-
-      -   result (varying) - takes the number of bytes given by the result_size parameter off the current @ref coroutine's stack and returns them
+      @throws exit_in_coroutine if called in a coroutine
       */
       exit,
-      /**
-      # Exit Returning Everything
-
-      Terminates execution, returning the whole @ref stack of the current @ref coroutine.
-
-      Used for calling Perseus functions from C++.
-
-      ## Input
-
-      -   result (varying) - takes however many bytes are on the current @ref coroutine's stack off it and returns them
-      */
-      exit_returning_everything,
       /**
       @brief end marker
       

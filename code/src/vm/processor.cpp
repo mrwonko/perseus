@@ -9,23 +9,17 @@ namespace perseus
 {
   namespace detail
   {
-    processor::processor( code_segment&& code, const instruction_pointer::value_type start_address )
+    processor::processor( code_segment&& code )
       : _code( std::move( code ) )
     {
-      _active_coroutine_stack.push_back( &_coroutine_manager.new_coroutine( _code, start_address ) );
     }
 
-    processor::execution_result processor::continue_execution( stack&& parameters )
+    stack processor::execute( const instruction_pointer::value_type start_address, stack&& parameters )
     {
-      if( _active_coroutine_stack.empty() )
-      {
-        throw execution_finished( "Trying to continue_execution() of a finished program!" );
-      }
-      _active_coroutine_stack.back()->stack.append( parameters );
-      parameters.clear();
+      std::vector< coroutine* > active_coroutines{ &_coroutine_manager.new_coroutine( _code, start_address, std::move( parameters ) ) };
       while( true )
       {
-        coroutine& co = *_active_coroutine_stack.back();
+        coroutine& co = *active_coroutines.back();
         instruction_pointer& ip = co.instruction_pointer;
         const opcode instruction = ip.read< opcode >();
         switch( instruction )
@@ -33,24 +27,11 @@ namespace perseus
         case opcode::no_operation:
           break;
         case opcode::exit:
-        {
-          stack::size_type result_size = ip.read< std::uint32_t >();
-          stack result_stack = co.stack.split( result_size );
-          _active_coroutine_stack.clear();
-          _coroutine_manager.clear();
-          // workaround for MSVC14RC bug where destructors would not get called - create a temporary object and move that.
-          execution_result result { true, std::move( result_stack ) };
-          return result;
-        }
-        case opcode::exit_returning_everything:
-        {
-          stack result_stack = std::move( co.stack );
-          _active_coroutine_stack.clear();
-          _coroutine_manager.clear();
-          // workaround for MSVC14RC bug where destructors would not get called - create a temporary object and move that.
-          execution_result result{ true, std::move( result_stack ) };
-          return result;
-        }
+          if( active_coroutines.size() > 1 )
+          {
+            throw exit_in_coroutine( "opcode::exit in coroutine!" );
+          }
+          return std::move( co.stack );
         default:
           throw invalid_opcode( "Invalid opcode " + std::to_string( static_cast< std::underlying_type_t< opcode > >( instruction ) ) );
         }

@@ -31,6 +31,14 @@ namespace perseus
   };
 
   /**
+  @brief Used exit opcode in a coroutine.
+  */
+  struct exit_in_coroutine : std::logic_error
+  {
+    using std::logic_error::logic_error;
+  };
+
+  /**
   @brief Pop from an empty stack
 
   Tried to pop more from a stack than is on it.
@@ -38,16 +46,6 @@ namespace perseus
   struct stack_underflow : std::out_of_range
   {
     using std::out_of_range::out_of_range;
-  };
-
-  /**
-  @brief Tried to continue execution of a @ref detail::processor "processor" where execution was over
-
-  The root @ref detail::coroutine "coroutine" of a @ref detail::processor "processor" may yield, suspending itself and leaving values on the root @ref stack of the processor. In this case, 
-  */
-  struct execution_finished : std::logic_error
-  {
-    using std::logic_error::logic_error;
   };
 
   /**
