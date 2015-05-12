@@ -38,18 +38,18 @@ namespace perseus
           stack result_stack = active_coroutine->stack.split( result_size );
           _active_coroutine_stack.clear();
           _coroutine_manager.clear();
-          // workaround for MSVC14RC bug where destructors would not get called
+          // workaround for MSVC14RC bug where destructors would not get called - create a temporary object and move that.
           execution_result result { true, std::move( result_stack ) };
-          return std::move( result );
+          return result;
         }
         case opcode::exit_returning_everything:
         {
           stack result_stack = std::move( active_coroutine->stack );
           _active_coroutine_stack.clear();
           _coroutine_manager.clear();
-          // workaround for MSVC14RC bug where destructors would not get called
+          // workaround for MSVC14RC bug where destructors would not get called - create a temporary object and move that.
           execution_result result{ true, std::move( result_stack ) };
-          return std::move( result );
+          return result;
         }
         default:
           throw invalid_opcode( "Invalid opcode " + std::to_string( static_cast< std::underlying_type_t< opcode > >( instruction ) ) );
