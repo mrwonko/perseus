@@ -35,18 +35,16 @@ Parameters are 32 bit, unless otherwise stated, with the exception of addresses,
 
 Machine instruction operands are pushed left to right. They are marked `[stack-operand]`, while parameters in the code use `<opcode-operand>`
 
-*   `exit <return size>`
-*   `exit_returning_everything`
+*   `exit`
 *   jumps; choose bit patterns such that unified handling is possible
     *   `absolute_jump <address>`
     *   `relative_jump <offset>`
-    *   `relative_jump_if_true <offset>`
     *   `relative_jump_if_false <offset>`
     *   `indirect_jump [address]` (useful for tail recursion optimization of function pointers)
     *   indexed jumps could be added later
     *   `call <address>`
     *   `indirect_call [address]` (function pointers)
-    *   `return`
+    *   `return <arguments size>`: pops the return address and `arguments size` additional bytes below it off the stack, then jumps to the return address
 *   coroutines
     *   creating a new coroutine; this pushes the 32bit identifier onto the stack
         *   `absolute_coroutine <address>`
@@ -99,4 +97,4 @@ Machine instruction operands are pushed left to right. They are marked `[stack-o
 
 ## functions
 
-Arguments are evaluated and pushed left to right. Callee removes them from the stack, enabling potential tail recursion optimization.
+First, space for the return value is reserved by the called. Then, arguments are evaluated and pushed left to right. In the case of an indirect call, the function address is then pushed. Finally, the call is made, popping the function address off the stack in case of an indirect jump and pushing the return address onto it while moving the instruction pointer to the function. The Callee removes the arguments from the stack.
