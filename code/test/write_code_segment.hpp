@@ -3,7 +3,7 @@
 #include "vm/code_segment.hpp"
 
 /// End of recursion (noop)
-void add_code( perseus::detail::code_segment& out_code )
+static void add_code( perseus::detail::code_segment& out_code )
 {
 }
 
