@@ -1,6 +1,14 @@
 #pragma once
 
-// this file contains Doxygen documentation that doesn't quite fit in any specific file.
+/**
+@file
+
+Doxygen documentation that doesn't quite fit in any specific file.
+
+Also Doxygen-related todos.
+
+@todo Fix broken references to enum values (primarily opcodes).
+*/
 
 /**
 @namespace perseus

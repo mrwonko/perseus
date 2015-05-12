@@ -5,6 +5,7 @@
 #include <stdexcept>
 #include <climits>
 #include <cassert>
+#include <type_traits>
 
 #include "shared/opcodes.hpp"
 
@@ -33,6 +34,7 @@ namespace perseus
       template< typename T >
       void push( const T value )
       {
+        static_assert( std::is_trivially_copyable< T >::value, "code_segment data must be trivially copyable!" );
         const_pointer begin = reinterpret_cast< const_pointer >( &value );
         const_pointer end = begin + sizeof( T );
         insert( std::vector< char >::end(), begin, end );

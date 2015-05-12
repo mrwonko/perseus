@@ -22,11 +22,14 @@ set( VM_FILES
     "src/vm/code_segment.cpp" "include/vm/code_segment.hpp"
     "src/vm/instruction_pointer.cpp" "include/vm/instruction_pointer.hpp"
     "src/vm/stack.cpp" "include/vm/stack.hpp"
+    "src/vm/coroutine.cpp" "include/vm/coroutine.hpp"
+    "src/vm/coroutine_manager.cpp" "include/vm/coroutine_manager.hpp"
 )
 
 set( TEST_FILES
     "test/test_init.cpp"
-    "test/execution.cpp"
+    "test/execution/basic.cpp"
+    "test/execution/coroutines.cpp"
     "test/write_code_segment.hpp"
     "test/instruction_pointer.cpp"
     "test/stack.cpp"
@@ -35,9 +38,13 @@ set( TEST_FILES
 source_group( "src" REGULAR_EXPRESSION "src/.*" )
 source_group( "src\\vm" REGULAR_EXPRESSION "src/vm/.*" )
 source_group( "src\\shared" REGULAR_EXPRESSION "src/shared/.*" )
+
 source_group( "include" REGULAR_EXPRESSION "include/.*" )
 source_group( "include\\vm" REGULAR_EXPRESSION "include/vm/.*" )
 source_group( "include\\shared" REGULAR_EXPRESSION "include/shared/.*" )
+
+source_group( "test" REGULAR_EXPRESSION "test/.*" )
+source_group( "test\\execution" REGULAR_EXPRESSION "test/execution/.*" )
 
 # If doxygen is available, add a target for it
 find_package( Doxygen )

@@ -25,9 +25,17 @@ namespace perseus
   
   Tried reading an @ref detail::opcode "opcode" from the @ref detail::code_segment "code_segment" but received an invalid one.
   */
-  struct invalid_opcode : std::domain_error
+  struct invalid_opcode : std::invalid_argument
   {
-    using std::domain_error::domain_error;
+    using std::invalid_argument::invalid_argument;
+  };
+
+  /**
+  @brief Used exit opcode in a coroutine.
+  */
+  struct exit_in_coroutine : std::logic_error
+  {
+    using std::logic_error::logic_error;
   };
 
   /**
@@ -38,5 +46,55 @@ namespace perseus
   struct stack_underflow : std::out_of_range
   {
     using std::out_of_range::out_of_range;
+  };
+
+  /**
+  @brief Supplied a @ref detail::coroutine::identifier "coroutine identifier" with no corresponding coroutine
+  */
+  struct invalid_coroutine_identifer : std::out_of_range
+  {
+    using std::out_of_range::out_of_range;
+  };
+
+  /**
+  @brief Used @ref detail::opcode::delete_coroutine "delete_coroutine" on a live coroutine
+  */
+  struct deleting_live_coroutine : std::invalid_argument
+  {
+    using std::invalid_argument::invalid_argument;
+  };
+
+  /**
+  @brief Used @ref detail::opcode::resume_coroutine "resume_coroutine" on a dead coroutine
+  */
+  struct resuming_dead_coroutine : std::invalid_argument
+  {
+    using std::invalid_argument::invalid_argument;
+  };
+
+  /**
+  @brief Used @ref detail::opcode::resume_coroutine "resume_coroutine" on a live coroutine
+  */
+  struct resuming_live_coroutine : std::invalid_argument
+  {
+    using std::invalid_argument::invalid_argument;
+  };
+
+  /**
+  @brief Tried to have more coroutines simultaneously than fit into @ref detail::coroutine::identifier
+  @note Realistically this will never happen during normal usage
+  */
+  struct too_many_coroutines : std::logic_error
+  {
+    using std::logic_error::logic_error;
+  };
+
+  /**
+  @brief Yielded/returned outside a coroutine.
+  @note Use @ref detail::opcode::exit "exit" to terminate your program.
+  */
+  struct no_coroutine : std::invalid_argument
+  {
+    using std::invalid_argument::invalid_argument;
   };
 }

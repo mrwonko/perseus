@@ -1,8 +1,8 @@
 # Perseus
 
-## A persistent embedded programming language... plan
+## A persistent embedded programming language... in development
 
-Nothing to see here. Yet. Except some ideas...
+Nothing to see here. Yet. Except some ideas... and work in progress code.
 
 *   [Schedule](design/schedule.md)
 *   [Language features](design/language.md)
