@@ -1,4 +1,4 @@
-#include "write_code_segment.hpp"
+#include "../write_code_segment.hpp"
 
 #include "vm/processor.hpp"
 #include "vm/stack.hpp"
