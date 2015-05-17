@@ -84,6 +84,15 @@ namespace perseus
           previous_co.stack.append( co.stack.split( co.instruction_pointer.read< std::uint32_t >() ) );
           break;
         }
+        case opcode::push_8:
+          co.stack.push< char >( ip.read< char >() );
+          break;
+        case opcode::push_32:
+          co.stack.push< std::int32_t >( ip.read< std::int32_t >() );
+          break;
+        case opcode::pop:
+          co.stack.discard( ip.read< std::uint32_t >() );
+          break;
         default:
           throw invalid_opcode( "Invalid opcode " + std::to_string( static_cast< std::underlying_type_t< opcode > >( instruction ) ) );
         }

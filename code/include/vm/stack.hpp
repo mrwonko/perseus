@@ -72,6 +72,13 @@ namespace perseus
     }
 
     /**
+    @brief Discard a given number of bytes from the top of the stack
+    @param bytes number of bytes to discard
+    @throws stack_underflow if the stack contains less than the given number of bytes
+    */
+    void discard( size_type bytes );
+
+    /**
     @brief Create a new stack by popping a given size off this one.
 
     The order on the new stack will be the same as on the current.

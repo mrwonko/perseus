@@ -16,6 +16,15 @@ namespace perseus
     return *this;
   }
 
+  void stack::discard( size_type bytes )
+  {
+    if( size() < bytes )
+    {
+      throw stack_underflow( "Stack underflow" );
+    }
+    resize( size() - bytes );
+  }
+
   stack stack::split( const size_type size )
   {
     if( size > this->size() )

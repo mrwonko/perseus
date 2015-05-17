@@ -204,6 +204,48 @@ namespace perseus
       */
       yield,
       /**
+      # Push 8 Bit Constant
+
+      Pushes a given 8 bit constant onto the stack.
+
+      ## Parameters
+
+      -   data (1 byte) - constant to push
+
+      ## Output
+
+      -   data (1 byte) - the given data
+      */
+      push_8,
+      /**
+      # Push 32 Bit Constant
+
+      Pushes a given 32 bit constant onto the stack.
+
+      ## Parameters
+
+      -   data (4 bytes) - constant to push
+
+      ## Output
+
+      -   data (4 bytes) - the given data
+      */
+      push_32,
+      /**
+      # Pop
+
+      Pops a given number of bytes off the stack
+
+      ## Parameters
+      
+      -   size (4 bytes) - number of bytes to pop
+
+      ## Input
+
+      -   discarded (varying, as given in size) - the data that gets popped
+      */
+      pop,
+      /**
       @brief end marker
       
       Not a valid opcode, just used as an end marker.
