@@ -28,9 +28,10 @@ set( VM_FILES
 
 set( TEST_FILES
     "test/test_init.cpp"
+	"test/execution/arithmetic.cpp"
     "test/execution/basic.cpp"
-    "test/execution/stack.cpp"
     "test/execution/coroutines.cpp"
+    "test/execution/stack.cpp"
     "test/write_code_segment.hpp"
     "test/instruction_pointer.cpp"
     "test/stack.cpp"
