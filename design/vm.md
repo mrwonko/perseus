@@ -25,7 +25,7 @@
 
 ## opcodes
 
-Operands are implicity taken from the top of the stack.
+Operands are implicitly taken from the top of the stack.
 
 Opcodes are suffixed with their type, e.g. `_((i|u)(8|16|32|64)|(f(32|64))|b)`. This is also how a boolean "and" (`and_b`) is differentiated from a bitwise one (e.g. `and_i32`)
 
@@ -56,7 +56,7 @@ Machine instruction operands are pushed left to right. They are marked `[stack-o
         *   `0`: live - a non-suspended, non-dead coroutine, i.e. the current coroutine or one waiting on it
         *   `1`: suspended - a coroutine that has yielded or not yet been started
         *   `2`: dead - a coroutine that executed `coroutine_return`
-    *   `delete_coroutine [coroutine]`: Destroys the given coroutine. It must be a valid coroutine itentifier and the coroutine must not be active.
+    *   `delete_coroutine [coroutine]`: Destroys the given coroutine. It must be a valid coroutine identifier and the coroutine must not be active.
 *   one each for each size of integer and float:
     *   `push <value>`
     *   `add [op1] [op2]`
@@ -69,7 +69,7 @@ Machine instruction operands are pushed left to right. They are marked `[stack-o
     *   `less_than_or_equals [op1] [op2]`
     *   `greater_than [op1] [op2]`
     *   `greater_than_or_equals [op1] [op2]`
-    *   `invert [operand]`
+    *   `negate [operand]`
 *   one for each size of integer:
     *   `modulo [op1] [op2]`
 *   bitwise operators (including shifts) could conceivably be added later but would only make sense on unsigned types
