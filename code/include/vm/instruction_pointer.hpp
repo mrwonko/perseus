@@ -46,7 +46,7 @@ namespace perseus
       instruction_pointer& operator=( instruction_pointer&& ) = default;
 
       /**
-      @brief Get internal pointer value.
+      @brief Get internal pointer value implicitly.
       @returns Offset of the pointer into the @ref code_segment
       */
       operator value_type() const

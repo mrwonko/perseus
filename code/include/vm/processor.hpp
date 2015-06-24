@@ -25,7 +25,6 @@ namespace perseus
       @brief Constructor.
 
       @param code Code this processor will execute. The processor takes ownership of it.
-      @param start_address The address to begin execution at.
       */
       processor( code_segment&& code );
       /// Non-copyable
@@ -53,6 +52,9 @@ namespace perseus
       **/
       stack execute( const instruction_pointer::value_type start_address = 0, stack&& parameters = stack() );
 
+      /**
+      @brief Whether there are any coroutines
+      */
       bool has_coroutines() const
       {
         return !_coroutine_manager.empty();

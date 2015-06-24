@@ -41,6 +41,7 @@ namespace perseus
       @param index this coroutine's index in the list of coroutines; used to reference its stack
       @param code the @ref code_segment this coroutine executes
       @param start_address where in the code this coroutine starts execution
+      @param initial_stack initial state of the coroutine's stack
       */
       coroutine( const identifier index, const code_segment& code, const instruction_pointer::value_type start_address, stack&& initial_stack );
       

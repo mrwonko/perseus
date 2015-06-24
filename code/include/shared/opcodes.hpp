@@ -58,6 +58,11 @@ namespace perseus
       */
       exit,
       /**
+      */
+
+      //    Coroutines
+
+      /**
       # Absolute Coroutine
 
       Create a new coroutine by absolute address of its initial @ref instruction_pointer.
@@ -203,6 +208,9 @@ namespace perseus
       @see opcode::resume_coroutine for how execution returns to this coroutine after it has been suspended
       */
       yield,
+
+      //    Push/Pop
+
       /**
       # Push 8 Bit Constant
 
@@ -243,6 +251,8 @@ namespace perseus
       ## Input
 
       -   discarded (varying, as given in size) - the data that gets popped
+
+      @throws stack_underflow if popping more than there is on the stack
       */
       pop,
       /**
