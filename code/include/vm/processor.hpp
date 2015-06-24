@@ -1,6 +1,7 @@
 #pragma once
 
 #include <vector>
+#include <functional>
 
 #include "code_segment.hpp"
 #include "instruction_pointer.hpp"
@@ -11,6 +12,13 @@ namespace perseus
 {
   namespace detail
   {
+    /**
+    @brief Syscall callback
+
+    Invoked by the @ref opcode::syscall "syscall opcode"
+    */
+    typedef std::function< void( stack& ) > syscall;
+
     /**
     @brief Processor for Perseus bytecode.
 
@@ -25,8 +33,9 @@ namespace perseus
       @brief Constructor.
 
       @param code Code this processor will execute. The processor takes ownership of it.
+      @param syscalls Vector of syscalls for the @ref opcode::syscall "syscall opcode"
       */
-      processor( code_segment&& code );
+      processor( code_segment&& code, std::vector< syscall >&& syscalls = {} );
       /// Non-copyable
       processor( const processor& ) = delete;
       /// Non-copyable
@@ -68,6 +77,7 @@ namespace perseus
       /// Memory segment containing the code to be executed.
       code_segment _code;
       coroutine_manager _coroutine_manager;
+      std::vector< syscall > _syscalls;
     };
   }
 }

@@ -55,6 +55,15 @@ namespace perseus
       }
 
       /**
+      @brief Get internal pointer value explicitly.
+      @returns Offset of the pointer into the @ref code_segment
+      */
+      value_type value() const
+      {
+        return *this;
+      }
+
+      /**
       @brief Set this @ref instruction_pointer to a given address.
       @param absolute_offset address to point to
       @pre `absolute_offset < code_segment size`

@@ -14,7 +14,7 @@ namespace perseus
 
   @todo Add support for custom allocators? (remove mention of std::bad_alloc in push_back() then)
   */
-  class stack : private std::vector< char >
+  class stack : public std::vector< char >
   {
   public:
     /// Constructor for empty stack
@@ -29,12 +29,6 @@ namespace perseus
     stack( const stack& ) = delete;
     /// non-copyable
     stack& operator=( const stack& ) = delete;
-
-    using std::vector< char >::size;
-    using std::vector< char >::reserve;
-    using std::vector< char >::empty;
-    using std::vector< char >::size_type;
-    using std::vector< char >::clear;
 
     /**
     @brief Push an arbitrary value onto the stack

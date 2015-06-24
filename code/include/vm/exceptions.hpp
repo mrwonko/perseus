@@ -21,6 +21,14 @@ namespace perseus
   };
 
   /**
+  @brief Attempted to read or write outside @ref stack bounds
+  */
+  struct stack_segmentation_fault : segmentation_fault
+  {
+    using segmentation_fault::segmentation_fault;
+  };
+
+  /**
   @brief Read an invalid opcode.
   
   Tried reading an @ref detail::opcode "opcode" from the @ref detail::code_segment "code_segment" but received an invalid one.
@@ -96,5 +104,21 @@ namespace perseus
   struct no_coroutine : std::invalid_argument
   {
     using std::invalid_argument::invalid_argument;
+  };
+
+  /**
+  @brief Tried to call an invalid syscall
+  */
+  struct invalid_syscall : std::invalid_argument
+  {
+    using std::invalid_argument::invalid_argument;
+  };
+
+  /**
+  @brief Tried to divide by zero
+  */
+  struct divide_by_zero : std::range_error
+  {
+    using std::range_error::range_error;
   };
 }
