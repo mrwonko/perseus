@@ -31,6 +31,7 @@ set( TEST_FILES
 	"test/execution/arithmetic.cpp"
     "test/execution/basic.cpp"
     "test/execution/coroutines.cpp"
+	"test/execution/load_store.cpp"
     "test/execution/stack.cpp"
     "test/write_code_segment.hpp"
     "test/instruction_pointer.cpp"
