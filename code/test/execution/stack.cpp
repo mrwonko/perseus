@@ -51,6 +51,17 @@ BOOST_AUTO_TEST_CASE( pop_test )
   BOOST_CHECK_EQUAL( result.pop< char >(), 'a' );
 }
 
+BOOST_AUTO_TEST_CASE( reserve_3_test )
+{
+  BOOST_MESSAGE( "reserving 3 bytes on the stack" );
+  auto code = create_code_segment( opcode::reserve, std::uint32_t( 3 ), opcode::exit );
+  auto result = processor( std::move( code ) ).execute();
+  BOOST_CHECK_EQUAL( result.size(), 3 );
+  BOOST_CHECK_EQUAL( result.pop< std::uint8_t >(), 0 );
+  BOOST_CHECK_EQUAL( result.pop< std::uint8_t >(), 0 );
+  BOOST_CHECK_EQUAL( result.pop< std::uint8_t >(), 0 );
+}
+
 BOOST_AUTO_TEST_SUITE_END()
 
 BOOST_AUTO_TEST_SUITE_END()

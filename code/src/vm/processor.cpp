@@ -7,6 +7,21 @@
 #include <algorithm>
 #include <iterator>
 
+#ifdef _MSC_VER
+# include <Windows.h>
+# define sys_debug_break() DebugBreak()
+#else
+# ifdef __GNUC__
+// TODO: does this always work on gcc? Maybe let cmake find out and generate a configuration file.
+#   include <csignal>
+#   define sys_debug_break() std::raise(SIGTRAP)
+# else
+// the best we can do?
+#   include <iostream>
+#   define sys_debug_break() std::cerr << "please break here" << std::endl;
+# endif
+#endif
+
 namespace perseus
 {
   namespace detail
@@ -48,6 +63,11 @@ namespace perseus
             throw invalid_syscall( "Invalid syscall!" );
           }
           _syscalls[ index ]( co.stack );
+          break;
+        }
+        case opcode::low_level_break:
+        {
+          sys_debug_break();
           break;
         }
 
@@ -96,9 +116,12 @@ namespace perseus
           co.current_state = instruction == opcode::yield ? coroutine::state::suspended : coroutine::state::dead;
           active_coroutines.pop_back();
           coroutine& previous_co = *active_coroutines.back();
-          previous_co.stack.append( co.stack.split( co.instruction_pointer.read< std::uint32_t >() ) );
+          previous_co.stack.append( co.stack.split( ip.read< std::uint32_t >() ) );
           break;
         }
+        case opcode::push_coroutine_identifier:
+          co.stack.push< coroutine::identifier >( co.index );
+          break;
 
         //    Push/Pop
         case opcode::push_8:
@@ -106,6 +129,9 @@ namespace perseus
           break;
         case opcode::push_32:
           co.stack.push< std::int32_t >( ip.read< std::int32_t >() );
+          break;
+        case opcode::reserve:
+          co.stack.resize( co.stack.size() + ip.read< std::uint32_t >() );
           break;
         case opcode::pop:
           co.stack.discard( ip.read< std::uint32_t >() );
@@ -119,7 +145,7 @@ namespace perseus
           const std::uint32_t size = ip.read< std::uint32_t >();
           // FIXME: does not catch underflow errors
           // note: co.stack.size() would have to be from_co.stack.size(), but in the case of relative_load_stack from_co = co
-          const std::uint32_t address = instruction == opcode::relative_load_stack ? co.stack.pop< std::int32_t >() + co.stack.size() : co.stack.pop< std::uint32_t >();
+          const std::uint32_t address = instruction == opcode::relative_load_stack ? ip.read< std::int32_t >() + co.stack.size() : co.stack.pop< std::uint32_t >();
           const coroutine& from_co = instruction == opcode::absolute_load_stack ? _coroutine_manager.get_coroutine( co.stack.pop< std::uint32_t >() ) : co;
           if( address + size > from_co.stack.size() )
           {
@@ -137,16 +163,18 @@ namespace perseus
           const std::uint32_t size = ip.read< std::uint32_t >();
           // FIXME: does not catch underflow errors
           // as above: co.stack.size() should be to_co.stack.size(), but for relative_store_stack to_co = co
-          const std::uint32_t address = instruction == opcode::relative_store_stack ? co.stack.pop< std::int32_t >() + co.stack.size() : co.stack.pop< std::uint32_t >();
+          const std::uint32_t address = instruction == opcode::relative_store_stack ? ip.read< std::int32_t >() + co.stack.size() : co.stack.pop< std::uint32_t >();
           coroutine& to_co = instruction == opcode::absolute_store_stack ? _coroutine_manager.get_coroutine( co.stack.pop< std::uint32_t >() ) : co;
           if( address + size > to_co.stack.size() )
           {
             throw stack_segmentation_fault( "stack segmentation fault: write above top of stack" );
           }
           std::copy( co.stack.end() - size, co.stack.end(), to_co.stack.begin() + address );
-          co.stack.discard( size );
           break;
         }
+        case opcode::push_stack_size:
+          co.stack.push< std::uint32_t >( co.stack.size() );
+          break;
 
         //    Jumps/Calls
         case opcode::absolute_jump:

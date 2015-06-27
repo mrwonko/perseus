@@ -77,6 +77,12 @@ namespace perseus
       @throws invalid_syscall if no such syscall exists
       */
       syscall,
+      /**
+      # Low Level Break
+
+      Break into the system's debugger via DebugBreak()/raise(SIGTRAP)
+      */
+      low_level_break,
 
       //    Coroutines
 
@@ -226,6 +232,16 @@ namespace perseus
       @see opcode::resume_coroutine for how execution returns to this coroutine after it has been suspended
       */
       yield,
+      /**
+      # Push Coroutine Identifier
+
+      Pushes the identifier of the current coroutine onto the stack. Also works for the root coroutine.
+
+      ## Output
+
+      -   coroutine_identifier (4 bytes)
+      */
+      push_coroutine_identifier,
 
       //    Push/Pop
 
@@ -257,6 +273,20 @@ namespace perseus
       -   data (4 bytes) - the given data
       */
       push_32,
+      /**
+      # Reserve
+
+      Reserves zero-initialized space on top of the stack.
+
+      ## Parameters
+
+      -   size (4 bytes) - unsigned number of bytes to reserve
+
+      ## Output
+
+      -   memory (varying, of given size) - a zero-filled block of memory of the requested size
+      */
+      reserve,
       /**
       # Pop
 
@@ -301,7 +331,9 @@ namespace perseus
       /**
       # Absolute store onto current coroutine's stack
 
-      Pops bytes from the top of the stack and writes them at the given location into the current stack
+      Reads bytes from the top of the stack and writes them at the given location into the current stack.
+
+      The read data is not removed from the stack; if that is desired, issue a discard as well.
 
       ## Parameters
 
@@ -310,7 +342,6 @@ namespace perseus
       ## Input
 
       -   address (4 bytes) - unsigned address on this coroutine's stack to write to (overwriting what is there)
-      -   bytes (varying, as given in size) - data to write into stack
 
       @throws stack_segmentation_fault if attempting write above top of stack
       */
@@ -340,7 +371,9 @@ namespace perseus
       /**
       # Absolute store onto arbitrary coroutine's stack
 
-      Pops bytes from the top of the stack and writes them at the given location into the stack of the given coroutine
+      Reads bytes from the top of the stack and writes them at the given location into the stack of the given coroutine
+
+      The read data is not removed from the stack; if that is desired, issue a pop as well.
 
       ## Parameters
 
@@ -350,7 +383,7 @@ namespace perseus
 
       -   address (4 bytes) - unsigned address on given coroutine's stack to write to (overwriting what is there)
       -   coroutine_identifier (4 bytes) - coroutine on whose stack to write
-      -   bytes (varying, as given in size) - data to write into stack
+      -   (data (varying) - written to location, but kept on stack)
 
       @throws stack_segmentation_fault if attempting write above top of stack
       @see invalid_coroutine_identifer thrown if an incorrect coroutine identifier is supplied
@@ -376,20 +409,28 @@ namespace perseus
       /**
       # Relative store onto current coroutine's stack
 
-      Pops bytes from the top of the stack and writes them at the given offset into the current stack.
+      Reads bytes from the top of the stack and writes them at the given offset into the current stack.
+
+      The read data is not removed from the stack; if that is desired, issue a discard as well.
 
       ## Parameters
 
       -   size (4 bytes) - unsigned number of bytes to pop/write
       -   offset (4 bytes) - signed offset into current coroutine's stack before popping the bytes (must be negative)
 
-      ## Input
-
-      -   bytes (varying, as given in size) - data to write into stack
-
       @throws stack_segmentation_fault if attempting write above top of stack
       */
       relative_store_stack,
+      /**
+      # Push Stack Size
+
+      Retrieve the current size of this coroutine's stack, i.e. the address on top.
+
+      ## Output
+
+      -   size (4 bytes) - unsigned size of current coroutine's stack
+      */
+      push_stack_size,
 
       //    Jumps/Calls
 
