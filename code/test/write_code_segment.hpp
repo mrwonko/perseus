@@ -29,6 +29,11 @@ struct label_reference
   const std::string name;
 };
 
+struct label_reference_offset : label_reference
+{
+  using label_reference::label_reference;
+};
+
 namespace detail
 {
 
@@ -70,6 +75,19 @@ namespace detail
     add_code( out_code, labels, tail... );
   }
 
+  /// Specialization: retrieving label offset
+  template< typename... Tail >
+  void add_code( perseus::detail::code_segment& out_code, const label_map& labels, const label_reference_offset& reference, Tail... tail )
+  {
+    auto pos = labels.find( reference.name );
+    if( pos == labels.end() )
+    {
+      throw std::logic_error( "invalid label reference" );
+    }
+    out_code.push< std::uint32_t >( pos->second - out_code.size() - sizeof( std::uint32_t ) );
+    add_code( out_code, labels, tail... );
+  }
+
   /// Specialization: label (ignored)
   template< typename... Tail >
   void add_code( perseus::detail::code_segment& out_code, const label_map& labels, const label&, Tail... tail )
@@ -105,6 +123,13 @@ namespace detail
   /// Specialization: retrieving label address (ignored)
   template< typename... Tail >
   static void calculate_labels( label_map& out_labels, const std::uint32_t address, const label_reference& reference, Tail... tail )
+  {
+    calculate_labels( out_labels, address + sizeof( std::uint32_t ), tail... );
+  }
+
+  /// Specialization: retrieving label offset (ignored)
+  template< typename... Tail >
+  static void calculate_labels( label_map& out_labels, const std::uint32_t address, const label_reference_offset& reference, Tail... tail )
   {
     calculate_labels( out_labels, address + sizeof( std::uint32_t ), tail... );
   }
