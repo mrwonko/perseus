@@ -34,16 +34,18 @@ namespace perseus
     @brief Push an arbitrary value onto the stack
     @tparam T type of value to push back. Should probably be a POD type since it's copied bitwise.
     @param value what to push onto the top of the stack
+    @returns Reference to this stack, allowing for chaining.
     @throws std::bad_alloc if the system is out of memory
     */
     template< typename T >
-    void push( const T& value )
+    stack& push( const T& value )
     {
       static_assert( std::is_trivially_copyable< T >::value, "stack data must be trivially copyable!" );
       // this code is copied from code_segment::push() - it could be factored out, but that seems like overkill to me
       const_pointer begin = reinterpret_cast< const_pointer >( &value );
       const_pointer end = begin + sizeof( T );
       insert( std::vector< char >::end(), begin, end );
+      return *this;
     }
 
     /**
@@ -68,9 +70,10 @@ namespace perseus
     /**
     @brief Discard a given number of bytes from the top of the stack
     @param bytes number of bytes to discard
+    @returns a reference to this stack, to allow for chaining.
     @throws stack_underflow if the stack contains less than the given number of bytes
     */
-    void discard( size_type bytes );
+    stack& discard( size_type bytes );
 
     /**
     @brief Create a new stack by popping a given size off this one.
@@ -88,9 +91,10 @@ namespace perseus
     /**
     @brief Push the contents of another stack onto this one
     @param other stack to push onto this one (in order)
+    @returns a reference to this stack, to allow for chaining.
     @throws std::bad_alloc if the system is out of memory
     */
-    void append( const stack& other );
+    stack& append( const stack& other );
 
   private:
     /**
