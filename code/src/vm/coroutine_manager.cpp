@@ -42,6 +42,7 @@ namespace perseus
       {
         throw deleting_live_coroutine( "Trying to delete live coroutine!" );
       }
+      _free_indices.push_back( iter->second.index );
       _coroutines.erase( iter );
     }
 
@@ -70,7 +71,7 @@ namespace perseus
       // this is only called by opcode::exit and its variants, so we don't check if any coroutines are still live.
       _coroutines.clear();
       _free_indices.clear();
-      _next_index = 0;
+      _next_index = FIRST_INDEX;
     }
   }
 }

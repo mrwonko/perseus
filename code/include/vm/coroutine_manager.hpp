@@ -77,9 +77,12 @@ namespace perseus
       void clear();
 
     private:
+      /// Index of the first coroutine; 0 is reserved for heap memory
+      static constexpr coroutine::identifier FIRST_INDEX = 1;
+
       std::map< coroutine::identifier, coroutine > _coroutines;
       std::vector< coroutine::identifier > _free_indices;
-      coroutine::identifier _next_index = 0;
+      coroutine::identifier _next_index = FIRST_INDEX;
     };
   }
 }
