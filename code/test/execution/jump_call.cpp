@@ -168,8 +168,11 @@ BOOST_AUTO_TEST_CASE( call_and_return_factorial )
     // stack: [-12: return_value = result] [-8: n] [-4: return_address]
     opcode::return_, std::uint32_t( 4 ) // return, popping 4 bytes of parameters
     );
-  perseus::stack result = processor( std::move( code ) ).execute( 0, std::move( perseus::stack().push< std::int32_t >( 5 ) ) );
+  perseus::stack result = processor( perseus::detail::code_segment( code ) ).execute( 0, std::move( perseus::stack().push< std::int32_t >( 5 ) ) );
   BOOST_CHECK_EQUAL( result.pop< std::uint32_t >(), 120 );
+  BOOST_CHECK_EQUAL( result.size(), 0 );
+  result = processor( std::move( code ) ).execute( 0, std::move( perseus::stack().push< std::int32_t >( 0 ) ) );
+  BOOST_CHECK_EQUAL( result.pop< std::uint32_t >(), 1 );
   BOOST_CHECK_EQUAL( result.size(), 0 );
 }
 
