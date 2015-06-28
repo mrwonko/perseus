@@ -2,32 +2,31 @@
 
 # 2015-04-08 - 2015-04-22
 
-Define syntax and opcodes/bytecode
+Define opcodes/bytecode/goals
 
 _Especially think about modules and types, those seem complicated_
 
 # 2015-04-22 - 2015-05-06
 
-VM (with hand written bytecode)
+VM basics (with hand written bytecode)
 
-_Writing the VM first allows us to execute code early, which is exciting, but may lead to writing something unusable? Might put this off until we can generate the bytecode?_
+# 2015-05-07 - 2015-06-21
 
-# 2015-05-06 - 2015-05-20
+(Unrelated Uni work)
 
-Lexer, Parser
+# 2015-06-22 - 2015-06-28
 
-# 2015-05-20 - 2015-06-03
+Implementing Opcodes
+
+# 2015-06-29 - 2015-07-05
+
+* Syntax
+* Lexer, Parser
+
+# 2015-07-06 - 2015-07-12
 
 Bytecode generator
 
-# 2015-06-03 - 2015-06-17
-
-Iteration, Buffer
-
-# 2015-06-17 - 2015-07-01
-
-Thesis
-
-# 2015-07-01 - 2015-07-15
+# 2015-07-13 - 2015-08-13
 
 Thesis
