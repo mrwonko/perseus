@@ -1,0 +1,34 @@
+class ScriptCommand {}
+
+class SCWait extends ScriptCommand
+{
+    time : Milliseconds
+}
+
+
+class Script
+{
+    coroutine : Coroutine< ScriptCommand, () >
+}
+
+// async instead of yielding? 
+persistent yielding function Script:wait( time : Milliseconds ) -> ()
+{
+    coroutine.yield( SCWait{ time : time } )
+}
+
+
+persistent mutable function run( script : Script ) -> ()
+{
+    script.wait( 1000 )
+}
+
+
+
+persistent impure coroutine< ScriptCommand, () > runScriptFunction( scriptFunction : persistent mutable function( Script ) -> () )
+{
+    script : Script = { coroutine : this }; // is `this` a good solution?
+    scriptFunction( script )
+}
+
+function 

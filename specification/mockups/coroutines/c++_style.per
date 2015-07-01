@@ -1,0 +1,41 @@
+/*
+Is `yielding` still useful here? Is it just about persistence at this point?
+A coroutine must return what it yields, right?
+*/
+yielding function myCoroutine( yield : yielding function( i32 ) -> bool, initial : i32 ) -> i32
+{
+    mutable current : i32 = initial;
+    loop
+    {
+        continue : bool = yield( current ); // only yielding functions may call yielding functions
+        if( !continue )
+            return current + 1;
+        current += 1;
+    }
+}
+
+impure function main() -> ()
+{
+    // This won't do, the first yielded value is lost? also ugly?
+    co : Coroutine< bool, i32 > = Coroutine< bool, i32, i32 >( myCoroutine, 0 );
+    
+    // or maybe this is a nicer syntax? although launch< bool, i32 > would have to be deduced. also, the FIRST YIELDED VALUE IS LOST!
+    co : Coroutine< bool, i32 > = launch myCoroutine( 0 );
+    
+    // maybe it has to be like this? but then people could erroneously skip launching and go for resume
+    // but surely I want differing launch and resume parameters!
+    co : Coroutine< bool, i32, i32 > = Coroutine< bool, i32, i32 >( myCoroutine );
+    print( co.launch( 0 ) ); // 0
+    
+    print( co.resume( true ) ); // 1
+    assert( !co.done );
+    print( co.resume( false ) ); // 2
+    assert( co.done )
+    
+    // Actually, I may want varying return value types and yields as well, so really a resume should return either
+    case co.resume( true )
+    {
+        yield { i : i32 } -> print( i )
+        return { i : i32 } -> ()
+    }
+}
