@@ -12,10 +12,10 @@ set( Boost_USE_STATIC_LIBS ON )
 find_package( Boost COMPONENTS unit_test_framework REQUIRED )
 
 set( EXTERNAL_FILES
-    "include/utf8.h"
-    "include/utf8/checked.h"
-    "include/utf8/unchecked.h"
-    "include/utf8/core.h"
+    "lib/utf8.h"
+    "lib/utf8/checked.h"
+    "lib/utf8/unchecked.h"
+    "lib/utf8/core.h"
     )
 
 set( SHARED_FILES
@@ -60,11 +60,13 @@ source_group( "include" REGULAR_EXPRESSION "include/.*" )
 source_group( "include\\vm" REGULAR_EXPRESSION "include/vm/.*" )
 source_group( "include\\shared" REGULAR_EXPRESSION "include/shared/.*" )
 source_group( "include\\compiler" REGULAR_EXPRESSION "include/compiler/.*" )
-source_group( "include\\utf8" REGULAR_EXPRESSION "include/utf8/.*" )
 
 source_group( "test" REGULAR_EXPRESSION "test/.*" )
 source_group( "test\\execution" REGULAR_EXPRESSION "test/execution/.*" )
 source_group( "test\\compiler" REGULAR_EXPRESSION "test/compiler/.*" )
+
+source_group( "lib" REGULAR_EXPRESSION "lib/.*" )
+source_group( "lib\\utf8" REGULAR_EXPRESSION "lib/utf8/.*" )
 
 # If doxygen is available, add a target for it
 find_package( Doxygen )
@@ -75,7 +77,7 @@ else( DOXYGEN_FOUND )
     message( "Could not find Doxygen, no doc target created." )
 endif( DOXYGEN_FOUND )
 
-include_directories( "include" "${Boost_INCLUDE_DIRS}" )
+include_directories( "include" "lib" "${Boost_INCLUDE_DIRS}" )
 link_directories(${Boost_LIBRARY_DIRS})
 
 add_library( perseus
