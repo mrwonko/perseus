@@ -11,13 +11,6 @@ set( Boost_USE_STATIC_LIBS ON )
 # add_definitions( "-DBOOST_TEST_DYN_LINK" )
 find_package( Boost COMPONENTS unit_test_framework REQUIRED )
 
-set( EXTERNAL_FILES
-    "lib/utf8.h"
-    "lib/utf8/checked.h"
-    "lib/utf8/unchecked.h"
-    "lib/utf8/core.h"
-    )
-
 set( SHARED_FILES
     "src/shared/opcodes.cpp" "include/shared/opcodes.hpp"
     "include/shared/documentation.hpp"
@@ -66,9 +59,6 @@ source_group( "test" REGULAR_EXPRESSION "test/.*" )
 source_group( "test\\execution" REGULAR_EXPRESSION "test/execution/.*" )
 source_group( "test\\compiler" REGULAR_EXPRESSION "test/compiler/.*" )
 
-source_group( "lib" REGULAR_EXPRESSION "lib/.*" )
-source_group( "lib\\utf8" REGULAR_EXPRESSION "lib/utf8/.*" )
-
 # If doxygen is available, add a target for it
 find_package( Doxygen )
 if( DOXYGEN_FOUND )
@@ -85,7 +75,6 @@ add_library( perseus
     ${VM_FILES}
 	${COMPILER_FILES}
     ${SHARED_FILES}
-    ${EXTERNAL_FILES}
 )
 
 add_executable( testsuite
