@@ -24,6 +24,7 @@ set( SHARED_FILES
 )
 
 set( COMPILER_FILES
+    "include/compiler/iterators.hpp"
     "src/compiler/compile.cpp" "include/compiler/compile.hpp"
 )
 
@@ -48,7 +49,7 @@ set( TEST_FILES
     "test/write_code_segment.hpp"
     "test/instruction_pointer.cpp"
     "test/stack.cpp"
-    "test/compiler/temp.cpp"
+    "test/compiler/iterators.cpp"
 )
 
 source_group( "src" REGULAR_EXPRESSION "src/.*" )
