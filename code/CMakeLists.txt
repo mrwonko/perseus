@@ -23,6 +23,10 @@ set( SHARED_FILES
     "include/shared/documentation.hpp"
 )
 
+set( COMPILER_FILES
+    "src/compiler/compile.cpp" "include/compiler/compile.hpp"
+)
+
 set( VM_FILES
     "include/vm/exceptions.hpp"
     "src/vm/processor.cpp" "include/vm/processor.hpp"
@@ -44,19 +48,23 @@ set( TEST_FILES
     "test/write_code_segment.hpp"
     "test/instruction_pointer.cpp"
     "test/stack.cpp"
+    "test/compiler/temp.cpp"
 )
 
 source_group( "src" REGULAR_EXPRESSION "src/.*" )
 source_group( "src\\vm" REGULAR_EXPRESSION "src/vm/.*" )
 source_group( "src\\shared" REGULAR_EXPRESSION "src/shared/.*" )
+source_group( "src\\compiler" REGULAR_EXPRESSION "src/compiler/.*" )
 
 source_group( "include" REGULAR_EXPRESSION "include/.*" )
 source_group( "include\\vm" REGULAR_EXPRESSION "include/vm/.*" )
 source_group( "include\\shared" REGULAR_EXPRESSION "include/shared/.*" )
+source_group( "include\\compiler" REGULAR_EXPRESSION "include/compiler/.*" )
 source_group( "include\\utf8" REGULAR_EXPRESSION "include/utf8/.*" )
 
 source_group( "test" REGULAR_EXPRESSION "test/.*" )
 source_group( "test\\execution" REGULAR_EXPRESSION "test/execution/.*" )
+source_group( "test\\compiler" REGULAR_EXPRESSION "test/compiler/.*" )
 
 # If doxygen is available, add a target for it
 find_package( Doxygen )
@@ -72,6 +80,7 @@ link_directories(${Boost_LIBRARY_DIRS})
 
 add_library( perseus
     ${VM_FILES}
+	${COMPILER_FILES}
     ${SHARED_FILES}
     ${EXTERNAL_FILES}
 )
