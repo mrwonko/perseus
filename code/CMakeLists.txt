@@ -11,6 +11,13 @@ set( Boost_USE_STATIC_LIBS ON )
 # add_definitions( "-DBOOST_TEST_DYN_LINK" )
 find_package( Boost COMPONENTS unit_test_framework REQUIRED )
 
+set( EXTERNAL_FILES
+    "include/utf8.h"
+    "include/utf8/checked.h"
+    "include/utf8/unchecked.h"
+    "include/utf8/core.h"
+    )
+
 set( SHARED_FILES
     "src/shared/opcodes.cpp" "include/shared/opcodes.hpp"
     "include/shared/documentation.hpp"
@@ -46,6 +53,7 @@ source_group( "src\\shared" REGULAR_EXPRESSION "src/shared/.*" )
 source_group( "include" REGULAR_EXPRESSION "include/.*" )
 source_group( "include\\vm" REGULAR_EXPRESSION "include/vm/.*" )
 source_group( "include\\shared" REGULAR_EXPRESSION "include/shared/.*" )
+source_group( "include\\utf8" REGULAR_EXPRESSION "include/utf8/.*" )
 
 source_group( "test" REGULAR_EXPRESSION "test/.*" )
 source_group( "test\\execution" REGULAR_EXPRESSION "test/execution/.*" )
@@ -65,6 +73,7 @@ link_directories(${Boost_LIBRARY_DIRS})
 add_library( perseus
     ${VM_FILES}
     ${SHARED_FILES}
+    ${EXTERNAL_FILES}
 )
 
 add_executable( testsuite
