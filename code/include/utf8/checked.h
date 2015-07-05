@@ -288,7 +288,7 @@ namespace utf8
       }
       bool operator == (const iterator& rhs) const
       {
-          if (range_start != rhs.range_start || range_end != rhs.range_end)
+          if (!(range_start == rhs.range_start) || !(range_end == rhs.range_end))
               throw std::logic_error("Comparing utf-8 iterators defined with different ranges");
           return (it == rhs.it);
       }
