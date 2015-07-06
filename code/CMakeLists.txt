@@ -19,6 +19,8 @@ set( SHARED_FILES
 set( COMPILER_FILES
     "src/compiler/token_ids.cpp" "include/compiler/token_ids.hpp"
     "include/compiler/token_definitions.hpp"
+    "include/compiler/grammar.hpp"
+    "include/compiler/ast.hpp"
     "include/compiler/iterators.hpp"
     "src/compiler/compile.cpp" "include/compiler/compile.hpp"
 )
@@ -46,6 +48,7 @@ set( TEST_FILES
     "test/stack.cpp"
     "test/compiler/iterators.cpp"
     "test/compiler/lexer.cpp"
+    "test/compiler/parser.cpp"
 )
 
 source_group( "src" REGULAR_EXPRESSION "src/.*" )
