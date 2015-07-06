@@ -3,9 +3,7 @@
 
 #include <boost/test/unit_test.hpp>
 
-#include <boost/spirit/home/lex/lexer/lexertl/token.hpp>
-#include <boost/spirit/home/lex/lexer/lexertl/lexer.hpp>
-#include <boost/spirit/home/lex/lexer_lexertl.hpp>
+#include <boost/spirit/home/lex/tokenize_and_parse.hpp>
 
 #include <sstream>
 #include <vector>
@@ -21,26 +19,16 @@ BOOST_AUTO_TEST_CASE( tokenize )
 and a long comment
 */)" );
 
-  typedef perseus::detail::enhanced_istream_iterator iterator;
-  typedef boost::spirit::lex::lexertl::token<
-    iterator,
-    boost::mpl::vector<>, // don't do automatic attribute conversion, just supply the plain iterator ranges
-    boost::mpl::false_, // not interested in lexer states
-    perseus::detail::token_id::token_id // token id type
-  > token;
-  typedef boost::spirit::lex::lexertl::lexer< token > lexer;
-  typedef perseus::detail::token_definitions< lexer > token_definitions;
-
-  iterator begin, end;
+  perseus::detail::enhanced_istream_iterator begin, end;
   std::tie( begin, end ) = perseus::detail::enhanced_iterators( source );
 
-  std::vector< token > result;
+  std::vector< perseus::detail::token > result;
 
   bool success = boost::spirit::lex::tokenize(
     begin,
     end,
-    token_definitions{},
-    [ &result ]( const token& t )
+    perseus::detail::token_definitions{},
+    [ &result ]( const perseus::detail::token& t )
   {
     result.push_back( t );
     return true; // continue tokenizing

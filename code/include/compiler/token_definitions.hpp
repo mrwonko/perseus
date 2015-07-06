@@ -1,22 +1,29 @@
 #pragma once
 
 #include <boost/spirit/home/lex/lexer/lexer.hpp>
-
-#include <cstdint>
-#include <string>
+#include <boost/spirit/home/lex/lexer/lexertl/token.hpp>
+#include <boost/spirit/home/lex/lexer/lexertl/lexer.hpp>
 
 #include "token_ids.hpp"
+#include "iterators.hpp"
 
 namespace perseus
 {
   namespace detail
   {
+    typedef boost::spirit::lex::lexertl::token<
+      enhanced_istream_iterator,
+      boost::mpl::vector<>, // don't do automatic attribute conversion, just supply the plain iterator ranges
+      boost::mpl::false_, // not interested in lexer states
+      perseus::detail::token_id::token_id // token id type
+    > token;
+    typedef boost::spirit::lex::lexertl::lexer< token > lexer;
+
     /**
     @brief Definition of the various tokens
 
     The first phase of perseus compilation is tokenization, or lexical analysis. The char stream is split into tokens according to regular expressions; those tokens are then parsed according to the grammar.
     */
-    template< typename lexer >
     class token_definitions : public boost::spirit::lex::lexer< lexer >
     {
     public:
