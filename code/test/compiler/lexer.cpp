@@ -22,9 +22,9 @@ BOOST_AUTO_TEST_CASE( tokenize )
   typedef perseus::detail::enhanced_istream_iterator iterator;
   typedef boost::spirit::lex::lexertl::token<
     iterator,
-    boost::mpl::vector< std::string >, // all the attribute types used (returned) by the various token definitions
+    boost::mpl::vector<>, // don't do automatic attribute conversion, just supply the plain iterator ranges
     boost::mpl::false_, // not interested in lexer states
-    perseus::detail::token_id::token_id // token type
+    perseus::detail::token_id::token_id // token id type
   > token;
   typedef boost::spirit::lex::lexertl::lexer< token > lexer;
   typedef perseus::detail::tokens< lexer > tokens;
@@ -53,10 +53,8 @@ BOOST_AUTO_TEST_CASE( tokenize )
   BOOST_CHECK_EQUAL( result.at( 0 ).id(), perseus::detail::token_id::comment );
   BOOST_CHECK_EQUAL( result.at( 1 ).id(), perseus::detail::token_id::whitespace );
   BOOST_CHECK_EQUAL( result.at( 2 ).id(), perseus::detail::token_id::identifier );
-  // this works, but I don't think I should test for it - spirit::lex initially assigns iterator_range to the value
-  //BOOST_CHECK_EQUAL( boost::get< boost::iterator_range< iterator > >( result.at( 2 ).value() ).begin().get_position(), perseus::detail::file_position( 2, 2 ) );
-  // this does not work, the on-demand conversion of the iterator_range to the target value does not seem to happen until spirit::qi parses it
-  //BOOST_CHECK_EQUAL( boost::get< std::string >( result.at( 2 ).value() ), "some" );
+  BOOST_CHECK_EQUAL( result.at( 2 ).value().begin().get_position(), perseus::detail::file_position( 2, 2 ) );
+  BOOST_CHECK_EQUAL( std::string( result.at( 2 ).value().begin(), result.at( 2 ).value().end() ), "some" );
   BOOST_CHECK_EQUAL( result.at( 3 ).id(), perseus::detail::token_id::whitespace );
   BOOST_CHECK_EQUAL( result.at( 4 ).id(), perseus::detail::token_id::identifier );
 }

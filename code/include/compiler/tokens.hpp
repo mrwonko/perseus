@@ -23,14 +23,12 @@ namespace perseus
       /// 
       tokens()
       {
-        self = identifier | whitespace | comment;
+        self.add
+          ( R"([a-zA-Z_][a-zA-Z_0-9]*)", token_id::identifier )
+          ( R"([ \t\n]+)", token_id::whitespace )
+          ( R"(\/\/[^\n]*)", token_id::comment )
+          ;
       }
-
-      template< typename Attribute = boost::spirit::unused_type > using token_def = boost::spirit::lex::token_def< Attribute, char, token_id::token_id >;
-
-      token_def< std::string > identifier{ R"([a-zA-Z_][a-zA-Z_0-9]*)", token_id::identifier };
-      token_def<> whitespace{ R"([ \t\n]+)", token_id::whitespace };
-      token_def<> comment{ R"(\/\/[^\n]*)", token_id::comment };
     };
   }
 }
