@@ -14,6 +14,8 @@ namespace perseus
           return os << "whitespace";
         case comment:
           return os << "comment";
+        case string:
+          return os << "string";
         case identifier:
           return os << "identifier";
         case any:

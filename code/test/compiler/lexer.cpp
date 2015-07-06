@@ -1,5 +1,5 @@
 #include "compiler/iterators.hpp"
-#include "compiler/tokens.hpp"
+#include "compiler/token_definitions.hpp"
 
 #include <boost/test/unit_test.hpp>
 
@@ -17,7 +17,9 @@ BOOST_AUTO_TEST_SUITE( lexer )
 BOOST_AUTO_TEST_CASE( tokenize )
 {
   std::stringstream source( u8R"(// a cömment
-	some identifiers)" );
+	some identifiers/*
+and a long comment
+*/)" );
 
   typedef perseus::detail::enhanced_istream_iterator iterator;
   typedef boost::spirit::lex::lexertl::token<
@@ -27,9 +29,7 @@ BOOST_AUTO_TEST_CASE( tokenize )
     perseus::detail::token_id::token_id // token id type
   > token;
   typedef boost::spirit::lex::lexertl::lexer< token > lexer;
-  typedef perseus::detail::tokens< lexer > tokens;
-
-  tokens t;
+  typedef perseus::detail::token_definitions< lexer > token_definitions;
 
   iterator begin, end;
   std::tie( begin, end ) = perseus::detail::enhanced_iterators( source );
@@ -39,7 +39,7 @@ BOOST_AUTO_TEST_CASE( tokenize )
   bool success = boost::spirit::lex::tokenize(
     begin,
     end,
-    t,
+    token_definitions{},
     [ &result ]( const token& t )
   {
     result.push_back( t );
@@ -49,7 +49,7 @@ BOOST_AUTO_TEST_CASE( tokenize )
 
   BOOST_CHECK( success );
 
-  BOOST_CHECK_EQUAL( result.size(), 5 );
+  BOOST_CHECK_EQUAL( result.size(), 6 );
   BOOST_CHECK_EQUAL( result.at( 0 ).id(), perseus::detail::token_id::comment );
   BOOST_CHECK_EQUAL( result.at( 1 ).id(), perseus::detail::token_id::whitespace );
   BOOST_CHECK_EQUAL( result.at( 2 ).id(), perseus::detail::token_id::identifier );
@@ -57,6 +57,7 @@ BOOST_AUTO_TEST_CASE( tokenize )
   BOOST_CHECK_EQUAL( std::string( result.at( 2 ).value().begin(), result.at( 2 ).value().end() ), "some" );
   BOOST_CHECK_EQUAL( result.at( 3 ).id(), perseus::detail::token_id::whitespace );
   BOOST_CHECK_EQUAL( result.at( 4 ).id(), perseus::detail::token_id::identifier );
+  BOOST_CHECK_EQUAL( result.at( 5 ).id(), perseus::detail::token_id::comment );
 }
 
 BOOST_AUTO_TEST_SUITE_END()
