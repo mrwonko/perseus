@@ -5,7 +5,7 @@
 
 #include <sstream>
 
-static std::u32string parse( const char* string_literal )
+static std::u32string parse( const std::string& string_literal )
 {
   std::stringstream source( string_literal );
 
@@ -23,9 +23,27 @@ using namespace std::string_literals;
 
 BOOST_AUTO_TEST_CASE( empty )
 {
-  std::u32string parsed = parse( u8R"("")" );
+  BOOST_CHECK_EQUAL( parse( u8R"("")"s ), U""s );
+}
 
-  BOOST_CHECK_EQUAL( parsed, U""s );
+BOOST_AUTO_TEST_CASE( null )
+{
+  BOOST_CHECK_EQUAL( parse( u8"\"\0\""s ), U"\0"s );
+}
+
+BOOST_AUTO_TEST_CASE( two_bytes )
+{
+  BOOST_CHECK_EQUAL( parse( u8"\"\u0080\""s ), U"\u0080"s );
+}
+
+BOOST_AUTO_TEST_CASE( three_bytes )
+{
+  BOOST_CHECK_EQUAL( parse( u8"\"\u0800\""s ), U"\u0800"s );
+}
+
+BOOST_AUTO_TEST_CASE( four_bytes )
+{
+  BOOST_CHECK_EQUAL( parse( u8"\"\U00010000\""s ), U"\U00010000"s );
 }
 
 BOOST_AUTO_TEST_SUITE_END()
