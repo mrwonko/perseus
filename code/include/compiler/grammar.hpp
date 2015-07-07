@@ -3,18 +3,24 @@
 #include <boost/spirit/home/qi.hpp>
 #include <boost/spirit/home/lex.hpp>
 
+#include <string>
+
 #include "iterators.hpp"
 #include "ast.hpp"
 #include "token_ids.hpp"
 #include "token_definitions.hpp"
+#include "conversions.hpp"
+
+// DELETEME
+#include <iostream>
 
 namespace perseus
 {
   namespace detail
   {
-    using iterator = token_definitions::iterator_type;
+    using namespace std::string_literals; // gain access to operator ""s
 
-    class skip_grammar : public boost::spirit::qi::grammar< iterator >
+    class skip_grammar : public boost::spirit::qi::grammar< token_iterator >
     {
     public:
       skip_grammar()
@@ -23,31 +29,31 @@ namespace perseus
         skip = whitespace | comment;
       }
     private:
-      using rule = boost::spirit::qi::rule< iterator >;
+      using rule = boost::spirit::qi::rule< token_iterator >;
 
       // terminals
-      rule whitespace = { boost::spirit::qi::token( token_id::whitespace ), "whitespace" };
-      rule comment = { boost::spirit::qi::token( token_id::whitespace ), "comment" };
+      rule whitespace = { boost::spirit::qi::token( token_id::whitespace ), "whitespace"s };
+      rule comment = { boost::spirit::qi::token( token_id::whitespace ), "comment"s };
       // start symbol
       start_type skip;
     };
 
-    class grammar : public boost::spirit::qi::grammar< iterator, /* ast::file, */ skip_grammar >
+
+    class grammar : public boost::spirit::qi::grammar< token_iterator, /* ast::file, */ skip_grammar >
     {
     public:
       grammar()
-        : base_type( file, "perseus script" )
+        : base_type( file, "perseus script"s )
       {
-        file %= *( string | identifier );
+        file %= -byte_order_mark >> boost::spirit::qi::omit[ *( string | identifier ) ];
       }
     private:
-      template< typename attribute > using rule = boost::spirit::qi::rule< iterator, attribute, skip_grammar >;
+      template< typename attribute > using rule = boost::spirit::qi::rule< token_iterator, attribute, skip_grammar >;
 
       //    terminals
-#define PERSEUS_DETAIL_DEFINE_TERMINAL( name ) rule< boost::spirit::unused_type > name = { boost::spirit::qi::token( token_id::name ), #name }
-      PERSEUS_DETAIL_DEFINE_TERMINAL( string );
-      PERSEUS_DETAIL_DEFINE_TERMINAL( identifier );
-#undef PERSEUS_DETAIL_DEFINE_TERMINAL
+      rule< std::string() > identifier = { boost::spirit::qi::token( token_id::identifier ), "identifier"s };
+      rule< parsed_string_literal() > string = rule< parsed_string_literal() >( boost::spirit::qi::token( token_id::string ), "string"s ); // note that this must explicitly be std::string or it would be interpretted as an Expression (rule)
+      rule< boost::spirit::unused_type() > byte_order_mark = rule< boost::spirit::unused_type() >( boost::spirit::qi::token( token_id::byte_order_mark ), "UTF-8 byte order mark"s );
 
       //    non-terminals; defined in constructor since they reference each other
       start_type file;//{ std::string( "file" ) };

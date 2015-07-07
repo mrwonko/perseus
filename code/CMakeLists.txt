@@ -20,6 +20,8 @@ set( COMPILER_FILES
     "src/compiler/token_ids.cpp" "include/compiler/token_ids.hpp"
     "include/compiler/token_definitions.hpp"
     "include/compiler/grammar.hpp"
+    "src/compiler/conversions.cpp" "include/compiler/conversions.hpp"
+    "include/compiler/exceptions.hpp"
     "include/compiler/ast.hpp"
     "include/compiler/iterators.hpp"
     "src/compiler/compile.cpp" "include/compiler/compile.hpp"
@@ -49,6 +51,8 @@ set( TEST_FILES
     "test/compiler/iterators.cpp"
     "test/compiler/lexer.cpp"
     "test/compiler/parser.cpp"
+    "test/compiler/literals.cpp"
+    "test/u32string_ostream.hpp"
 )
 
 source_group( "src" REGULAR_EXPRESSION "src/.*" )

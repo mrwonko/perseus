@@ -34,10 +34,12 @@ namespace perseus
           ( R"(\xEF\xBB\xBF)", token_id::byte_order_mark )
           ( R"(\s+)", token_id::whitespace )
           ( R"(\/\/[^\n]*|\/\*([^\*]|\*[^\/])*\*\/)", token_id::comment )
-          ( R"(\"([^\n\"\\]|\\[^\n])*\")", token_id::string )
+          ( R"(\"([^\n\"\\]|\\[\"nrt\\])*\")", token_id::string )
           ( R"(\w+)", token_id::identifier ) // alphanumeric and underscore
           ;
       }
     };
+
+    typedef token_definitions::iterator_type token_iterator;
   }
 }
