@@ -31,6 +31,7 @@ namespace perseus
       token_definitions()
       {
         self.add
+          ( R"(\xEF\xBB\xBF)", token_id::byte_order_mark )
           ( R"(\s+)", token_id::whitespace )
           ( R"(\/\/[^\n]*|\/\*([^\*]|\*[^\/])*\*\/)", token_id::comment )
           ( R"(\"([^\n\"\\]|\\[^\n])*\")", token_id::string )

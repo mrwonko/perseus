@@ -16,6 +16,7 @@ namespace perseus
         comment,
         string,
         identifier,
+        byte_order_mark,
         any
       };
 

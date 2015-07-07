@@ -20,6 +20,8 @@ namespace perseus
           return os << "identifier";
         case any:
           return os << "any";
+        case byte_order_mark:
+          return os << "byte_order_mark";
         default:
           return os << "token_id(" << static_cast< unsigned int >( token ) << ')';
         }
