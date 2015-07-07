@@ -1,13 +1,11 @@
 #pragma once
 
-// std::istreambuf_iterator
+// std::istreambuf_iterator, std::iterator, iterator tags
 #include <iterator>
 // tuple
 #include <tuple>
 // std::ostream
 #include <ostream>
-// std::iterator, iterator tags
-#include <iterator>
 // assertions
 #include <cassert>
 
