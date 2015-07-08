@@ -4,6 +4,7 @@
 #include <boost/spirit/home/lex.hpp>
 
 #include <string>
+#include <vector>
 
 #include "iterators.hpp"
 #include "ast.hpp"
@@ -39,13 +40,14 @@ namespace perseus
     };
 
 
-    class grammar : public boost::spirit::qi::grammar< token_iterator, std::u32string(), skip_grammar >
+    class grammar : public boost::spirit::qi::grammar< token_iterator, std::vector< std::int32_t >(), skip_grammar >
     {
     public:
       grammar()
         : base_type( file, "perseus script"s )
       {
-        file %= ( -byte_order_mark ) >> string;
+        file %= ( -byte_order_mark ) >> *( decimal_integer | hexadecimal_integer | binary_integer );
+        boost::spirit::qi::int_;
       }
     private:
       template< typename attribute = boost::spirit::unused_type() > using rule = boost::spirit::qi::rule< token_iterator, attribute, skip_grammar >;
@@ -54,6 +56,9 @@ namespace perseus
 
       rule<> byte_order_mark = { boost::spirit::qi::token( token_id::byte_order_mark ), "UTF-8 byte order mark"s };
       rule< parsed_string_literal() > string = { boost::spirit::qi::token( token_id::string ), "string"s };
+      rule< std::int32_t() > decimal_integer = { decimal_integer_literal_parser{}, "decimal integer"s };
+      rule< std::int32_t() > hexadecimal_integer = { hexadecimal_integer_literal_parser{}, "hexadecimal integer"s };
+      rule< std::int32_t() > binary_integer = { binary_integer_literal_parser{}, "binary integer"s };
 
       //rule< ast::identifier() > identifier = { boost::spirit::qi::raw[ boost::spirit::qi::token( token_id::identifier ) ], "identifier"s };
       //rule< ast::operator_identifier() > operator_identifier = { boost::spirit::qi::token( token_id::operator_identifier ), "operator identifier"s };

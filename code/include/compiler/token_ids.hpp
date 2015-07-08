@@ -18,15 +18,20 @@ namespace perseus
 
         // constants
         string,
+        decimal_integer,
+        hexadecimal_integer,
+        binary_integer,
 
         identifier,
         operator_identifier,
 
-        // keywords
+        // keywords; using a _ suffix for conistency, even for those that are not c++ keywords
         if_,
         else_,
         while_,
         return_,
+        function_,
+        let_,
 
         colon,
         semicolon,
@@ -34,6 +39,7 @@ namespace perseus
         comma,
         equals,
         backtick, // `
+        arrow_right, // ->
 
         // ()
         paren_open,

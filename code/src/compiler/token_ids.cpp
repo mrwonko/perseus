@@ -18,7 +18,13 @@ namespace perseus
           return os << "byte_order_mark";
 
         case string:
-          return os << "string";
+          return os << "string literal";
+        case decimal_integer:
+          return os << "decimal integer literal";
+        case hexadecimal_integer:
+          return os << "hexadecimal integer literal";
+        case binary_integer:
+          return os << "binary integer literal";
 
         case identifier:
           return os << "identifier";
@@ -26,39 +32,43 @@ namespace perseus
           return os << "operator identifier";
 
         case if_:
-          return os << "if";
+          return os << "\"if\"";
         case else_:
-          return os << "else";
+          return os << "\"else\"";
         case while_:
-          return os << "while";
+          return os << "\"while\"";
         case return_:
-          return os << "return";
+          return os << "\"return\"";
+        case function_:
+          return os << "\"function\"";
 
         case colon:
-          return os << "colon";
+          return os << "\":\"";
         case semicolon:
-          return os << "semicolon";
+          return os << "\";\"";
         case dot:
-          return os << "dot";
+          return os << "\".\"";
         case comma:
-          return os << "comma";
+          return os << "\",\"";
         case equals:
-          return os << "equals sign";
+          return os << "\"=\"";
         case backtick:
-          return os << "backtick";
+          return os << "\"`\"";
+        case arrow_right:
+          return os << "\"->\"";
 
         case paren_open:
-          return os << "opening paren";
+          return os << "\"(\"";
         case paren_close:
-          return os << "closing paren";
+          return os << "\")\"";
         case  brace_open:
-          return os << "opening brace";
+          return os << "\"{\"";
         case brace_close:
-          return os << "closing brace";
+          return os << "\"}\"";
         case square_bracket_open:
-          return os << "opening square bracket";
+          return os << "\"[\"";
         case square_bracket_close:
-          return os << "closing square bracket";
+          return os << "\"]\"";
 
         case any:
           return os << "any";

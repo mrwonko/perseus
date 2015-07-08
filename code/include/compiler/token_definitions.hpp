@@ -30,12 +30,20 @@ namespace perseus
       /// constructor (contains definitions)
       token_definitions()
       {
+        self.add_pattern
+          ( "HEX", "[0-9a-zA-Z]" )
+          ;
+
         self.add
           ( R"(\xEF\xBB\xBF)", token_id::byte_order_mark )
           ( R"(\s+)", token_id::whitespace )
           ( R"(\/\/[^\n]*|\/\*([^\*]|\*[^\/])*\*\/)", token_id::comment )
 
+          // literals
           ( R"(\"([^\n\"\\]|\\[\"nrt\\])*\")", token_id::string )
+          ( R"(\d('?\d+)*)", token_id::decimal_integer )
+          ( R"(0[xX]{HEX}('?{HEX}+)*)", token_id::hexadecimal_integer )
+          ( R"(0[bB][01]('?[01]+)*)", token_id::binary_integer )
 
           // these keywords must come before identifier or they'd be matched by that
           ( R"(if)", token_id::if_ )

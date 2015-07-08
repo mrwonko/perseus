@@ -1,5 +1,4 @@
 #include "compiler/conversions.hpp"
-#include "compiler/exceptions.hpp"
 
 #include <boost/spirit/include/qi_expect.hpp>
 
@@ -8,11 +7,16 @@
 #include <locale> // std::locale, std::codecvt, std::use_facet
 #include <cwchar> // std::mbstate_t
 #include <codecvt>
+#include <string>
+#include <climits>
+#include <string>
 
 namespace perseus
 {
   namespace detail
   {
+    using namespace std::string_literals;
+
     /**
     read one code point from a utf8 sequence
     @throws invalid_utf8 on stray or missing continuations
@@ -81,7 +85,7 @@ namespace perseus
         return out;
       }
     }
-
+    
     parsed_string_literal::parsed_string_literal( const enhanced_istream_iterator& begin, const enhanced_istream_iterator& end )
       : ast::string_literal( begin.get_position() )
     {

@@ -30,11 +30,6 @@ namespace perseus
       {
       };
 
-      struct integer_literal
-      {
-        std::int32_t value;
-      };
-
       struct identifier : std::string, file_position
       {
         identifier() = default;
@@ -62,7 +57,7 @@ namespace perseus
       typedef boost::variant<
         void_expression,
         string_literal,
-        integer_literal,
+        std::int32_t,
         identifier,
         boost::recursive_wrapper< binary_operation >,
         boost::recursive_wrapper< unary_operation >,

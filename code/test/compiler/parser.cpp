@@ -20,18 +20,21 @@ BOOST_AUTO_TEST_CASE( parse )
 {
   std::stringstream source( u8R"(
 
-"hello world"
+1337 0x42 0b1100'0001
 
 )" );
 
   perseus::detail::enhanced_istream_iterator begin, end;
   std::tie( begin, end ) = perseus::detail::enhanced_iterators( source );
 
-  std::u32string result;
+  std::vector< std::int32_t > result;
   bool success = boost::spirit::lex::tokenize_and_phrase_parse( begin, end, perseus::detail::token_definitions{}, perseus::detail::grammar{}, perseus::detail::skip_grammar{}, result );
 
   BOOST_CHECK( success );
-  BOOST_CHECK_EQUAL( result, U"hello world"s );
+  BOOST_CHECK_EQUAL( result.size(), 3 );
+  BOOST_CHECK_EQUAL( result.at( 0 ), 1337 );
+  BOOST_CHECK_EQUAL( result.at( 1 ), 0x42 );
+  BOOST_CHECK_EQUAL( result.at( 2 ), 0b1100'0001 );
 }
 
 BOOST_AUTO_TEST_SUITE_END()
