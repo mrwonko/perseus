@@ -18,7 +18,7 @@ set( SHARED_FILES
 
 set( COMPILER_FILES
     "src/compiler/token_ids.cpp" "include/compiler/token_ids.hpp"
-    "include/compiler/token_definitions.hpp"
+    "src/compiler/token_definitions.cpp" "include/compiler/token_definitions.hpp"
     "src/compiler/grammar.cpp" "include/compiler/grammar.hpp"
     "src/compiler/conversions.cpp" "include/compiler/conversions.hpp"
     "include/compiler/exceptions.hpp"
