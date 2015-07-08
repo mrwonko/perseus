@@ -8,32 +8,36 @@
 #include <sstream>
 #include <vector>
 
+static bool tokenize( const std::string& source, std::vector< perseus::detail::token >& out_tokens )
+{
+  std::stringstream stream( source );
+
+  perseus::detail::enhanced_istream_iterator begin, end;
+  std::tie( begin, end ) = perseus::detail::enhanced_iterators( stream );
+
+  return boost::spirit::lex::tokenize(
+    begin,
+    end,
+    perseus::detail::token_definitions{},
+    [ &out_tokens ]( const perseus::detail::token& t )
+  {
+    out_tokens.push_back( t );
+    return true; // continue tokenizing
+  }
+  );
+}
+
 BOOST_AUTO_TEST_SUITE( compiler )
 
 BOOST_AUTO_TEST_SUITE( lexer )
 
-BOOST_AUTO_TEST_CASE( tokenize )
+BOOST_AUTO_TEST_CASE( basic )
 {
-  std::stringstream source( u8R"(// a cömment
+  std::vector< perseus::detail::token > result;
+  bool success = tokenize( u8R"(// a cömment
 	some identifiers/*
 and a long comment
-*/)" );
-
-  perseus::detail::enhanced_istream_iterator begin, end;
-  std::tie( begin, end ) = perseus::detail::enhanced_iterators( source );
-
-  std::vector< perseus::detail::token > result;
-
-  bool success = boost::spirit::lex::tokenize(
-    begin,
-    end,
-    perseus::detail::token_definitions{},
-    [ &result ]( const perseus::detail::token& t )
-  {
-    result.push_back( t );
-    return true; // continue tokenizing
-  }
-  );
+*/)", result );
 
   BOOST_CHECK( success );
 
@@ -46,6 +50,19 @@ and a long comment
   BOOST_CHECK_EQUAL( result.at( 3 ).id(), perseus::detail::token_id::whitespace );
   BOOST_CHECK_EQUAL( result.at( 4 ).id(), perseus::detail::token_id::identifier );
   BOOST_CHECK_EQUAL( result.at( 5 ).id(), perseus::detail::token_id::comment );
+}
+
+BOOST_AUTO_TEST_CASE( longest_match_if )
+{
+  std::vector< perseus::detail::token > result;
+  bool success = tokenize( u8R"(iffy if)", result );
+
+  BOOST_CHECK( success );
+
+  BOOST_CHECK_EQUAL( result.size(), 3 );
+  BOOST_CHECK_EQUAL( result.at( 0 ).id(), perseus::detail::token_id::identifier );
+  BOOST_CHECK_EQUAL( result.at( 1 ).id(), perseus::detail::token_id::whitespace );
+  BOOST_CHECK_EQUAL( result.at( 2 ).id(), perseus::detail::token_id::if_ );
 }
 
 BOOST_AUTO_TEST_SUITE_END()
