@@ -34,8 +34,30 @@ namespace perseus
           ( R"(\xEF\xBB\xBF)", token_id::byte_order_mark )
           ( R"(\s+)", token_id::whitespace )
           ( R"(\/\/[^\n]*|\/\*([^\*]|\*[^\/])*\*\/)", token_id::comment )
+
           ( R"(\"([^\n\"\\]|\\[\"nrt\\])*\")", token_id::string )
+
+          // these keywords must come before identifier or they'd be matched by that
+          ( R"(if)", token_id::if_ )
+          ( R"(else)", token_id::else_ )
+          ( R"(while)", token_id::while_ )
+          ( R"(return)", token_id::return_ )
           ( R"(\w+)", token_id::identifier ) // alphanumeric and underscore
+
+          ( R"(:)", token_id::colon )
+          ( R"(;)", token_id::semicolon )
+          ( R"(\.)", token_id::dot )
+          ( R"(,)", token_id::comma )
+          ( R"(=)", token_id::equals ) // must come before operator_ definition, since it's also covered by that
+          ( R"(`)", token_id::backtick )
+          ( R"(\()", token_id::paren_open )
+          ( R"(\))", token_id::paren_close )
+          ( R"(\{)", token_id::brace_open )
+          ( R"(\})", token_id::brace_close )
+          ( R"(\[)", token_id::square_bracket_open )
+          ( R"(\])", token_id::square_bracket_close )
+          // + - * . / | \ ! # $ % & < = > ? @ ^ ~
+          ( R"([\+\-\*\.\/\|\\\!#$%&<=>\?@\^~]+)", token_id::operator_identifier )
           ;
       }
     };

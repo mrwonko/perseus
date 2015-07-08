@@ -14,9 +14,37 @@ namespace perseus
       {
         whitespace = boost::spirit::lex::min_token_id,
         comment,
-        string,
-        identifier,
         byte_order_mark,
+
+        // constants
+        string,
+
+        identifier,
+        operator_identifier,
+
+        // keywords
+        if_,
+        else_,
+        while_,
+        return_,
+
+        colon,
+        semicolon,
+        dot,
+        comma,
+        equals,
+        backtick, // `
+
+        // ()
+        paren_open,
+        paren_close,
+        // {}
+        brace_open,
+        brace_close,
+        // []
+        square_bracket_open,
+        square_bracket_close,
+
         any
       };
 
