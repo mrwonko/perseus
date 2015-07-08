@@ -83,6 +83,7 @@ namespace perseus
     }
 
     parsed_string_literal::parsed_string_literal( const enhanced_istream_iterator& begin, const enhanced_istream_iterator& end )
+      : ast::string_literal( begin.get_position() )
     {
       assert( std::distance( begin, end ) >= 2 );
       assert( *begin == '"' );

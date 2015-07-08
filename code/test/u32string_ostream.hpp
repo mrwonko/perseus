@@ -6,7 +6,7 @@
 
 namespace std
 {
-  std::ostream& operator<<( std::ostream& os, const std::u32string& s )
+  static std::ostream& operator<<( std::ostream& os, const std::u32string& s )
   {
     for( const char32_t& c : s )
     {

@@ -39,24 +39,47 @@ namespace perseus
     };
 
 
-    class grammar : public boost::spirit::qi::grammar< token_iterator, /* ast::file, */ skip_grammar >
+    class grammar : public boost::spirit::qi::grammar< token_iterator, std::u32string(), skip_grammar >
     {
     public:
       grammar()
         : base_type( file, "perseus script"s )
       {
-        file %= -byte_order_mark >> boost::spirit::qi::omit[ *( string | identifier ) ];
+        file %= ( -byte_order_mark ) >> string;
       }
     private:
-      template< typename attribute > using rule = boost::spirit::qi::rule< token_iterator, attribute, skip_grammar >;
+      template< typename attribute = boost::spirit::unused_type() > using rule = boost::spirit::qi::rule< token_iterator, attribute, skip_grammar >;
 
       //    terminals
-      rule< std::string() > identifier = { boost::spirit::qi::token( token_id::identifier ), "identifier"s };
-      rule< parsed_string_literal() > string = rule< parsed_string_literal() >( boost::spirit::qi::token( token_id::string ), "string"s ); // note that this must explicitly be std::string or it would be interpretted as an Expression (rule)
-      rule< boost::spirit::unused_type() > byte_order_mark = rule< boost::spirit::unused_type() >( boost::spirit::qi::token( token_id::byte_order_mark ), "UTF-8 byte order mark"s );
+
+      rule<> byte_order_mark = { boost::spirit::qi::token( token_id::byte_order_mark ), "UTF-8 byte order mark"s };
+      rule< parsed_string_literal() > string = { boost::spirit::qi::token( token_id::string ), "string"s };
+
+      //rule< ast::identifier() > identifier = { boost::spirit::qi::raw[ boost::spirit::qi::token( token_id::identifier ) ], "identifier"s };
+      //rule< ast::operator_identifier() > operator_identifier = { boost::spirit::qi::token( token_id::operator_identifier ), "operator identifier"s };
+
+      rule<> if_ = { boost::spirit::qi::token( token_id::if_ ), "if"s };
+      rule<> else_ = { boost::spirit::qi::token( token_id::else_ ), "else"s };
+      rule<> while_ = { boost::spirit::qi::token( token_id::while_ ), "while"s };
+      rule<> return_ = { boost::spirit::qi::token( token_id::if_ ), "return"s };
+
+      rule<> colon = { boost::spirit::qi::token( token_id::colon ), "colon"s };
+      rule<> semicolon = { boost::spirit::qi::token( token_id::semicolon ), "semicolon"s };
+      rule<> dot = { boost::spirit::qi::token( token_id::dot ), "dot"s };
+      rule<> comma = { boost::spirit::qi::token( token_id::comma ), "comma"s };
+      rule<> equals = { boost::spirit::qi::token( token_id::equals ), "equals sign"s };
+      rule<> backtick = { boost::spirit::qi::token( token_id::backtick ), "backtick"s };
+
+      rule<> paren_open = { boost::spirit::qi::token( token_id::paren_open ), "opening paren"s };
+      rule<> paren_close = { boost::spirit::qi::token( token_id::paren_close ), "closing paren"s };
+      rule<> brace_open = { boost::spirit::qi::token( token_id::brace_open ), "opening brace"s };
+      rule<> brace_close = { boost::spirit::qi::token( token_id::brace_close ), "closing brace"s };
+      rule<> square_bracket_open = { boost::spirit::qi::token( token_id::square_bracket_open ), "opening square bracket"s };
+      rule<> square_bracket_close = { boost::spirit::qi::token( token_id::square_bracket_close ), "closing square bracket"s };
 
       //    non-terminals; defined in constructor since they reference each other
-      start_type file;//{ std::string( "file" ) };
+      start_type file;// { "file"s };
+      //rule< ast::expression() > expression;
     };
   }
 }
