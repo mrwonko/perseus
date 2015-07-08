@@ -17,7 +17,6 @@ namespace perseus
 
     grammar::grammar()
       : base_type( file, "perseus script"s )
-      /*
       // terminals - full definition
       , byte_order_mark( boost::spirit::qi::token( token_id::byte_order_mark ), "UTF-8 byte order mark"s )
       , string( boost::spirit::qi::token( token_id::string ), "string"s )
@@ -59,12 +58,11 @@ namespace perseus
       , block_expression( "block expression"s )
       , parens_expression( "parens expression"s )
       , index_expression( "index expression"s )
-      */
     {
       file %= ( -byte_order_mark ) >> expression;
 
       // what about operator_identifier? first class functions and all that?
-      //expression = string | integer | identifier | binary_operation | unary_operation | if_expression | while_expression | call_expression | block_expression | parens_expression;
+      expression = string | integer | identifier | binary_operation | unary_operation | if_expression | while_expression | call_expression | block_expression | parens_expression;
       // expression alternatives
       {
         // x `op` y
@@ -75,19 +73,18 @@ namespace perseus
         // Logically there's always an else, but it may be "nothing" (i.e. void).
         // > is an expectation concatenation: after an "if" terminal there *must* be an expression (allows for early abortion in case of errors and better errors)
         // this parsing is eager, i.e. `if c1 if c2 t else e` means `if c1 { if c2 t else e }`
-        //if_expression = if_ > expression > ( ( else_ > expression ) | boost::spirit::qi::attr( ast::void_expression{} ) );
-        //if_expression = if_ > expression > ( /*( else_ > expression ) | */ boost::spirit::qi::attr( ast::void_expression{} ) );
+        if_expression = if_ > expression > ( ( else_ > expression ) | boost::spirit::qi::attr( ast::void_expression{} ) );
         // while cond body
-        //while_expression = while_ > expression > expression;
+        while_expression = while_ > expression > expression;
         // name( arg1, arg2 )
         // a % b means list of a separated by b
-        //call_expression = expression >> paren_open > ( expression % comma ) > paren_close;
+        call_expression = expression >> paren_open > ( expression % comma ) > paren_close;
         // { exp1; exp2 }
-        //block_expression = brace_open > ( expression % semicolon ) > brace_close;
+        block_expression = brace_open > ( expression % semicolon ) > brace_close;
         // ( expression )
-        //parens_expression = paren_open > expression > paren_close;
+        parens_expression = paren_open > expression > paren_close;
         // object[index]
-        //index_expression = expression >> square_bracket_open > expression > square_bracket_close;
+        index_expression = expression >> square_bracket_open > expression > square_bracket_close;
       }
     }
   }

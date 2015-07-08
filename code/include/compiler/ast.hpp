@@ -110,9 +110,19 @@ namespace perseus
 
       Binary expressions in the ast will be re-ordered according to their associativity and precedence; we need to keep track of explicitly defined precedence so we don't reorder that.
       */
-      struct parens_expression : expression
+      struct parens_expression
       {
-        using expression::expression;
+        parens_expression() = default;
+        parens_expression( const expression& exp )
+          : body( exp )
+        {
+        }
+        operator const expression&() const
+        {
+          return body;
+        }
+
+        expression body;
       };
 
       struct index_expression

@@ -92,5 +92,3 @@ add_executable( testsuite
 )
 
 target_link_libraries( testsuite ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY} perseus )
-
-add_executable( debug_grammar_crash "debug/grammar_crash.cpp" )
