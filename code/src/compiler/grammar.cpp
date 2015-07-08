@@ -4,72 +4,70 @@
 #include <boost/spirit/home/qi.hpp>
 #include <boost/spirit/home/lex.hpp>
 
+using namespace std::string_literals;
+
 namespace perseus
 {
   namespace detail
   {
-    skip_grammar::skip_grammar()
-      : base_type( skip )
-      , whitespace( boost::spirit::qi::token( token_id::whitespace ), "whitespace"s )
-      , comment( boost::spirit::qi::token( token_id::whitespace ), "comment"s )
-    {
-      skip = whitespace | comment;
-    }
+    // rule definition; optional attributes are generated from the matched code
+    template< typename attribute = boost::spirit::unused_type() >
+    using rule = boost::spirit::qi::rule< token_iterator, attribute, skip_grammar >;
+
+    //    terminals
+
+    static rule<> byte_order_mark{ boost::spirit::qi::token( token_id::byte_order_mark ), "UTF-8 byte order mark"s };
+    static rule< ast::string_literal() > string{ string_literal_parser{}, "string literal"s };
+    static rule< std::int32_t() > decimal_integer{ decimal_integer_literal_parser{}, "decimal integer"s };
+    static rule< std::int32_t() > hexadecimal_integer{ hexadecimal_integer_literal_parser{}, "hexadecimal integer"s };
+    static rule< std::int32_t() > binary_integer{ binary_integer_literal_parser{}, "binary integer"s };
+    static rule< std::int32_t() > integer{ decimal_integer | hexadecimal_integer | binary_integer, "integer"s };
+
+    static rule< ast::identifier() > identifier{ boost::spirit::qi::token( token_id::identifier ), "identifier"s };
+    static rule< ast::operator_identifier() > operator_identifier{ boost::spirit::qi::token( token_id::operator_identifier ), "operator identifier"s };
+
+    static rule<> if_{ boost::spirit::qi::token( token_id::if_ ), "if"s };
+    static rule<> else_{ boost::spirit::qi::token( token_id::else_ ), "else"s };
+    static rule<> while_{ boost::spirit::qi::token( token_id::while_ ), "while"s };
+    static rule<> return_{ boost::spirit::qi::token( token_id::if_ ), "return"s };
+
+    static rule<> colon{ boost::spirit::qi::token( token_id::colon ), "colon"s };
+    static rule<> semicolon{ boost::spirit::qi::token( token_id::semicolon ), "semicolon"s };
+    static rule<> dot{ boost::spirit::qi::token( token_id::dot ), "dot"s };
+    static rule<> comma{ boost::spirit::qi::token( token_id::comma ), "comma"s };
+    static rule<> equals{ boost::spirit::qi::token( token_id::equals ), "equals sign"s };
+    static rule<> backtick{ boost::spirit::qi::token( token_id::backtick ), "backtick"s };
+
+    static rule<> paren_open{ boost::spirit::qi::token( token_id::paren_open ), "opening paren"s };
+    static rule<> paren_close{ boost::spirit::qi::token( token_id::paren_close ), "closing paren"s };
+    static rule<> brace_open{ boost::spirit::qi::token( token_id::brace_open ), "opening brace"s };
+    static rule<> brace_close{ boost::spirit::qi::token( token_id::brace_close ), "closing brace"s };
+    static rule<> square_bracket_open{ boost::spirit::qi::token( token_id::square_bracket_open ), "opening square bracket"s };
+    static rule<> square_bracket_close{ boost::spirit::qi::token( token_id::square_bracket_close ), "closing square bracket"s };
+
+    //    non-terminals
+    static grammar::start_type file;
+
+    static rule< ast::expression() > expression{ "expression"s };
+    static rule< ast::binary_operation() > binary_operation{ "binary operation"s };
+    static rule< ast::unary_operation() > unary_operation{ "unary operation"s };
+    static rule< ast::if_expression() > if_expression{ "if expression"s };
+    static rule< ast::while_expression() > while_expression{ "while expression"s };
+    static rule< ast::call_expression() > call_expression{ "call expression"s };
+    static rule< ast::block_expression() > block_expression{ "block expression"s };
+    static rule< ast::parens_expression() > parens_expression{ "parens expression"s };
+    static rule< ast::index_expression() > index_expression{ "index expression"s };
+
 
     grammar::grammar()
       : base_type( file, "perseus script"s )
-      // terminals - full definition
-      , byte_order_mark( boost::spirit::qi::token( token_id::byte_order_mark ), "UTF-8 byte order mark"s )
-
-      , string( string_literal_parser{}, "string literal"s )
-
-      , decimal_integer( decimal_integer_literal_parser{}, "decimal integer"s )
-      , hexadecimal_integer( hexadecimal_integer_literal_parser{}, "hexadecimal integer"s )
-      , binary_integer( binary_integer_literal_parser{}, "binary integer"s )
-      , integer( decimal_integer | hexadecimal_integer | binary_integer, "integer"s )
-
-      , identifier( boost::spirit::qi::token( token_id::identifier ), "identifier"s )
-      , operator_identifier( boost::spirit::qi::token( token_id::operator_identifier ), "operator identifier"s )
-
-      , if_( boost::spirit::qi::token( token_id::if_ ), "if"s )
-      , else_( boost::spirit::qi::token( token_id::else_ ), "else"s )
-      , while_( boost::spirit::qi::token( token_id::while_ ), "while"s )
-      , return_( boost::spirit::qi::token( token_id::if_ ), "return"s )
-
-      , colon( boost::spirit::qi::token( token_id::colon ), "colon"s )
-      , semicolon( boost::spirit::qi::token( token_id::semicolon ), "semicolon"s )
-      , dot( boost::spirit::qi::token( token_id::dot ), "dot"s )
-      , comma( boost::spirit::qi::token( token_id::comma ), "comma"s )
-      , equals( boost::spirit::qi::token( token_id::equals ), "equals sign"s )
-      , backtick( boost::spirit::qi::token( token_id::backtick ), "backtick"s )
-
-      , paren_open( boost::spirit::qi::token( token_id::paren_open ), "opening paren"s )
-      , paren_close( boost::spirit::qi::token( token_id::paren_close ), "closing paren"s )
-      , brace_open( boost::spirit::qi::token( token_id::brace_open ), "opening brace"s )
-      , brace_close( boost::spirit::qi::token( token_id::brace_close ), "closing brace"s )
-      , square_bracket_open( boost::spirit::qi::token( token_id::square_bracket_open ), "opening square bracket"s )
-      , square_bracket_close( boost::spirit::qi::token( token_id::square_bracket_close ), "closing square bracket"s )
-
-      // non-terminals - names only, definitions follow
-      , file( "file"s )
-      , expression( "expression"s )
-      , binary_operation( "binary operation"s )
-      , unary_operation( "unary operation"s )
-      , if_expression( "if expression"s )
-      , while_expression( "while expression"s )
-      , call_expression( "call expression"s )
-      , block_expression( "block expression"s )
-      , parens_expression( "parens expression"s )
-      , index_expression( "index expression"s )
     {
       // EOI = End of Input
       file %= ( -byte_order_mark ) > expression > boost::spirit::qi::eoi;
-
-      // what about operator_identifier? first class functions and all that?
-      expression = string | integer | identifier | binary_operation | unary_operation | if_expression | while_expression | call_expression | block_expression | parens_expression;
-
-      // expression alternatives
       {
+        // what about operator_identifier? first class functions and all that?
+        expression = string | integer | identifier | binary_operation | unary_operation | if_expression | while_expression | call_expression | block_expression | parens_expression;
+
         // x `op` y
         binary_operation = expression >> operator_identifier >> expression;
 
@@ -98,6 +96,21 @@ namespace perseus
         // object[index]
         index_expression = expression >> square_bracket_open > expression > square_bracket_close;
       }
+    }
+  }
+  namespace detail
+  {
+    using skip_rule = boost::spirit::qi::rule< token_iterator >;
+
+    // terminals
+    static skip_rule whitespace{ boost::spirit::qi::token( token_id::whitespace ), "whitespace"s };
+    static skip_rule comment{ boost::spirit::qi::token( token_id::whitespace ), "comment"s };
+    // start symbol
+    static skip_grammar::start_type skip{ whitespace | comment };
+
+    skip_grammar::skip_grammar()
+      : base_type( skip )
+    {
     }
   }
 }
