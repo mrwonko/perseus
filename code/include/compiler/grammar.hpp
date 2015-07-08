@@ -1,10 +1,7 @@
 #pragma once
 
-#include <boost/spirit/home/qi.hpp>
-#include <boost/spirit/home/lex.hpp>
-
-#include <string>
-#include <vector>
+#include <boost/spirit/home/qi/nonterminal/rule.hpp>
+#include <boost/spirit/home/qi/nonterminal/grammar.hpp>
 
 #include "iterators.hpp"
 #include "ast.hpp"
@@ -12,79 +9,86 @@
 #include "token_definitions.hpp"
 #include "conversions.hpp"
 
-// DELETEME
-#include <iostream>
-
 namespace perseus
 {
   namespace detail
   {
     using namespace std::string_literals; // gain access to operator ""s
 
+    /// Tokens to skip during parse; takes care of ignoring comments and whitespace
     class skip_grammar : public boost::spirit::qi::grammar< token_iterator >
     {
     public:
-      skip_grammar()
-        : base_type( skip )
-      {
-        skip = whitespace | comment;
-      }
+      /// constructor defining the grammar
+      skip_grammar();
+
     private:
       using rule = boost::spirit::qi::rule< token_iterator >;
 
       // terminals
-      rule whitespace = { boost::spirit::qi::token( token_id::whitespace ), "whitespace"s };
-      rule comment = { boost::spirit::qi::token( token_id::whitespace ), "comment"s };
+      rule whitespace;
+      rule comment;
       // start symbol
       start_type skip;
     };
 
-
-    class grammar : public boost::spirit::qi::grammar< token_iterator, std::vector< std::int32_t >(), skip_grammar >
+    /**
+    @brief Syntax Definition of the Perseus Language
+    */
+    class grammar : public boost::spirit::qi::grammar< token_iterator, ast::expression(), skip_grammar >
     {
     public:
-      grammar()
-        : base_type( file, "perseus script"s )
-      {
-        file %= ( -byte_order_mark ) >> *( decimal_integer | hexadecimal_integer | binary_integer );
-        boost::spirit::qi::int_;
-      }
+      /// constructor defining the grammar
+      grammar();
+
     private:
-      template< typename attribute = boost::spirit::unused_type() > using rule = boost::spirit::qi::rule< token_iterator, attribute, skip_grammar >;
+      // rule definition; optional attributes are generated from the matched code
+      template< typename attribute = boost::spirit::unused_type() >
+      using rule = boost::spirit::qi::rule< token_iterator, attribute, skip_grammar >;
 
       //    terminals
 
-      rule<> byte_order_mark = { boost::spirit::qi::token( token_id::byte_order_mark ), "UTF-8 byte order mark"s };
-      rule< parsed_string_literal() > string = { boost::spirit::qi::token( token_id::string ), "string"s };
-      rule< std::int32_t() > decimal_integer = { decimal_integer_literal_parser{}, "decimal integer"s };
-      rule< std::int32_t() > hexadecimal_integer = { hexadecimal_integer_literal_parser{}, "hexadecimal integer"s };
-      rule< std::int32_t() > binary_integer = { binary_integer_literal_parser{}, "binary integer"s };
+      rule<> byte_order_mark;
+      rule< parsed_string_literal() > string;
+      rule< std::int32_t() > decimal_integer;
+      rule< std::int32_t() > hexadecimal_integer;
+      rule< std::int32_t() > binary_integer;
+      rule< std::int32_t() > integer;
 
-      //rule< ast::identifier() > identifier = { boost::spirit::qi::raw[ boost::spirit::qi::token( token_id::identifier ) ], "identifier"s };
-      //rule< ast::operator_identifier() > operator_identifier = { boost::spirit::qi::token( token_id::operator_identifier ), "operator identifier"s };
+      rule< ast::identifier() > identifier;
+      rule< ast::operator_identifier() > operator_identifier;
 
-      rule<> if_ = { boost::spirit::qi::token( token_id::if_ ), "if"s };
-      rule<> else_ = { boost::spirit::qi::token( token_id::else_ ), "else"s };
-      rule<> while_ = { boost::spirit::qi::token( token_id::while_ ), "while"s };
-      rule<> return_ = { boost::spirit::qi::token( token_id::if_ ), "return"s };
+      rule<> if_;
+      rule<> else_;
+      rule<> while_;
+      rule<> return_;
 
-      rule<> colon = { boost::spirit::qi::token( token_id::colon ), "colon"s };
-      rule<> semicolon = { boost::spirit::qi::token( token_id::semicolon ), "semicolon"s };
-      rule<> dot = { boost::spirit::qi::token( token_id::dot ), "dot"s };
-      rule<> comma = { boost::spirit::qi::token( token_id::comma ), "comma"s };
-      rule<> equals = { boost::spirit::qi::token( token_id::equals ), "equals sign"s };
-      rule<> backtick = { boost::spirit::qi::token( token_id::backtick ), "backtick"s };
+      rule<> colon;
+      rule<> semicolon;
+      rule<> dot;
+      rule<> comma;
+      rule<> equals;
+      rule<> backtick;
 
-      rule<> paren_open = { boost::spirit::qi::token( token_id::paren_open ), "opening paren"s };
-      rule<> paren_close = { boost::spirit::qi::token( token_id::paren_close ), "closing paren"s };
-      rule<> brace_open = { boost::spirit::qi::token( token_id::brace_open ), "opening brace"s };
-      rule<> brace_close = { boost::spirit::qi::token( token_id::brace_close ), "closing brace"s };
-      rule<> square_bracket_open = { boost::spirit::qi::token( token_id::square_bracket_open ), "opening square bracket"s };
-      rule<> square_bracket_close = { boost::spirit::qi::token( token_id::square_bracket_close ), "closing square bracket"s };
+      rule<> paren_open;
+      rule<> paren_close;
+      rule<> brace_open;
+      rule<> brace_close;
+      rule<> square_bracket_open;
+      rule<> square_bracket_close;
 
-      //    non-terminals; defined in constructor since they reference each other
-      start_type file;// { "file"s };
-      //rule< ast::expression() > expression;
+      //    non-terminals
+      start_type file;
+
+      rule< ast::expression() > expression;
+      rule< ast::binary_operation() > binary_operation;
+      rule< ast::unary_operation() > unary_operation;
+      rule< ast::if_expression() > if_expression;
+      rule< ast::while_expression() > while_expression;
+      rule< ast::call_expression() > call_expression;
+      rule< ast::block_expression() > block_expression;
+      rule< ast::parens_expression() > parens_expression;
+      rule< ast::index_expression() > index_expression;
     };
   }
 }
