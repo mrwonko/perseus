@@ -6,7 +6,8 @@
 
 #include <boost/test/unit_test.hpp>
 
-#include <boost/spirit/home/lex/tokenize_and_parse.hpp>
+#include <boost/spirit/home/qi/parse.hpp>
+#include <boost/variant/get.hpp>
 
 #include <sstream>
 
@@ -18,23 +19,30 @@ using namespace std::string_literals;
 
 BOOST_AUTO_TEST_CASE( parse )
 {
+  namespace ast = perseus::detail::ast;
   std::stringstream source( u8R"(
 
-1337 0x42 0b1100'0001
+my_identifier42
 
 )" );
 
-  perseus::detail::enhanced_istream_iterator begin, end;
-  std::tie( begin, end ) = perseus::detail::enhanced_iterators( source );
+  perseus::detail::enhanced_istream_iterator source_begin, source_end;
+  std::tie( source_begin, source_end ) = perseus::detail::enhanced_iterators( source );
 
-  std::vector< std::int32_t > result;
-  bool success = boost::spirit::lex::tokenize_and_phrase_parse( begin, end, perseus::detail::token_definitions{}, perseus::detail::grammar{}, perseus::detail::skip_grammar{}, result );
+  perseus::detail::token_definitions tokens;
+
+  perseus::detail::token_iterator tokens_it = tokens.begin( source_begin, source_end );
+  perseus::detail::token_iterator tokens_end = tokens.end();
+
+  ast::expression result;
+  bool success = boost::spirit::qi::phrase_parse( tokens_it, tokens_end, perseus::detail::grammar{}, perseus::detail::skip_grammar{}, result );
 
   BOOST_CHECK( success );
-  BOOST_CHECK_EQUAL( result.size(), 3 );
-  BOOST_CHECK_EQUAL( result.at( 0 ), 1337 );
-  BOOST_CHECK_EQUAL( result.at( 1 ), 0x42 );
-  BOOST_CHECK_EQUAL( result.at( 2 ), 0b1100'0001 );
+  BOOST_CHECK( tokens_it == tokens_end );
+  
+  ast::identifier* identifier = boost::get< ast::identifier >( &result );
+  BOOST_REQUIRE( identifier );
+  BOOST_CHECK_EQUAL( *identifier, "my_identifier42" );
 }
 
 BOOST_AUTO_TEST_SUITE_END()

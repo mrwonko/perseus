@@ -53,6 +53,9 @@ namespace perseus
       struct if_expression;
       struct while_expression;
       struct call_expression;
+      struct block_expression;
+      struct parens_expression;
+      struct index_expression;
 
       typedef boost::variant<
         void_expression,
@@ -63,7 +66,10 @@ namespace perseus
         boost::recursive_wrapper< unary_operation >,
         boost::recursive_wrapper< if_expression >,
         boost::recursive_wrapper< while_expression >,
-        boost::recursive_wrapper< call_expression >
+        boost::recursive_wrapper< call_expression >,
+        boost::recursive_wrapper< block_expression >,
+        boost::recursive_wrapper< parens_expression >,
+        boost::recursive_wrapper< index_expression >
       > expression;
 
       struct binary_operation
@@ -93,6 +99,37 @@ namespace perseus
         expression name;
         std::vector< expression > arguments;
       };
+
+      struct block_expression : std::vector< expression >
+      {
+        using std::vector< expression >::vector;
+      };
+
+      /**
+      @brief Explicit precedence using parens
+
+      Binary expressions in the ast will be re-ordered according to their associativity and precedence; we need to keep track of explicitly defined precedence so we don't reorder that.
+      */
+      struct parens_expression
+      {
+        parens_expression() = default;
+        parens_expression( const expression& exp )
+          : body( exp )
+        {
+        }
+        operator const expression&() const
+        {
+          return body;
+        }
+
+        expression body;
+      };
+
+      struct index_expression
+      {
+        expression object;
+        expression index;
+      };
     }
   }
 }
@@ -104,3 +141,4 @@ BOOST_FUSION_ADAPT_STRUCT( perseus::detail::ast::unary_operation, operation, ope
 BOOST_FUSION_ADAPT_STRUCT( perseus::detail::ast::if_expression, condition, then_expression, else_expression );
 BOOST_FUSION_ADAPT_STRUCT( perseus::detail::ast::while_expression, condition, body );
 BOOST_FUSION_ADAPT_STRUCT( perseus::detail::ast::call_expression, name, arguments );
+BOOST_FUSION_ADAPT_STRUCT( perseus::detail::ast::index_expression, object, index );
