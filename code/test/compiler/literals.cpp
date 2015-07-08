@@ -1,10 +1,15 @@
 #include "compiler/conversions.hpp"
 #include "compiler/exceptions.hpp"
+#include "compiler/token_definitions.hpp"
 #include "../u32string_ostream.hpp"
+
+#include <boost/spirit/home/lex/tokenize_and_parse.hpp>
 
 #include <boost/test/unit_test.hpp>
 
 #include <sstream>
+
+using namespace std::string_literals;
 
 static std::u32string parse( const std::string& string_literal )
 {
@@ -13,14 +18,16 @@ static std::u32string parse( const std::string& string_literal )
   perseus::detail::enhanced_istream_iterator begin, end;
   std::tie( begin, end ) = perseus::detail::enhanced_iterators( source );
 
-  return perseus::detail::parsed_string_literal( begin, end );
+  std::u32string result;
+
+  return boost::spirit::lex::tokenize_and_parse( begin, end, perseus::detail::token_definitions{}, perseus::detail::string_literal_parser{}, result )
+    ? result
+    : U"parse failed"s;
 }
 
 BOOST_AUTO_TEST_SUITE( compiler )
 
 BOOST_AUTO_TEST_SUITE( literals )
-
-using namespace std::string_literals;
 
 BOOST_AUTO_TEST_CASE( empty )
 {

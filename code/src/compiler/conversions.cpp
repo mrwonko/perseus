@@ -17,11 +17,7 @@ namespace perseus
   {
     using namespace std::string_literals;
 
-    /**
-    read one code point from a utf8 sequence
-    @throws invalid_utf8 on stray or missing continuations
-    */
-    static char32_t readCodePoint( enhanced_istream_iterator& it, const enhanced_istream_iterator& end )
+    char32_t readCodePoint( enhanced_istream_iterator& it, const enhanced_istream_iterator& end )
     {
       // look into std::codecvt_utf8<char32_t>?
       const unsigned char& byte0 = *it;
@@ -84,53 +80,6 @@ namespace perseus
         */
         return out;
       }
-    }
-    
-    parsed_string_literal::parsed_string_literal( const enhanced_istream_iterator& begin, const enhanced_istream_iterator& end )
-      : ast::string_literal( begin.get_position() )
-    {
-      assert( std::distance( begin, end ) >= 2 );
-      assert( *begin == '"' );
-      assert( std::string( begin, end ).back() == '"' );
-      auto it = begin;
-      // skip opening quote
-      ++it;
-      for( ; it != end; ++it )
-      {
-        char32_t c = readCodePoint( it, end );
-        if( c != '\\' )
-        {
-          push_back( c );
-        }
-        else
-        {
-          switch( readCodePoint( it, end ) )
-          {
-          case U'\\':
-            push_back( U'\\' );
-            break;
-          case U'"':
-            push_back( U'"' );
-            break;
-          case U'n':
-            push_back( U'\n' );
-            break;
-          case U'r':
-            push_back( U'\r' );
-            break;
-          case U't':
-            push_back( U'\t' );
-            break;
-          default:
-            // the lexer should not give us invalid escape codes
-            assert( false );
-          }
-        }
-      }
-      // remove trailing quote (ForwardIterator means we can't stop one before end)
-      assert( !empty() );
-      assert( back() == U'"' );
-      pop_back();
     }
   }
 }

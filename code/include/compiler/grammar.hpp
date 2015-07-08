@@ -3,11 +3,8 @@
 #include <boost/spirit/home/qi/nonterminal/rule.hpp>
 #include <boost/spirit/home/qi/nonterminal/grammar.hpp>
 
-#include "iterators.hpp"
 #include "ast.hpp"
-#include "token_ids.hpp"
 #include "token_definitions.hpp"
-#include "conversions.hpp"
 
 namespace perseus
 {
@@ -49,7 +46,7 @@ namespace perseus
       //    terminals
 
       rule<> byte_order_mark;
-      rule< parsed_string_literal() > string;
+      rule< ast::string_literal() > string;
       rule< std::int32_t() > decimal_integer;
       rule< std::int32_t() > hexadecimal_integer;
       rule< std::int32_t() > binary_integer;

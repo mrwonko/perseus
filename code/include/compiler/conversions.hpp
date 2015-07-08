@@ -8,10 +8,103 @@
 #include <boost/spirit/home/support/context.hpp>
 #include <boost/spirit/home/qi/skip_over.hpp>
 
+#include <cassert>
+
 namespace perseus
 {
   namespace detail
   {
+    /**
+    read one code point from a utf8 sequence
+    @throws invalid_utf8 on stray or missing continuations
+    */
+    char32_t readCodePoint( enhanced_istream_iterator& it, const enhanced_istream_iterator& end );
+
+    struct string_literal_parser : boost::spirit::qi::primitive_parser< string_literal_parser >
+    {
+      /// meta-information about the resulting attribute
+      template< typename Context, typename Iterator >
+      struct attribute
+      {
+        /// this parser yields an integer
+        typedef ast::string_literal type;
+      };
+
+      /**
+      This function is called when the parser tries to match a string literal. It returns if a string literal was matched and moves the iterator past it if it did.
+      */
+      template< typename Context, typename Skipper, typename Attribute >
+      bool parse( token_iterator& token_it, const token_iterator& token_end, Context&, const Skipper& skipper, Attribute& out_attribute ) const
+      {
+        boost::spirit::qi::skip_over( token_it, token_end, skipper );
+        if( token_it == token_end )
+        {
+          return false;
+        }
+        const token& t = *token_it;
+        if( t.id() != token_id::string )
+        {
+          return false;
+        }
+
+        // this is supposed to be a string literal, so let's try parsing it.
+        const enhanced_istream_iterator& begin = t.value().begin(), end = t.value().end();
+        // due to the regex in the lexer we can assume the string to be wrapped in quotes
+        assert( std::distance( begin, end ) >= 2 );
+        assert( *begin == '"' );
+        out_attribute.clear();
+        // skip opening quote
+        enhanced_istream_iterator it = begin;
+        ++it;
+        for( ; it != end; ++it )
+        {
+          char32_t c = readCodePoint( it, end );
+          if( c != '\\' )
+          {
+            out_attribute.push_back( c );
+          }
+          else
+          {
+            // unescape character
+            switch( readCodePoint( it, end ) )
+            {
+            case U'\\':
+              out_attribute.push_back( U'\\' );
+              break;
+            case U'"':
+              out_attribute.push_back( U'"' );
+              break;
+            case U'n':
+              out_attribute.push_back( U'\n' );
+              break;
+            case U'r':
+              out_attribute.push_back( U'\r' );
+              break;
+            case U't':
+              out_attribute.push_back( U'\t' );
+              break;
+            default:
+              // the lexer should not give us invalid escape codes, as per the regular expression
+              assert( false );
+            }
+          }
+        }
+        // remove trailing quote (ForwardIterator means we can't stop one before end)
+        assert( !out_attribute.empty() );
+        assert( out_attribute.back() == U'"' );
+        out_attribute.pop_back();
+
+        ++token_it;
+        return true;
+      }
+
+      template< typename Context >
+      boost::spirit::qi::info what( Context& )
+      {
+        return{ "string literal" };
+      }
+    };
+
     struct parsed_string_literal : ast::string_literal
     {
       parsed_string_literal() = default;
