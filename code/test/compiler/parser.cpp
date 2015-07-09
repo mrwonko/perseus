@@ -37,8 +37,10 @@ my_identifier42
 
   BOOST_CHECK( success );
   BOOST_CHECK( tokens_it == tokens_end );
-  
-  ast::identifier* identifier = boost::get< ast::identifier >( &result );
+
+  BOOST_CHECK_EQUAL( result.tail.size(), 0 );
+  ast::operand* operand = &result.head;
+  ast::identifier* identifier = boost::get< ast::identifier >( operand );
   BOOST_REQUIRE( identifier );
   BOOST_CHECK_EQUAL( *identifier, "my_identifier42" );
 }

@@ -62,26 +62,54 @@ namespace perseus
         string_literal,
         std::int32_t,
         identifier,
-        boost::recursive_wrapper< binary_operation >,
         boost::recursive_wrapper< unary_operation >,
         boost::recursive_wrapper< if_expression >,
         boost::recursive_wrapper< while_expression >,
-        boost::recursive_wrapper< call_expression >,
         boost::recursive_wrapper< block_expression >,
-        boost::recursive_wrapper< parens_expression >,
-        boost::recursive_wrapper< index_expression >
-      > expression;
+        boost::recursive_wrapper< parens_expression >
+      > operand;
+
+      typedef boost::variant<
+        boost::recursive_wrapper< index_expression >,
+        boost::recursive_wrapper< binary_operation >,
+        boost::recursive_wrapper< call_expression >
+      > operation;
+
+      struct expression
+      {
+        operand head;
+        std::vector< operation > tail;
+      };
 
       struct binary_operation
       {
         std::string operation;
-        expression left_operand, right_operand;
+        expression operand;
+      };
+
+      struct call_expression
+      {
+        std::vector< expression > arguments;
+      };
+
+      struct index_expression
+      {
+        index_expression() = default;
+        index_expression( const expression& exp )
+          : index( exp )
+        {
+        }
+        operator const expression&( ) const
+        {
+          return index;
+        }
+        expression index;
       };
 
       struct unary_operation
       {
         std::string operation;
-        expression operand_;
+        expression operand;
       };
 
       struct if_expression
@@ -92,12 +120,6 @@ namespace perseus
       struct while_expression
       {
         expression condition, body;
-      };
-
-      struct call_expression
-      {
-        expression name;
-        std::vector< expression > arguments;
       };
 
       struct block_expression : std::vector< expression >
@@ -125,12 +147,6 @@ namespace perseus
         expression body;
       };
 
-      struct index_expression
-      {
-        expression object;
-        expression index;
-      };
-
       typedef expression root;
     }
   }
@@ -138,9 +154,9 @@ namespace perseus
 
 // these must be at global scope
 
-BOOST_FUSION_ADAPT_STRUCT( perseus::detail::ast::binary_operation, left_operand, operation, right_operand );
-BOOST_FUSION_ADAPT_STRUCT( perseus::detail::ast::unary_operation, operation, operand_ );
+BOOST_FUSION_ADAPT_STRUCT( perseus::detail::ast::expression, head, tail );
+BOOST_FUSION_ADAPT_STRUCT( perseus::detail::ast::binary_operation, operation, operand );
+BOOST_FUSION_ADAPT_STRUCT( perseus::detail::ast::unary_operation, operation, operand );
 BOOST_FUSION_ADAPT_STRUCT( perseus::detail::ast::if_expression, condition, then_expression, else_expression );
 BOOST_FUSION_ADAPT_STRUCT( perseus::detail::ast::while_expression, condition, body );
-BOOST_FUSION_ADAPT_STRUCT( perseus::detail::ast::call_expression, name, arguments );
-BOOST_FUSION_ADAPT_STRUCT( perseus::detail::ast::index_expression, object, index );
+BOOST_FUSION_ADAPT_STRUCT( perseus::detail::ast::call_expression, arguments );

@@ -49,6 +49,8 @@ namespace perseus
     static grammar::start_type file;
 
     static rule< ast::expression() > expression{ "expression"s };
+    static rule< ast::operand() > operand{ "operand"s };
+    static rule< ast::operation() > operation{ "operation"s };
     static rule< ast::binary_operation() > binary_operation{ "binary operation"s };
     static rule< ast::unary_operation() > unary_operation{ "unary operation"s };
     static rule< ast::if_expression() > if_expression{ "if expression"s };
@@ -64,37 +66,41 @@ namespace perseus
     {
       // EOI = End of Input
       file %= ( -byte_order_mark ) > expression > boost::spirit::qi::eoi;
-      {
-        // what about operator_identifier? first class functions and all that?
-        expression = string | integer | identifier | binary_operation | unary_operation | if_expression | while_expression | call_expression | block_expression | parens_expression;
 
+      // what about operator_identifier? first class functions and all that?
+      // this split is required to prevent left recursion, which in the parser turns into an infinite recursion.
+      expression = operand >> *operation;
+      operand = string | integer | identifier | unary_operation | if_expression | while_expression | block_expression | parens_expression;
+      operation = binary_operation | call_expression | index_expression;
+      {
+        // FIXME: LEFT RECURSION
         // x `op` y
-        binary_operation = expression >> operator_identifier >> expression;
+        binary_operation = operator_identifier >> expression;
+
+        // name( arg1, arg2 )
+        // a % b means list of a separated by b
+        call_expression = paren_open > ( expression % comma ) > paren_close;
+        
+        // object[index]
+        index_expression = square_bracket_open > expression > square_bracket_close;
 
         // `op` x
-        unary_operation = operator_identifier >> expression;
+        unary_operation = operator_identifier > expression;
 
         // if cond then_body else_body
         // Logically there's always an else, but it may be "nothing" (i.e. void).
         // > is an expectation concatenation: after an "if" terminal there *must* be an expression (allows for early abortion in case of errors and better errors)
         // this parsing is eager, i.e. `if c1 if c2 t else e` means `if c1 { if c2 t else e }`
-        if_expression = if_ > expression > ( ( else_ > expression ) | boost::spirit::qi::attr( ast::void_expression{} ) );
+        if_expression = if_ > expression > ( ( else_ > expression ) | boost::spirit::qi::attr( ast::expression{ ast::void_expression{}, {} } ) );
 
         // while cond body
         while_expression = while_ > expression > expression;
-
-        // name( arg1, arg2 )
-        // a % b means list of a separated by b
-        call_expression = expression >> paren_open > ( expression % comma ) > paren_close;
 
         // { exp1; exp2 }
         block_expression = brace_open > ( expression % semicolon ) > brace_close;
 
         // ( expression )
         parens_expression = paren_open > expression > paren_close;
-
-        // object[index]
-        index_expression = expression >> square_bracket_open > expression > square_bracket_close;
       }
     }
   }
