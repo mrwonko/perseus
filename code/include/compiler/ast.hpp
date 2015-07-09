@@ -130,6 +130,8 @@ namespace perseus
         expression object;
         expression index;
       };
+
+      typedef expression root;
     }
   }
 }

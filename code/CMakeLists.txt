@@ -78,7 +78,7 @@ else( DOXYGEN_FOUND )
     message( "Could not find Doxygen, no doc target created." )
 endif( DOXYGEN_FOUND )
 
-include_directories( "include" "lib" "${Boost_INCLUDE_DIRS}" )
+include_directories( "include" "${Boost_INCLUDE_DIRS}" )
 link_directories(${Boost_LIBRARY_DIRS})
 
 add_library( perseus
@@ -91,4 +91,9 @@ add_executable( testsuite
     ${TEST_FILES}
 )
 
+add_executable( perseus_print
+    "src/executable/perseus_print.cpp"
+)
+
 target_link_libraries( testsuite ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY} perseus )
+target_link_libraries( perseus_print perseus )
