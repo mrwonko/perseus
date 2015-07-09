@@ -1,6 +1,6 @@
 #include "compiler/grammar.hpp"
 
-#include "../u32string_ostream.hpp"
+#include "util/u32string_ostream.hpp"
 
 #include <boost/test/unit_test.hpp>
 

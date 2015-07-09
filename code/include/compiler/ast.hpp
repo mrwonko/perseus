@@ -122,9 +122,9 @@ namespace perseus
         expression condition, body;
       };
 
-      struct block_expression : std::vector< expression >
+      struct block_expression
       {
-        using std::vector< expression >::vector;
+        std::vector< expression > body;
       };
 
       /**
@@ -160,3 +160,4 @@ BOOST_FUSION_ADAPT_STRUCT( perseus::detail::ast::unary_operation, operation, ope
 BOOST_FUSION_ADAPT_STRUCT( perseus::detail::ast::if_expression, condition, then_expression, else_expression );
 BOOST_FUSION_ADAPT_STRUCT( perseus::detail::ast::while_expression, condition, body );
 BOOST_FUSION_ADAPT_STRUCT( perseus::detail::ast::call_expression, arguments );
+BOOST_FUSION_ADAPT_STRUCT( perseus::detail::ast::block_expression, body );

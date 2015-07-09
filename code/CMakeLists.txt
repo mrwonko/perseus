@@ -37,6 +37,10 @@ set( VM_FILES
     "src/vm/coroutine_manager.cpp" "include/vm/coroutine_manager.hpp"
 )
 
+set( UTIL_FILES
+    "include/util/u32string_ostream.hpp"
+    )
+
 set( TEST_FILES
     "test/test_init.cpp"
 	"test/execution/arithmetic.cpp"
@@ -52,7 +56,6 @@ set( TEST_FILES
     "test/compiler/lexer.cpp"
     "test/compiler/parser.cpp"
     "test/compiler/literals.cpp"
-    "test/u32string_ostream.hpp"
 )
 
 source_group( "src" REGULAR_EXPRESSION "src/.*" )
@@ -89,10 +92,12 @@ add_library( perseus
 
 add_executable( testsuite
     ${TEST_FILES}
+    ${UTIL_FILES}
 )
 
 add_executable( perseus_print
     "src/executable/perseus_print.cpp"
+    ${UTIL_FILES}
 )
 
 target_link_libraries( testsuite ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY} perseus )

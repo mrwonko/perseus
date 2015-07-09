@@ -1,7 +1,7 @@
 #include "compiler/conversions.hpp"
 #include "compiler/exceptions.hpp"
 #include "compiler/token_definitions.hpp"
-#include "../u32string_ostream.hpp"
+#include "util/u32string_ostream.hpp"
 
 #include <boost/spirit/home/lex/tokenize_and_parse.hpp>
 
