@@ -11,6 +11,7 @@
 #include "iterators.hpp"
 #include "token_definitions.hpp"
 
+// TODO: separate these into multiple files so you can only import ast::parser or ast::clean on demand?
 namespace perseus
 {
   namespace detail

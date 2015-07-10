@@ -22,6 +22,7 @@ struct while_expression
 
 struct return_expression
 {
+#ifdef PERSEUS_AST_PARSER
   return_expression() = default;
   return_expression( const expression& exp )
     : value( exp )
@@ -31,6 +32,7 @@ struct return_expression
   {
     return value;
   }
+#endif
   expression value;
 };
 
@@ -46,6 +48,7 @@ Binary expressions in the ast will be re-ordered according to their associativit
 */
 struct parens_expression
 {
+#ifdef PERSEUS_AST_PARSER
   parens_expression() = default;
   parens_expression( const expression& exp )
     : body( exp )
@@ -55,7 +58,7 @@ struct parens_expression
   {
     return body;
   }
-
+#endif
   expression body;
 };
 
@@ -90,5 +93,3 @@ struct file
 {
   std::vector< function_definition > functions;
 };
-
-typedef file root;

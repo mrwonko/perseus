@@ -28,6 +28,8 @@ set( COMPILER_FILES
     "include/compiler/ast_adapted.hpp"
     "src/compiler/iterators.cpp" "include/compiler/iterators.hpp"
     "src/compiler/compiler.cpp" "include/compiler/compiler.hpp"
+    "include/compiler/steps.hpp"
+    "src/compiler/steps/clean_parser_ast.cpp"
 )
 
 set( VM_FILES

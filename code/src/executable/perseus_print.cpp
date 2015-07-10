@@ -223,7 +223,7 @@ int main( const int argc, const char* argv[] )
     return 0;
   }
 
-  perseus::detail::ast::parser::root result;
+  perseus::detail::ast::parser::file result;
   bool success = true;
   try
   {
