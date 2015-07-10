@@ -14,8 +14,6 @@ namespace perseus
           return os << "whitespace";
         case comment:
           return os << "comment";
-        case byte_order_mark:
-          return os << "byte_order_mark";
 
         case string:
           return os << "string literal";

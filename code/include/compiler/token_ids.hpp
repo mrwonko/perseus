@@ -14,7 +14,6 @@ namespace perseus
       {
         whitespace = boost::spirit::lex::min_token_id,
         comment,
-        byte_order_mark,
 
         // constants
         string,

@@ -117,6 +117,7 @@ namespace perseus
     template< char prefix, char alt_prefix >
     enhanced_istream_iterator consume_prefix( const enhanced_istream_iterator& begin, const enhanced_istream_iterator& end );
 
+    // TODO: sign prefix? as it stands, the we overflow on the smallest number since the - is parsed as an unary operator
     template< typename T, token_id::token_id id, T base, bool with_prefix = false, char prefix = '\0', char alt_prefix = '\0' >
     struct integer_literal_parser : boost::spirit::qi::primitive_parser< integer_literal_parser< T, id, base, with_prefix, prefix, alt_prefix > >
     {

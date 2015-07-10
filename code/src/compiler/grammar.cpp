@@ -11,20 +11,19 @@ namespace perseus
   namespace detail
   {
     // rule definition; optional attributes are generated from the matched code
-    template< typename attribute = boost::spirit::unused_type() >
-    using rule = boost::spirit::qi::rule< token_iterator, attribute, skip_grammar >;
+    template< typename attribute = boost::spirit::unused_type >
+    using rule = boost::spirit::qi::rule< token_iterator, attribute(), skip_grammar >;
 
     //    terminals
 
-    static rule<> byte_order_mark{ boost::spirit::qi::token( token_id::byte_order_mark ), "UTF-8 byte order mark"s };
-    static rule< ast::string_literal() > string{ string_literal_parser{}, "string literal"s };
-    static rule< std::int32_t() > decimal_integer{ decimal_integer_literal_parser{}, "decimal integer"s };
-    static rule< std::int32_t() > hexadecimal_integer{ hexadecimal_integer_literal_parser{}, "hexadecimal integer"s };
-    static rule< std::int32_t() > binary_integer{ binary_integer_literal_parser{}, "binary integer"s };
-    static rule< std::int32_t() > integer{ decimal_integer | hexadecimal_integer | binary_integer, "integer"s };
+    static rule< ast::string_literal > string{ string_literal_parser{}, "string literal"s };
+    static rule< std::int32_t > decimal_integer{ decimal_integer_literal_parser{}, "decimal integer"s };
+    static rule< std::int32_t > hexadecimal_integer{ hexadecimal_integer_literal_parser{}, "hexadecimal integer"s };
+    static rule< std::int32_t > binary_integer{ binary_integer_literal_parser{}, "binary integer"s };
+    static rule< std::int32_t > integer{ decimal_integer | hexadecimal_integer | binary_integer, "integer"s };
 
-    static rule< ast::identifier() > identifier{ boost::spirit::qi::token( token_id::identifier ), "identifier"s };
-    static rule< ast::operator_identifier() > operator_identifier{ boost::spirit::qi::token( token_id::operator_identifier ), "operator identifier"s };
+    static rule< ast::identifier > identifier{ boost::spirit::qi::token( token_id::identifier ), "identifier"s };
+    static rule< ast::operator_identifier > operator_identifier{ boost::spirit::qi::token( token_id::operator_identifier ), "operator identifier"s };
 
     static rule<> if_{ boost::spirit::qi::token( token_id::if_ ), "if"s };
     static rule<> else_{ boost::spirit::qi::token( token_id::else_ ), "else"s };
@@ -48,24 +47,24 @@ namespace perseus
     //    non-terminals
     static grammar::start_type file;
 
-    static rule< ast::expression() > expression{ "expression"s };
-    static rule< ast::operand() > operand{ "operand"s };
-    static rule< ast::operation() > operation{ "operation"s };
-    static rule< ast::binary_operation() > binary_operation{ "binary operation"s };
-    static rule< ast::unary_operation() > unary_operation{ "unary operation"s };
-    static rule< ast::if_expression() > if_expression{ "if expression"s };
-    static rule< ast::while_expression() > while_expression{ "while expression"s };
-    static rule< ast::call_expression() > call_expression{ "call expression"s };
-    static rule< ast::block_expression() > block_expression{ "block expression"s };
-    static rule< ast::parens_expression() > parens_expression{ "parens expression"s };
-    static rule< ast::index_expression() > index_expression{ "index expression"s };
+    static rule< ast::expression > expression{ "expression"s };
+    static rule< ast::operand > operand{ "operand"s };
+    static rule< ast::operation > operation{ "operation"s };
+    static rule< ast::binary_operation > binary_operation{ "binary operation"s };
+    static rule< ast::unary_operation > unary_operation{ "unary operation"s };
+    static rule< ast::if_expression > if_expression{ "if expression"s };
+    static rule< ast::while_expression > while_expression{ "while expression"s };
+    static rule< ast::call_expression > call_expression{ "call expression"s };
+    static rule< ast::block_expression > block_expression{ "block expression"s };
+    static rule< ast::parens_expression > parens_expression{ "parens expression"s };
+    static rule< ast::index_expression > index_expression{ "index expression"s };
 
 
     grammar::grammar()
       : base_type( file, "perseus script"s )
     {
       // EOI = End of Input
-      file %= ( -byte_order_mark ) > expression > boost::spirit::qi::eoi;
+      file %= expression > boost::spirit::qi::eoi;
 
       // what about operator_identifier? first class functions and all that?
       // this split is required to prevent left recursion, which in the parser turns into an infinite recursion.

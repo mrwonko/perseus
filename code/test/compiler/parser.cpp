@@ -1,4 +1,4 @@
-#include "compiler/grammar.hpp"
+#include "compiler/compiler.hpp"
 
 #include "util/u32string_ostream.hpp"
 
@@ -18,25 +18,8 @@ using namespace std::string_literals;
 BOOST_AUTO_TEST_CASE( parse )
 {
   namespace ast = perseus::detail::ast;
-  std::stringstream source( u8R"(
 
-my_identifier42
-
-)" );
-
-  perseus::detail::enhanced_istream_iterator source_begin, source_end;
-  std::tie( source_begin, source_end ) = perseus::detail::enhanced_iterators( source );
-
-  perseus::detail::token_definitions tokens;
-
-  perseus::detail::token_iterator tokens_it = tokens.begin( source_begin, source_end );
-  perseus::detail::token_iterator tokens_end = tokens.end();
-
-  ast::expression result;
-  bool success = boost::spirit::qi::phrase_parse( tokens_it, tokens_end, perseus::detail::grammar{}, perseus::detail::skip_grammar{}, result );
-
-  BOOST_CHECK( success );
-  BOOST_CHECK( tokens_it == tokens_end );
+  ast::expression result = perseus::compiler().parse( std::stringstream( "  my_identifier42  " ), "<string>" );
 
   BOOST_CHECK_EQUAL( result.tail.size(), 0 );
   ast::operand* operand = &result.head;

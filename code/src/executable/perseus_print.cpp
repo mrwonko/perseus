@@ -7,7 +7,8 @@
 #include <boost/variant/static_visitor.hpp>
 #include <boost/variant/apply_visitor.hpp>
 
-#include "compiler/grammar.hpp"
+#include "compiler/ast.hpp"
+#include "compiler/compiler.hpp"
 #include "util/u32string_ostream.hpp"
 
 using namespace std::string_literals;
@@ -20,19 +21,6 @@ void print_usage( const char* path )
  -e <code> : parse the given string
  <filename>: parse the given file
 Parses the given source and prints its syntax tree.)" << std::endl;
-}
-
-bool parse( std::istream& source, ast::root& out_result )
-{
-  if( !source )
-  {
-    std::cerr << "Could not open file!" << std::endl;
-    return false;
-  }
-  perseus::detail::enhanced_istream_iterator source_begin, source_end;
-  std::tie( source_begin, source_end ) = perseus::detail::enhanced_iterators( source );
-
-  return boost::spirit::lex::tokenize_and_phrase_parse( source_begin, source_end, perseus::detail::token_definitions{}, perseus::detail::grammar{}, perseus::detail::skip_grammar{}, out_result );
 }
 
 class print_visitor : public boost::static_visitor<>
@@ -167,22 +155,30 @@ int main( const int argc, const char* argv[] )
   }
 
   ast::root result;
-  bool success = false;
+  bool success = true;
   try
   {
+    perseus::compiler compiler;
     if( argv[ 1 ] == "-e"s )
     {
-      success = parse( std::stringstream( argv[ 2 ] ), result );
+      result = compiler.parse( std::stringstream( argv[ 2 ] ), "<string>" );
     }
     else
     {
-      success = parse( std::ifstream( argv[ 1 ] ), result );
+      result = compiler.parse( std::ifstream( argv[ 1 ] ), argv[ 1 ] );
     }
   }
   catch( boost::spirit::qi::expectation_failure< perseus::detail::token_iterator >& e )
   {
     // FIXME: the dereferencing presumably fails for empty inputs
-    std::cerr << "Unexpected token " << e.first->id() << " at " << e.first->value().begin().get_position() << std::endl;
+    if( e.first == perseus::detail::token_definitions{}.end() )
+    {
+      std::cerr << "Unexpected End of File" << std::endl;
+    }
+    else
+    {
+      std::cerr << "Unexpected token " << e.first->id() << " at " << e.first->value().begin().get_position() << std::endl;
+    }
     success = false;
   }
   catch( std::exception& e )
@@ -196,6 +192,5 @@ int main( const int argc, const char* argv[] )
     return 1;
   }
   print_visitor{}( result );
-  // TODO
   return 0;
 }

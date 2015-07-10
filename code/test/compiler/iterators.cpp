@@ -52,6 +52,29 @@ BOOST_AUTO_TEST_CASE( position_iterator )
   BOOST_CHECK( it == end );
 }
 
+BOOST_AUTO_TEST_CASE( position_iterator_bom )
+{
+  using perseus::detail::file_position;
+  using perseus::detail::enhanced_istream_iterator;
+  using perseus::detail::enhanced_iterators;
+
+  std::stringstream source{ u8"\uFEFF" };
+  enhanced_istream_iterator begin, end;
+  std::tie( begin, end ) = enhanced_iterators( source );
+
+  auto it = begin;
+  BOOST_REQUIRE( it != end );
+  BOOST_CHECK_EQUAL( *it, '\xef' );
+  ++it;
+  BOOST_REQUIRE( it != end );
+  BOOST_CHECK_EQUAL( *it, '\xbb' );
+  ++it;
+  BOOST_REQUIRE( it != end );
+  BOOST_CHECK_EQUAL( *it, '\xbf' );
+  ++it;
+  BOOST_CHECK( it == end );
+}
+
 BOOST_AUTO_TEST_SUITE_END()
 
 BOOST_AUTO_TEST_SUITE_END()

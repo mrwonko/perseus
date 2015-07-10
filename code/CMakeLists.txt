@@ -23,8 +23,8 @@ set( COMPILER_FILES
     "src/compiler/conversions.cpp" "include/compiler/conversions.hpp"
     "include/compiler/exceptions.hpp"
     "include/compiler/ast.hpp"
-    "include/compiler/iterators.hpp"
-    "src/compiler/compile.cpp" "include/compiler/compile.hpp"
+    "src/compiler/iterators.cpp" "include/compiler/iterators.hpp"
+    "src/compiler/compiler.cpp" "include/compiler/compiler.hpp"
 )
 
 set( VM_FILES
