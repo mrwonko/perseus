@@ -19,13 +19,17 @@ BOOST_AUTO_TEST_CASE( parse )
 {
   namespace ast = perseus::detail::ast;
 
-  ast::expression result = perseus::compiler().parse( std::stringstream( "  my_identifier42  " ), "<string>" );
+  ast::file result = perseus::compiler().parse( std::stringstream( "function f() 42" ), "<string>" );
 
-  BOOST_CHECK_EQUAL( result.tail.size(), 0 );
-  ast::operand* operand = &result.head;
-  ast::identifier* identifier = boost::get< ast::identifier >( operand );
-  BOOST_REQUIRE( identifier );
-  BOOST_CHECK_EQUAL( *identifier, "my_identifier42" );
+  BOOST_CHECK_EQUAL( result.functions.size(), 1 );
+  const ast::function_definition& func = result.functions.front();
+  BOOST_CHECK_EQUAL( func.name, "f" );
+  BOOST_CHECK( !func.type );
+  BOOST_CHECK_EQUAL( func.arguments.size(), 0 );
+  BOOST_CHECK_EQUAL( func.body.tail.size(), 0 );
+  const std::int32_t* body = boost::get< std::int32_t >( &func.body.head );
+  BOOST_REQUIRE( body );
+  BOOST_CHECK_EQUAL( *body, 42 );
 }
 
 BOOST_AUTO_TEST_SUITE_END()

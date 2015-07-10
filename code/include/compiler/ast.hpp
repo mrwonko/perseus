@@ -6,6 +6,7 @@
 #include <utility>
 
 #include <boost/variant/recursive_variant.hpp>
+#include <boost/optional/optional.hpp>
 
 #include "iterators.hpp"
 #include "token_definitions.hpp"
@@ -180,7 +181,26 @@ namespace perseus
         expression initial_value;
       };
 
-      typedef expression root;
+      struct function_argument
+      {
+        identifier name;
+        identifier type;
+      };
+
+      struct function_definition
+      {
+        identifier name;
+        std::vector< function_argument > arguments;
+        boost::optional< identifier > type;
+        expression body;
+      };
+
+      struct file
+      {
+        std::vector< function_definition > functions;
+      };
+
+      typedef file root;
     }
   }
 }

@@ -35,6 +35,41 @@ public:
   {
   }
 
+  void operator()( const ast::file& file ) const
+  {
+    indent() << "<file>" << std::endl;
+    for( const ast::function_definition& func : file.functions )
+    {
+      recurse( func );
+    }
+  }
+
+  void operator()( const ast::function_definition& func )
+  {
+    indent()
+      << "<function "
+      << static_cast< const std::string& >( func.name )
+      << " -> "
+      << ( func.type ? static_cast< const std::string& >( *func.type ) : "()"s )
+      << ">"
+      << std::endl;
+    for( const ast::function_argument& arg : func.arguments )
+    {
+      recurse( arg );
+    }
+    recurse( func.body );
+  }
+
+  void operator()( const ast::function_argument& arg )
+  {
+    indent()
+      << "<function argument "
+      << static_cast< const std::string& >( arg.name )
+      << ": "
+      << static_cast< const std::string& >( arg.type )
+      << std::endl;
+  }
+
   void operator()( const ast::void_expression& ) const
   {
     indent() << "<void expression>" << std::endl;
@@ -138,21 +173,22 @@ public:
   void operator()( const ast::expression& exp ) const
   {
     indent() << "<expression>" << std::endl;
-    recurse( exp.head );
+    recurse_visit( exp.head );
     for( const ast::operation& op : exp.tail )
     {
-      recurse( op );
+      recurse_visit( op );
     }
   }
 
 private:
 
-  void recurse( const ast::expression& exp ) const
-  {
-    print_visitor{ _indent + INDENT_SPACES }( exp );
-  }
   template< typename T >
   void recurse( const T& x ) const
+  {
+    print_visitor{ _indent + INDENT_SPACES }( x );
+  }
+  template< typename T >
+  void recurse_visit( const T& x ) const
   {
     boost::apply_visitor( print_visitor{ _indent + INDENT_SPACES }, x );
   }

@@ -16,3 +16,6 @@ BOOST_FUSION_ADAPT_STRUCT( perseus::detail::ast::call_expression, arguments );
 BOOST_FUSION_ADAPT_STRUCT( perseus::detail::ast::block_expression, body );
 BOOST_FUSION_ADAPT_STRUCT( perseus::detail::ast::explicit_variable_declaration, variable, type, initial_value );
 BOOST_FUSION_ADAPT_STRUCT( perseus::detail::ast::deduced_variable_declaration, variable, initial_value );
+BOOST_FUSION_ADAPT_STRUCT( perseus::detail::ast::function_argument, name, type );
+BOOST_FUSION_ADAPT_STRUCT( perseus::detail::ast::function_definition, name, arguments, type, body );
+BOOST_FUSION_ADAPT_STRUCT( perseus::detail::ast::file, functions );

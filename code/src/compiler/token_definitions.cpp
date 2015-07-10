@@ -39,6 +39,7 @@ namespace perseus
         ( R"(\.)", token_id::dot )
         ( R"(,)", token_id::comma )
         ( R"(=)", token_id::equals ) // must come before operator_ definition, since it's also covered by that
+        ( R"(->)", token_id::arrow_right )
         ( R"(`)", token_id::backtick )
         ( R"(\()", token_id::paren_open )
         ( R"(\))", token_id::paren_close )
