@@ -89,13 +89,14 @@ namespace perseus
         // Logically there's always an else, but it may be "nothing" (i.e. void).
         // > is an expectation concatenation: after an "if" terminal there *must* be an expression (allows for early abortion in case of errors and better errors)
         // this parsing is eager, i.e. `if c1 if c2 t else e` means `if c1 { if c2 t else e }`
-        if_expression = if_ > expression > expression > ( ( else_ > expression ) | boost::spirit::qi::attr( ast::expression{ ast::void_expression{}, {} } ) );
+        auto default_to_void = boost::spirit::qi::attr( ast::expression{ ast::void_expression{},{} } );
+        if_expression = if_ > expression > expression > ( ( else_ > expression ) | default_to_void );
 
         // while cond body
         while_expression = while_ > expression > expression;
 
         // { exp1; exp2 }
-        block_expression = brace_open > ( expression % semicolon ) > brace_close;
+        block_expression = brace_open > ( ( expression | default_to_void ) % semicolon ) > brace_close;
 
         // ( expression )
         parens_expression = paren_open > expression > paren_close;
