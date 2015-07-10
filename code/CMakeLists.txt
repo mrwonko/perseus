@@ -23,6 +23,7 @@ set( COMPILER_FILES
     "src/compiler/conversions.cpp" "include/compiler/conversions.hpp"
     "include/compiler/exceptions.hpp"
     "include/compiler/ast.hpp"
+    "include/compiler/ast_adapted.hpp"
     "src/compiler/iterators.cpp" "include/compiler/iterators.hpp"
     "src/compiler/compiler.cpp" "include/compiler/compiler.hpp"
 )

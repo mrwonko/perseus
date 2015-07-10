@@ -26,6 +26,12 @@ namespace perseus
         ( R"(else)", token_id::else_ )
         ( R"(while)", token_id::while_ )
         ( R"(return)", token_id::return_ )
+        ( R"(true)", token_id::true_ )
+        ( R"(false)", token_id::false_ )
+        ( R"(mut)", token_id::mut_ )
+        ( R"(impure)", token_id::impure_ )
+        ( R"(let)", token_id::let_ )
+        ( R"(function)", token_id::function_ )
         ( R"(\w+)", token_id::identifier ) // alphanumeric and underscore
 
         ( R"(:)", token_id::colon )

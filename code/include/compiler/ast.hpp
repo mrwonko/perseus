@@ -6,7 +6,6 @@
 #include <utility>
 
 #include <boost/variant/recursive_variant.hpp>
-#include <boost/fusion/include/adapt_struct.hpp>
 
 #include "iterators.hpp"
 #include "token_definitions.hpp"
@@ -52,19 +51,26 @@ namespace perseus
       struct unary_operation;
       struct if_expression;
       struct while_expression;
+      struct return_expression;
       struct call_expression;
       struct block_expression;
       struct parens_expression;
       struct index_expression;
-
+      struct explicit_variable_declaration;
+      struct deduced_variable_declaration;
+      
       typedef boost::variant<
         void_expression,
         string_literal,
         std::int32_t,
+        bool,
         identifier,
+        boost::recursive_wrapper< explicit_variable_declaration >,
+        boost::recursive_wrapper< deduced_variable_declaration >,
         boost::recursive_wrapper< unary_operation >,
         boost::recursive_wrapper< if_expression >,
         boost::recursive_wrapper< while_expression >,
+        boost::recursive_wrapper< return_expression >,
         boost::recursive_wrapper< block_expression >,
         boost::recursive_wrapper< parens_expression >
       > operand;
@@ -122,6 +128,20 @@ namespace perseus
         expression condition, body;
       };
 
+      struct return_expression
+      {
+        return_expression() = default;
+        return_expression( const expression& exp )
+          : value( exp )
+        {
+        }
+        operator const expression&( ) const
+        {
+          return value;
+        }
+        expression value;
+      };
+
       struct block_expression
       {
         std::vector< expression > body;
@@ -147,17 +167,21 @@ namespace perseus
         expression body;
       };
 
+      struct explicit_variable_declaration
+      {
+        identifier variable;
+        identifier type;
+        expression initial_value;
+      };
+
+      struct deduced_variable_declaration
+      {
+        identifier variable;
+        expression initial_value;
+      };
+
       typedef expression root;
     }
   }
 }
 
-// these must be at global scope
-
-BOOST_FUSION_ADAPT_STRUCT( perseus::detail::ast::expression, head, tail );
-BOOST_FUSION_ADAPT_STRUCT( perseus::detail::ast::binary_operation, operation, operand );
-BOOST_FUSION_ADAPT_STRUCT( perseus::detail::ast::unary_operation, operation, operand );
-BOOST_FUSION_ADAPT_STRUCT( perseus::detail::ast::if_expression, condition, then_expression, else_expression );
-BOOST_FUSION_ADAPT_STRUCT( perseus::detail::ast::while_expression, condition, body );
-BOOST_FUSION_ADAPT_STRUCT( perseus::detail::ast::call_expression, arguments );
-BOOST_FUSION_ADAPT_STRUCT( perseus::detail::ast::block_expression, body );

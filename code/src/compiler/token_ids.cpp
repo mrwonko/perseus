@@ -39,6 +39,14 @@ namespace perseus
           return os << "\"return\"";
         case function_:
           return os << "\"function\"";
+        case true_:
+          return os << "\"true\"";
+        case false_:
+          return os << "\"false\"";
+        case mut_:
+          return os << "\"mut\"";
+        case impure_:
+          return os << "\"impure\"";
 
         case colon:
           return os << "\":\"";

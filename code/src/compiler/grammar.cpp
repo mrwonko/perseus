@@ -1,5 +1,6 @@
 #include "compiler/grammar.hpp"
 #include "compiler/conversions.hpp"
+#include "compiler/ast_adapted.hpp"
 
 #include <boost/spirit/home/qi.hpp>
 #include <boost/spirit/home/lex.hpp>
@@ -16,34 +17,45 @@ namespace perseus
 
     //    terminals
 
+    // literals
     static rule< ast::string_literal > string{ string_literal_parser{}, "string literal"s };
     static rule< std::int32_t > decimal_integer{ decimal_integer_literal_parser{}, "decimal integer"s };
     static rule< std::int32_t > hexadecimal_integer{ hexadecimal_integer_literal_parser{}, "hexadecimal integer"s };
     static rule< std::int32_t > binary_integer{ binary_integer_literal_parser{}, "binary integer"s };
     static rule< std::int32_t > integer{ decimal_integer | hexadecimal_integer | binary_integer, "integer"s };
+    static rule< bool > true_{ boost::spirit::qi::omit[ boost::spirit::qi::token( token_id::true_ ) ] > boost::spirit::qi::attr( true ), "true"s };
+    static rule< bool > false_{ boost::spirit::qi::omit[ boost::spirit::qi::token( token_id::false_ ) ] > boost::spirit::qi::attr( false ), "false"s };
 
     static rule< ast::identifier > identifier{ boost::spirit::qi::token( token_id::identifier ), "identifier"s };
     static rule< ast::operator_identifier > operator_identifier{ boost::spirit::qi::token( token_id::operator_identifier ), "operator identifier"s };
 
-    static rule<> if_{ boost::spirit::qi::token( token_id::if_ ), "if"s };
-    static rule<> else_{ boost::spirit::qi::token( token_id::else_ ), "else"s };
-    static rule<> while_{ boost::spirit::qi::token( token_id::while_ ), "while"s };
-    static rule<> return_{ boost::spirit::qi::token( token_id::if_ ), "return"s };
+#define PERSEUS_TERMINAL( identifier, name ) static rule<> identifier{ boost::spirit::qi::token( token_id::identifier ), name }
+    PERSEUS_TERMINAL( if_, "if"s );
+    PERSEUS_TERMINAL( else_, "else"s );
+    PERSEUS_TERMINAL( while_, "while"s );
+    PERSEUS_TERMINAL( return_, "return"s );
 
-    static rule<> colon{ boost::spirit::qi::token( token_id::colon ), "colon"s };
-    static rule<> semicolon{ boost::spirit::qi::token( token_id::semicolon ), "semicolon"s };
-    static rule<> dot{ boost::spirit::qi::token( token_id::dot ), "dot"s };
-    static rule<> comma{ boost::spirit::qi::token( token_id::comma ), "comma"s };
-    static rule<> equals{ boost::spirit::qi::token( token_id::equals ), "equals sign"s };
-    static rule<> backtick{ boost::spirit::qi::token( token_id::backtick ), "backtick"s };
+    PERSEUS_TERMINAL( colon, "colon"s );
+    PERSEUS_TERMINAL( semicolon, "semicolon"s );
+    PERSEUS_TERMINAL( dot, "dot"s );
+    PERSEUS_TERMINAL( comma, "comma"s );
+    PERSEUS_TERMINAL( equals, "equals sign"s );
+    PERSEUS_TERMINAL( backtick, "backtick"s );
 
-    static rule<> paren_open{ boost::spirit::qi::token( token_id::paren_open ), "opening paren"s };
-    static rule<> paren_close{ boost::spirit::qi::token( token_id::paren_close ), "closing paren"s };
-    static rule<> brace_open{ boost::spirit::qi::token( token_id::brace_open ), "opening brace"s };
-    static rule<> brace_close{ boost::spirit::qi::token( token_id::brace_close ), "closing brace"s };
-    static rule<> square_bracket_open{ boost::spirit::qi::token( token_id::square_bracket_open ), "opening square bracket"s };
-    static rule<> square_bracket_close{ boost::spirit::qi::token( token_id::square_bracket_close ), "closing square bracket"s };
+    PERSEUS_TERMINAL( paren_open, "opening paren"s );
+    PERSEUS_TERMINAL( paren_close, "closing paren"s );
+    PERSEUS_TERMINAL( brace_open, "opening brace"s );
+    PERSEUS_TERMINAL( brace_close, "closing brace"s );
+    PERSEUS_TERMINAL( square_bracket_open, "opening square bracket"s );
+    PERSEUS_TERMINAL( square_bracket_close, "closing square bracket"s );
 
+    PERSEUS_TERMINAL( let_, "let" );
+    PERSEUS_TERMINAL( function_, "function" );
+
+    PERSEUS_TERMINAL( mut_, "mut" );
+    PERSEUS_TERMINAL( impure_, "impure" );
+#undef PERSEUS_TERMINAL
+    
     //    non-terminals
     static grammar::start_type file;
 
@@ -54,10 +66,13 @@ namespace perseus
     static rule< ast::unary_operation > unary_operation{ "unary operation"s };
     static rule< ast::if_expression > if_expression{ "if expression"s };
     static rule< ast::while_expression > while_expression{ "while expression"s };
+    static rule< ast::return_expression > return_expression{ "return expression"s };
     static rule< ast::call_expression > call_expression{ "call expression"s };
     static rule< ast::block_expression > block_expression{ "block expression"s };
     static rule< ast::parens_expression > parens_expression{ "parens expression"s };
     static rule< ast::index_expression > index_expression{ "index expression"s };
+    static rule< ast::explicit_variable_declaration > explicit_variable_declaration{ "explicit variable declaration"s };
+    static rule< ast::deduced_variable_declaration > deduced_variable_declaration{ "deduced variable declaration"s };
 
 
     grammar::grammar()
@@ -69,37 +84,48 @@ namespace perseus
       // what about operator_identifier? first class functions and all that?
       // this split is required to prevent left recursion, which in the parser turns into an infinite recursion.
       expression = operand >> *operation;
-      operand = string | integer | identifier | unary_operation | if_expression | while_expression | block_expression | parens_expression;
-      operation = binary_operation | call_expression | index_expression;
       {
-        // x `op` y
-        binary_operation = operator_identifier >> expression;
+        operand = string | integer | true_ | false_ | identifier | unary_operation | if_expression | while_expression | return_expression | block_expression | parens_expression | explicit_variable_declaration | deduced_variable_declaration;
+        {
+          // `op` x
+          unary_operation = operator_identifier > expression;
 
-        // name( arg1, arg2 )
-        // a % b means list of a separated by b; that has a minimum length of 1, thus the - (optional)
-        call_expression = paren_open > -( expression % comma ) > paren_close;
-        
-        // object[index]
-        index_expression = square_bracket_open > expression > square_bracket_close;
+          // if cond then_body else_body
+          // Logically there's always an else, but it may be "nothing" (i.e. void).
+          // > is an expectation concatenation: after an "if" terminal there *must* be an expression (allows for early abortion in case of errors and better errors)
+          // this parsing is eager, i.e. `if c1 if c2 t else e` means `if c1 { if c2 t else e }`
+          auto default_to_void = boost::spirit::qi::attr( ast::expression{ ast::void_expression{},{} } );
+          if_expression = if_ > expression > expression > ( ( else_ > expression ) | default_to_void );
 
-        // `op` x
-        unary_operation = operator_identifier > expression;
+          // while cond body
+          while_expression = while_ > expression > expression;
 
-        // if cond then_body else_body
-        // Logically there's always an else, but it may be "nothing" (i.e. void).
-        // > is an expectation concatenation: after an "if" terminal there *must* be an expression (allows for early abortion in case of errors and better errors)
-        // this parsing is eager, i.e. `if c1 if c2 t else e` means `if c1 { if c2 t else e }`
-        auto default_to_void = boost::spirit::qi::attr( ast::expression{ ast::void_expression{},{} } );
-        if_expression = if_ > expression > expression > ( ( else_ > expression ) | default_to_void );
+          // return exp
+          return_expression = return_ > ( expression | default_to_void );
 
-        // while cond body
-        while_expression = while_ > expression > expression;
+          // { exp1; exp2 }
+          block_expression = brace_open > ( ( expression | default_to_void ) % semicolon ) > brace_close;
 
-        // { exp1; exp2 }
-        block_expression = brace_open > ( ( expression | default_to_void ) % semicolon ) > brace_close;
+          // ( expression )
+          parens_expression = paren_open > expression > paren_close;
 
-        // ( expression )
-        parens_expression = paren_open > expression > paren_close;
+          // let x : t = v
+          explicit_variable_declaration = let_ >> identifier >> colon > identifier > equals > expression;
+          // let x = v
+          deduced_variable_declaration = let_ >> identifier >> equals > expression;
+        }
+        operation = binary_operation | call_expression | index_expression;
+        {
+          // x `op` y
+          binary_operation = operator_identifier >> expression;
+
+          // name( arg1, arg2 )
+          // a % b means list of a separated by b; that has a minimum length of 1, thus the - (optional)
+          call_expression = paren_open > -( expression % comma ) > paren_close;
+
+          // object[index]
+          index_expression = square_bracket_open > expression > square_bracket_close;
+        }
       }
     }
   }

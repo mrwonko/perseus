@@ -24,13 +24,20 @@ namespace perseus
         identifier,
         operator_identifier,
 
-        // keywords; using a _ suffix for conistency, even for those that are not c++ keywords
+        //    keywords; using a _ suffix for conistency, even for those that are not c++ keywords
+        // control flow
         if_,
         else_,
         while_,
         return_,
-        function_,
+        // values
+        true_,
+        false_,
+        // other
         let_,
+        function_,
+        mut_,
+        impure_,
 
         colon,
         semicolon,
