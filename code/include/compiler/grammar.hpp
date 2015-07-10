@@ -20,7 +20,7 @@ namespace perseus
     /**
     @brief Syntax Definition of the Perseus Language
     */
-    struct grammar : boost::spirit::qi::grammar< token_iterator, ast::file(), skip_grammar >
+    struct grammar : boost::spirit::qi::grammar< token_iterator, ast::parser::file(), skip_grammar >
     {
       /// constructor defining the grammar
       grammar();

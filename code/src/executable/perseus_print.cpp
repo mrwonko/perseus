@@ -13,7 +13,6 @@
 #include "util/u32string_ostream.hpp"
 
 using namespace std::string_literals;
-namespace ast = perseus::detail::ast;
 
 void print_usage( const char* path )
 {
@@ -24,183 +23,193 @@ void print_usage( const char* path )
 Parses the given source and prints its syntax tree.)" << std::endl;
 }
 
-class print_visitor : public boost::static_visitor<>
+namespace
 {
-  static constexpr unsigned int INDENT_SPACES = 2;
-
-public:
-  print_visitor( unsigned int indent = 0 )
-    : _indent( indent )
-    , _indent_string( indent, ' ' )
+  namespace ast
   {
+    using namespace perseus::detail::ast;
+    using namespace perseus::detail::ast::parser;
   }
 
-  void operator()( const ast::file& file ) const
+
+  class parser_print_visitor : public boost::static_visitor<>
   {
-    indent() << "<file>" << std::endl;
-    for( const ast::function_definition& func : file.functions )
+    static constexpr unsigned int INDENT_SPACES = 2;
+
+  public:
+    parser_print_visitor( unsigned int indent = 0 )
+      : _indent( indent )
+      , _indent_string( indent, ' ' )
     {
-      recurse( func );
     }
-  }
 
-  void operator()( const ast::function_definition& func )
-  {
-    indent()
-      << "<function "
-      << static_cast< const std::string& >( func.name )
-      << " -> "
-      << ( func.type ? static_cast< const std::string& >( *func.type ) : "()"s )
-      << ">"
-      << std::endl;
-    for( const ast::function_argument& arg : func.arguments )
+    void operator()( const ast::file& file ) const
     {
-      recurse( arg );
+      indent() << "<file>" << std::endl;
+      for( const ast::function_definition& func : file.functions )
+      {
+        recurse( func );
+      }
     }
-    recurse( func.body );
-  }
 
-  void operator()( const ast::function_argument& arg )
-  {
-    indent()
-      << "<function argument "
-      << static_cast< const std::string& >( arg.name )
-      << ": "
-      << static_cast< const std::string& >( arg.type )
-      << std::endl;
-  }
-
-  void operator()( const ast::void_expression& ) const
-  {
-    indent() << "<void expression>" << std::endl;
-  }
-
-  void operator()( const ast::string_literal& str ) const
-  {
-    indent() << "<string literal \"" << static_cast< const std::u32string& >( str ) << "\">" << std::endl;
-  }
-
-  void operator()( std::int32_t n ) const
-  {
-    indent() << "<integer literal " << n << ">" << std::endl;
-  }
-
-  void operator()( bool b ) const
-  {
-    indent() << "<bool literal " << std::boolalpha << b << ">" << std::endl;
-  }
-
-  void operator()( const ast::identifier& id ) const
-  {
-    indent() << "<identifier " << static_cast< const std::string& >( id ) << ">" << std::endl;
-  }
-
-  void operator()( const ast::deduced_variable_declaration& dec ) const
-  {
-    indent() << "<deduced declaration of " << static_cast< const std::string& >( dec.variable ) << ">" << std::endl;
-    recurse( dec.initial_value );
-  }
-
-  void operator()( const ast::explicit_variable_declaration& dec ) const
-  {
-    indent() << "<explicit declaration of " << static_cast< const std::string& >( dec.variable ) << ": " << static_cast< const std::string& >( dec.type ) << ">" << std::endl;
-    recurse( dec.initial_value );
-  }
-
-  void operator()( const ast::unary_operation& op ) const
-  {
-    indent() << "<unary " << static_cast< const std::string& >( op.operation ) << ">" << std::endl;
-    recurse( op.operand );
-  }
-
-  void operator()( const ast::if_expression& exp ) const
-  {
-    indent() << "<if>" << std::endl;
-    recurse( exp.condition );
-    recurse( exp.then_expression );
-    recurse( exp.else_expression );
-  }
-
-  void operator()( const ast::while_expression& exp ) const
-  {
-    indent() << "<while>" << std::endl;
-    recurse( exp.condition );
-    recurse( exp.body );
-  }
-
-  void operator()( const ast::return_expression& exp ) const
-  {
-    indent() << "<return>" << std::endl;
-    recurse( exp.value );
-  }
-
-  void operator()( const ast::block_expression& block ) const
-  {
-    indent() << "<block>" << std::endl;
-    for( const ast::expression& exp : block.body )
+    void operator()( const ast::function_definition& func )
     {
-      recurse( exp );
+      indent()
+        << "<function "
+        << static_cast< const std::string& >( func.name )
+        << " -> "
+        << ( func.type ? static_cast< const std::string& >( *func.type ) : "()"s )
+        << ">"
+        << std::endl;
+      for( const ast::function_argument& arg : func.arguments )
+      {
+        recurse( arg );
+      }
+      recurse( func.body );
     }
-  }
 
-  void operator()( const ast::parens_expression& par ) const
-  {
-    indent() << "<parens>" << std::endl;
-    recurse( par.body );
-  }
-
-  void operator()( const ast::index_expression& exp ) const
-  {
-    indent() << "<index>" << std::endl;
-    recurse( exp.index );
-  }
-
-  void operator()( const ast::binary_operation& exp ) const
-  {
-    indent() << "<binary " << static_cast< const std::string& >( exp.operation ) << ">" << std::endl;
-    recurse( exp.operand );
-  }
-
-  void operator()( const ast::call_expression& exp ) const
-  {
-    indent() << "<call>" << std::endl;
-    for( const ast::expression& arg : exp.arguments )
+    void operator()( const ast::function_argument& arg )
     {
-      recurse( arg );
+      indent()
+        << "<function argument "
+        << static_cast< const std::string& >( arg.name )
+        << ": "
+        << static_cast< const std::string& >( arg.type )
+        << std::endl;
     }
-  }
 
-  void operator()( const ast::expression& exp ) const
-  {
-    indent() << "<expression>" << std::endl;
-    recurse_visit( exp.head );
-    for( const ast::operation& op : exp.tail )
+    void operator()( const ast::void_expression& ) const
     {
-      recurse_visit( op );
+      indent() << "<void expression>" << std::endl;
     }
-  }
 
-private:
+    void operator()( const ast::string_literal& str ) const
+    {
+      indent() << "<string literal \"" << static_cast< const std::u32string& >( str ) << "\">" << std::endl;
+    }
 
-  template< typename T >
-  void recurse( const T& x ) const
-  {
-    print_visitor{ _indent + INDENT_SPACES }( x );
-  }
-  template< typename T >
-  void recurse_visit( const T& x ) const
-  {
-    boost::apply_visitor( print_visitor{ _indent + INDENT_SPACES }, x );
-  }
+    void operator()( std::int32_t n ) const
+    {
+      indent() << "<integer literal " << n << ">" << std::endl;
+    }
 
-  std::ostream& indent() const
-  {
-    return std::cout << _indent_string << "* ";
-  }
+    void operator()( bool b ) const
+    {
+      indent() << "<bool literal " << std::boolalpha << b << ">" << std::endl;
+    }
 
-  unsigned int _indent;
-  std::string _indent_string;
-};
+    void operator()( const ast::identifier& id ) const
+    {
+      indent() << "<identifier " << static_cast< const std::string& >( id ) << ">" << std::endl;
+    }
+
+    void operator()( const ast::deduced_variable_declaration& dec ) const
+    {
+      indent() << "<deduced declaration of " << static_cast< const std::string& >( dec.variable ) << ">" << std::endl;
+      recurse( dec.initial_value );
+    }
+
+    void operator()( const ast::explicit_variable_declaration& dec ) const
+    {
+      indent() << "<explicit declaration of " << static_cast< const std::string& >( dec.variable ) << ": " << static_cast< const std::string& >( dec.type ) << ">" << std::endl;
+      recurse( dec.initial_value );
+    }
+
+    void operator()( const ast::unary_operation& op ) const
+    {
+      indent() << "<unary " << static_cast< const std::string& >( op.operation ) << ">" << std::endl;
+      recurse( op.operand );
+    }
+
+    void operator()( const ast::if_expression& exp ) const
+    {
+      indent() << "<if>" << std::endl;
+      recurse( exp.condition );
+      recurse( exp.then_expression );
+      recurse( exp.else_expression );
+    }
+
+    void operator()( const ast::while_expression& exp ) const
+    {
+      indent() << "<while>" << std::endl;
+      recurse( exp.condition );
+      recurse( exp.body );
+    }
+
+    void operator()( const ast::return_expression& exp ) const
+    {
+      indent() << "<return>" << std::endl;
+      recurse( exp.value );
+    }
+
+    void operator()( const ast::block_expression& block ) const
+    {
+      indent() << "<block>" << std::endl;
+      for( const ast::expression& exp : block.body )
+      {
+        recurse( exp );
+      }
+    }
+
+    void operator()( const ast::parens_expression& par ) const
+    {
+      indent() << "<parens>" << std::endl;
+      recurse( par.body );
+    }
+
+    void operator()( const ast::index_expression& exp ) const
+    {
+      indent() << "<index>" << std::endl;
+      recurse( exp.index );
+    }
+
+    void operator()( const ast::binary_operation& exp ) const
+    {
+      indent() << "<binary " << static_cast< const std::string& >( exp.operation ) << ">" << std::endl;
+      recurse( exp.operand );
+    }
+
+    void operator()( const ast::call_expression& exp ) const
+    {
+      indent() << "<call>" << std::endl;
+      for( const ast::expression& arg : exp.arguments )
+      {
+        recurse( arg );
+      }
+    }
+
+    void operator()( const ast::expression& exp ) const
+    {
+      indent() << "<expression>" << std::endl;
+      recurse_visit( exp.head );
+      for( const ast::operation& op : exp.tail )
+      {
+        recurse_visit( op );
+      }
+    }
+
+  private:
+
+    template< typename T >
+    void recurse( const T& x ) const
+    {
+      parser_print_visitor{ _indent + INDENT_SPACES }( x );
+    }
+    template< typename T >
+    void recurse_visit( const T& x ) const
+    {
+      boost::apply_visitor( parser_print_visitor{ _indent + INDENT_SPACES }, x );
+    }
+
+    std::ostream& indent() const
+    {
+      return std::cout << _indent_string << "* ";
+    }
+
+    unsigned int _indent;
+    std::string _indent_string;
+  };
+}
 
 int main( const int argc, const char* argv[] )
 {
@@ -214,7 +223,7 @@ int main( const int argc, const char* argv[] )
     return 0;
   }
 
-  ast::root result;
+  perseus::detail::ast::parser::root result;
   bool success = true;
   try
   {
@@ -251,6 +260,6 @@ int main( const int argc, const char* argv[] )
     std::cerr << "Could not parse file!" << std::endl;
     return 1;
   }
-  print_visitor{}( result );
+  parser_print_visitor{}( result );
   return 0;
 }

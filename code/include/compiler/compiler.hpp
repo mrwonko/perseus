@@ -31,7 +31,7 @@ namespace perseus
     @return the syntax tree representation of the source code
     @todo document the various exceptions thrown on parse failure
     */
-    detail::ast::root parse( std::istream& source_stream, const std::string& filename ) const;
+    detail::ast::parser::root parse( std::istream& source_stream, const std::string& filename ) const;
   private:
     struct impl;
     std::unique_ptr< impl > _impl;

@@ -19,10 +19,10 @@ BOOST_AUTO_TEST_CASE( parse )
 {
   namespace ast = perseus::detail::ast;
 
-  ast::file result = perseus::compiler().parse( std::stringstream( "function f() 42" ), "<string>" );
+  ast::parser::file result = perseus::compiler().parse( std::stringstream( "function f() 42" ), "<string>" );
 
   BOOST_CHECK_EQUAL( result.functions.size(), 1 );
-  const ast::function_definition& func = result.functions.front();
+  const ast::parser::function_definition& func = result.functions.front();
   BOOST_CHECK_EQUAL( func.name, "f" );
   BOOST_CHECK( !func.type );
   BOOST_CHECK_EQUAL( func.arguments.size(), 0 );

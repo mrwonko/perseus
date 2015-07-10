@@ -26,7 +26,7 @@ namespace perseus
   /**
   Parse the given Input Stream into a Syntax Tree
   */
-  detail::ast::root compiler::parse( std::istream& source_stream, const std::string& filename ) const
+  detail::ast::parser::root compiler::parse( std::istream& source_stream, const std::string& filename ) const
   {
     detail::enhanced_istream_iterator input_it, input_end;
     std::tie( input_it, input_end ) = detail::enhanced_iterators( source_stream );
@@ -36,9 +36,7 @@ namespace perseus
     detail::token_iterator tokens_it = _impl->lexer.begin( input_it, input_end );
     const detail::token_iterator tokens_end = _impl->lexer.end();
 
-    namespace ast = detail::ast;
-
-    ast::root result;
+    detail::ast::parser::root result;
     bool success = boost::spirit::qi::phrase_parse( tokens_it, tokens_end, _impl->parser, _impl->skipper, result );
 
     if( !success )

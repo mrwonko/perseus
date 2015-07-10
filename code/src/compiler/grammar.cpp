@@ -11,6 +11,12 @@ namespace perseus
 {
   namespace detail
   {
+    namespace ast
+    {
+      // import ast::parser into ast namespace, since the parser exclusively creates ast::parser AST nodes
+      using namespace parser;
+    }
+
     // rule definition; optional attributes are generated from the matched code
     template< typename attribute = boost::spirit::unused_type >
     using rule = boost::spirit::qi::rule< token_iterator, attribute(), skip_grammar >;
