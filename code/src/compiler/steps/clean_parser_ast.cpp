@@ -23,11 +23,11 @@ namespace perseus
       }
       clean::block_member operator()( parser::explicit_variable_declaration& dec ) const
       {
-        return clean::explicit_variable_declaration{ std::move( dec.variable ), std::move( dec.type ), convert( std::move( dec.initial_value ) ) };
+        return clean::explicit_variable_declaration{ dec.mut, std::move( dec.variable ), std::move( dec.type ), convert( std::move( dec.initial_value ) ) };
       }
       clean::block_member operator()( parser::deduced_variable_declaration& dec ) const
       {
-        return clean::deduced_variable_declaration{ std::move( dec.variable ), convert( std::move( dec.initial_value ) ) };
+        return clean::deduced_variable_declaration{ dec.mut, std::move( dec.variable ), convert( std::move( dec.initial_value ) ) };
       }
     };
 

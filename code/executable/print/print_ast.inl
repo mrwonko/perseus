@@ -60,13 +60,13 @@ void operator()( const ast::identifier& id ) const
 
 void operator()( const ast::deduced_variable_declaration& dec ) const
 {
-  indent() << "<deduced declaration of " << static_cast< const std::string& >( dec.variable ) << ">" << std::endl;
+  indent() << "<deduced declaration of " << ( dec.mut ? "mutable " : "" ) << static_cast< const std::string& >( dec.variable ) << ">" << std::endl;
   recurse( dec.initial_value );
 }
 
 void operator()( const ast::explicit_variable_declaration& dec ) const
 {
-  indent() << "<explicit declaration of " << static_cast< const std::string& >( dec.variable ) << ": " << static_cast< const std::string& >( dec.type ) << ">" << std::endl;
+  indent() << "<explicit declaration of " << ( dec.mut ? "mutable " : "" ) << static_cast< const std::string& >( dec.variable ) << ": " << static_cast< const std::string& >( dec.type ) << ">" << std::endl;
   recurse( dec.initial_value );
 }
 

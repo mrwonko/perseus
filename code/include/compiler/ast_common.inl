@@ -38,6 +38,7 @@ struct return_expression
 
 struct explicit_variable_declaration
 {
+  bool mut;
   identifier variable;
   identifier type;
   expression initial_value;
@@ -45,6 +46,7 @@ struct explicit_variable_declaration
 
 struct deduced_variable_declaration
 {
+  bool mut;
   identifier variable;
   expression initial_value;
 };
