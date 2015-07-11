@@ -39,15 +39,6 @@ namespace perseus
         {
         }
       };
-
-      struct operator_identifier : std::string, file_position
-      {
-        operator_identifier() = default;
-        operator_identifier( const enhanced_istream_iterator& begin, const enhanced_istream_iterator& end )
-          : std::string( begin, end ), file_position( begin.get_position() )
-        {
-        }
-      };
       
       /// AST representation only used by the parser that is necessary to avoid left recursion but will be eliminated before further manipulation
       namespace parser
@@ -88,7 +79,7 @@ namespace perseus
 
         struct binary_operation
         {
-          std::string operation;
+          identifier operation;
           operand operand;
         };
 
@@ -143,7 +134,7 @@ namespace perseus
         struct binary_operation
         {
           expression left_operand;
-          std::string operation;
+          identifier operation;
           expression right_operand;
         };
 

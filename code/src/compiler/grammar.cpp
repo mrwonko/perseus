@@ -33,7 +33,7 @@ namespace perseus
     static rule< bool > false_{ boost::spirit::qi::omit[ boost::spirit::qi::token( token_id::false_ ) ] > boost::spirit::qi::attr( false ), "false"s };
 
     static rule< ast::identifier > identifier{ boost::spirit::qi::token( token_id::identifier ), "identifier"s };
-    static rule< ast::operator_identifier > operator_identifier{ boost::spirit::qi::token( token_id::operator_identifier ), "operator identifier"s };
+    static rule< ast::identifier > operator_identifier{ boost::spirit::qi::token( token_id::operator_identifier ), "operator identifier"s };
 
 #define PERSEUS_TERMINAL( identifier, name ) static rule<> identifier{ boost::spirit::qi::token( token_id::identifier ), name }
     PERSEUS_TERMINAL( if_, "if"s );
@@ -134,7 +134,7 @@ namespace perseus
           operation = binary_operation | call_expression | index_expression;
           {
             // x `op` y
-            binary_operation = operator_identifier >> operand;
+            binary_operation = ( operator_identifier | ( backtick > identifier > backtick ) ) >> operand;
 
             // name( arg1, arg2 )
             // a % b means list of a separated by b; that has a minimum length of 1, thus the - (optional)
