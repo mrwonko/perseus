@@ -15,21 +15,34 @@ namespace perseus
 
     static clean::expression convert( parser::expression&& exp );
 
+    struct convert_block_member
+    {
+      clean::block_member operator()( parser::expression& exp )
+      {
+        return convert( std::move( exp ) );
+      }
+      clean::block_member operator()( parser::explicit_variable_declaration& dec ) const
+      {
+        return clean::explicit_variable_declaration{ std::move( dec.variable ), std::move( dec.type ), convert( std::move( dec.initial_value ) ) };
+      }
+      clean::block_member operator()( parser::deduced_variable_declaration& dec ) const
+      {
+        return clean::deduced_variable_declaration{ std::move( dec.variable ), convert( std::move( dec.initial_value ) ) };
+      }
+    };
+
+    static clean::block_member convert( parser::block_member&& member )
+    {
+      return boost::apply_visitor( convert_block_member{}, std::move( member ) );
+    }
+
     struct convert_operand
     {
-      /// for int, bool, identifier, void & string literal
+      /// for shared types: int, bool, identifier, void & string literal
       template< typename T >
       clean::expression operator()( T& t ) const
       {
         return std::move( t );
-      }
-      clean::expression operator()( parser::explicit_variable_declaration& dec ) const
-      {
-        return clean::explicit_variable_declaration{ std::move( dec.variable ), std::move( dec.type ), convert( std::move( dec.initial_value ) ) };
-      }
-      clean::expression operator()( parser::deduced_variable_declaration& dec ) const
-      {
-        return clean::deduced_variable_declaration{ std::move( dec.variable ), convert( std::move( dec.initial_value ) ) };
       }
       clean::expression operator()( parser::unary_operation& op ) const
       {
@@ -49,12 +62,12 @@ namespace perseus
       }
       clean::expression operator()( parser::block_expression& block ) const
       {
-        std::vector< clean::expression > exps;
-        for( parser::expression& exp : block.body )
+        std::vector< clean::block_member > members;
+        for( parser::block_member& member : block.body )
         {
-          exps.emplace_back( convert( std::move( exp ) ) );
+          members.emplace_back( convert( std::move( member ) ) );
         }
-        return clean::block_expression{ std::move( exps ) };
+        return clean::block_expression{ std::move( members ) };
       }
       clean::expression operator()( parser::expression& exp ) const
       {
@@ -92,6 +105,7 @@ namespace perseus
         clean::expression lhs;
       };
 
+      // TODO FIXME: take operator precedence into account!
       clean::expression root = convert( std::move( exp.head ) );
       for( parser::operation& op : exp.tail )
       {

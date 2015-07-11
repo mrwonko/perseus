@@ -6,5 +6,3 @@ struct while_expression;
 struct return_expression;
 struct block_expression;
 struct parens_expression;
-struct explicit_variable_declaration;
-struct deduced_variable_declaration;

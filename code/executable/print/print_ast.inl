@@ -100,8 +100,8 @@ void operator()( const ast::return_expression& exp ) const
 void operator()( const ast::block_expression& block ) const
 {
   indent() << "<block>" << std::endl;
-  for( const ast::expression& exp : block.body )
+  for( const ast::block_member& member : block.body )
   {
-    recurse( exp );
+    recurse( member );
   }
 }

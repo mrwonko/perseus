@@ -36,11 +36,6 @@ struct return_expression
   expression value;
 };
 
-struct block_expression
-{
-  std::vector< expression > body;
-};
-
 struct explicit_variable_declaration
 {
   identifier variable;
@@ -52,6 +47,17 @@ struct deduced_variable_declaration
 {
   identifier variable;
   expression initial_value;
+};
+
+typedef boost::variant<
+  boost::recursive_wrapper< deduced_variable_declaration >,
+  boost::recursive_wrapper< explicit_variable_declaration >,
+  expression
+> block_member;
+
+struct block_expression
+{
+  std::vector< block_member > body;
 };
 
 struct function_argument

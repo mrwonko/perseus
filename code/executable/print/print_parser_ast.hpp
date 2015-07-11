@@ -35,7 +35,7 @@ namespace parser
     void operator()( const ast::binary_operation& exp ) const
     {
       indent() << "<binary " << static_cast< const std::string& >( exp.operation ) << ">" << std::endl;
-      recurse_visit( exp.operand );
+      recurse( exp.operand );
     }
 
     void operator()( const ast::call_expression& exp ) const
@@ -50,24 +50,31 @@ namespace parser
     void operator()( const ast::expression& exp ) const
     {
       indent() << "<expression>" << std::endl;
-      recurse_visit( exp.head );
+      recurse( exp.head );
       for( const ast::operation& op : exp.tail )
       {
-        recurse_visit( op );
+        recurse( op );
       }
     }
 
   private:
 
+    void recurse( const ast::operand& x ) const
+    {
+      boost::apply_visitor( print_visitor{ _indent + INDENT_SPACES }, x );
+    }
+    void recurse( const ast::block_member& x ) const
+    {
+      boost::apply_visitor( print_visitor{ _indent + INDENT_SPACES }, x );
+    }
+    void recurse( const ast::operation& x ) const
+    {
+      boost::apply_visitor( print_visitor{ _indent + INDENT_SPACES }, x );
+    }
     template< typename T >
     void recurse( const T& x ) const
     {
       print_visitor{ _indent + INDENT_SPACES }( x );
-    }
-    template< typename T >
-    void recurse_visit( const T& x ) const
-    {
-      boost::apply_visitor( print_visitor{ _indent + INDENT_SPACES }, x );
     }
   };
 }

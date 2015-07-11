@@ -50,11 +50,21 @@ namespace clean
       }
     }
 
+    // called by block_member visitation
+    void operator()( const ast::expression& exp ) const
+    {
+      boost::apply_visitor( *this, exp );
+    }
+
   private:
 
     void recurse( const ast::expression& exp ) const
     {
       boost::apply_visitor( print_visitor{ _indent + INDENT_SPACES }, exp );
+    }
+    void recurse( const ast::block_member& member ) const
+    {
+      boost::apply_visitor( print_visitor{ _indent + INDENT_SPACES }, member );
     }
     template< typename T >
     void recurse( const T& x ) const

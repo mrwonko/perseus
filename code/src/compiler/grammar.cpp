@@ -82,6 +82,7 @@ namespace perseus
     static rule< ast::deduced_variable_declaration > deduced_variable_declaration{ "deduced variable declaration"s };
     static rule< ast::function_definition > function_definition{ "function definition"s };
     static rule< ast::function_argument > function_argument{ "function argument"s };
+    static rule< ast::block_member > block_member{ "block member"s };
 
 
     grammar::grammar()
@@ -97,7 +98,7 @@ namespace perseus
         expression = operand >> *operation;
         {
           // what about operator_identifier? first class functions and all that?
-          operand = string | integer | true_ | false_ | identifier | unary_operation | if_expression | while_expression | return_expression | block_expression | parens_expression | explicit_variable_declaration | deduced_variable_declaration;
+          operand = string | integer | true_ | false_ | identifier | unary_operation | if_expression | while_expression | return_expression | block_expression | parens_expression;
           {
             // `op` x
             unary_operation = operator_identifier > expression;
@@ -116,15 +117,19 @@ namespace perseus
             return_expression = return_ > ( expression | default_to_void );
 
             // { exp1; exp2 }
-            block_expression = brace_open > ( ( expression | default_to_void ) % semicolon ) > brace_close;
+            block_expression = brace_open > ( ( block_member | default_to_void ) % semicolon ) > brace_close;
+            {
+              block_member = expression | explicit_variable_declaration | deduced_variable_declaration;
+              {
+                // let x : t = v
+                explicit_variable_declaration = let_ >> identifier >> colon > identifier > equals > expression;
+                // let x = v
+                deduced_variable_declaration = let_ >> identifier >> equals > expression;
+              }
+            }
 
             // ( expression )
             parens_expression = paren_open > expression > paren_close;
-
-            // let x : t = v
-            explicit_variable_declaration = let_ >> identifier >> colon > identifier > equals > expression;
-            // let x = v
-            deduced_variable_declaration = let_ >> identifier >> equals > expression;
           }
           operation = binary_operation | call_expression | index_expression;
           {
