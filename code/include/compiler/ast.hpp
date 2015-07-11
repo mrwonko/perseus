@@ -90,7 +90,7 @@ namespace perseus
         struct binary_operation
         {
           std::string operation;
-          expression operand;
+          operand operand;
         };
 
         struct call_expression

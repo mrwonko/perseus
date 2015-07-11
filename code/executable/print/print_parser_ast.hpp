@@ -35,7 +35,7 @@ namespace parser
     void operator()( const ast::binary_operation& exp ) const
     {
       indent() << "<binary " << static_cast< const std::string& >( exp.operation ) << ">" << std::endl;
-      recurse( exp.operand );
+      recurse_visit( exp.operand );
     }
 
     void operator()( const ast::call_expression& exp ) const

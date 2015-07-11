@@ -129,7 +129,7 @@ namespace perseus
           operation = binary_operation | call_expression | index_expression;
           {
             // x `op` y
-            binary_operation = operator_identifier >> expression;
+            binary_operation = operator_identifier >> operand;
 
             // name( arg1, arg2 )
             // a % b means list of a separated by b; that has a minimum length of 1, thus the - (optional)
