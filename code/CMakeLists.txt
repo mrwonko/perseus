@@ -101,7 +101,11 @@ add_executable( testsuite
 )
 
 add_executable( perseus_print
-    "src/executable/perseus_print.cpp"
+    "executable/print/main.cpp"
+    "executable/print/print_clean_ast.hpp"
+    "executable/print/print_parser_ast.hpp"
+    "executable/print/print_ast.hpp"
+    "executable/print/print_ast.inl"
     ${UTIL_FILES}
 )
 
