@@ -58,6 +58,7 @@ namespace perseus
         struct binary_operation;
         struct call_expression;
         struct index_expression;
+        struct expression;
         
         typedef boost::variant<
           void_expression,
@@ -72,7 +73,7 @@ namespace perseus
           boost::recursive_wrapper< while_expression >,
           boost::recursive_wrapper< return_expression >,
           boost::recursive_wrapper< block_expression >,
-          boost::recursive_wrapper< parens_expression >
+          boost::recursive_wrapper< expression >
         > operand;
 
         typedef boost::variant<
@@ -138,7 +139,6 @@ namespace perseus
           boost::recursive_wrapper< while_expression >,
           boost::recursive_wrapper< return_expression >,
           boost::recursive_wrapper< block_expression >,
-          boost::recursive_wrapper< parens_expression >,
           boost::recursive_wrapper< index_expression >,
           boost::recursive_wrapper< binary_operation >,
           boost::recursive_wrapper< call_expression >

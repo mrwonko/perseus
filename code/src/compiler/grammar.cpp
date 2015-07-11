@@ -76,7 +76,7 @@ namespace perseus
     static rule< ast::return_expression > return_expression{ "return expression"s };
     static rule< ast::call_expression > call_expression{ "call expression"s };
     static rule< ast::block_expression > block_expression{ "block expression"s };
-    static rule< ast::parens_expression > parens_expression{ "parens expression"s };
+    static rule< ast::expression > parens_expression{ "parens expression"s };
     static rule< ast::index_expression > index_expression{ "index expression"s };
     static rule< ast::explicit_variable_declaration > explicit_variable_declaration{ "explicit variable declaration"s };
     static rule< ast::deduced_variable_declaration > deduced_variable_declaration{ "deduced variable declaration"s };

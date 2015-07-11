@@ -56,9 +56,9 @@ namespace perseus
         }
         return clean::block_expression{ std::move( exps ) };
       }
-      clean::expression operator()( parser::parens_expression& exp ) const
+      clean::expression operator()( parser::expression& exp ) const
       {
-        return clean::parens_expression{ convert( std::move( exp.body ) ) };
+        return convert( std::move( exp ) );
       }
     };
 

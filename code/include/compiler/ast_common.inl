@@ -41,27 +41,6 @@ struct block_expression
   std::vector< expression > body;
 };
 
-/**
-@brief Explicit precedence using parens
-
-Binary expressions in the ast will be re-ordered according to their associativity and precedence; we need to keep track of explicitly defined precedence so we don't reorder that.
-*/
-struct parens_expression
-{
-#ifdef PERSEUS_AST_PARSER
-  parens_expression() = default;
-  parens_expression( const expression& exp )
-    : body( exp )
-  {
-  }
-  operator const expression&( ) const
-  {
-    return body;
-  }
-#endif
-  expression body;
-};
-
 struct explicit_variable_declaration
 {
   identifier variable;

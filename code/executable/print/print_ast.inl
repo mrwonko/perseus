@@ -105,9 +105,3 @@ void operator()( const ast::block_expression& block ) const
     recurse( exp );
   }
 }
-
-void operator()( const ast::parens_expression& par ) const
-{
-  indent() << "<parens>" << std::endl;
-  recurse( par.body );
-}
