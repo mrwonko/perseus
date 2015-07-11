@@ -1,13 +1,6 @@
 // structs shared between ast::parser and ast::clean
 // (except they're not quite shared, since the definition of expression varies, so we need to inline them)
 
-/// Unary operation such as -x
-struct unary_operation
-{
-  std::string operation;
-  expression operand;
-};
-
 /// if-then[-else] expression
 struct if_expression
 {

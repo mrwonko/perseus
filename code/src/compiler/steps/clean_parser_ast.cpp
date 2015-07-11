@@ -114,7 +114,7 @@ namespace perseus
       return root;
     }
 
-    clean::file clean_parser_ast( parser::file&& file )
+    clean::file clean_parser_ast( parser::file&& file, const type_manager& types, const function_manager& functions )
     {
       ast::clean::file result;
       for( auto& function : file.functions )

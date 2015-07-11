@@ -10,6 +10,7 @@
 
 #include "iterators.hpp"
 #include "token_definitions.hpp"
+#include "function_manager.hpp"
 
 // TODO: separate these into multiple files so you can only import ast::parser or ast::clean on demand?
 namespace perseus
@@ -50,6 +51,7 @@ namespace perseus
         struct call_expression;
         struct index_expression;
         struct expression;
+        struct unary_operation;
         
         typedef boost::variant<
           void_expression,
@@ -75,6 +77,16 @@ namespace perseus
         {
           operand head;
           std::vector< operation > tail;
+        };
+
+        /**
+        @brief Unary operation such as -x
+        @note They're translated to function calls in ast::clean
+        */
+        struct unary_operation
+        {
+          std::string operation;
+          expression operand;
         };
 
         struct binary_operation
@@ -121,26 +133,18 @@ namespace perseus
           std::int32_t,
           bool,
           identifier,
-          boost::recursive_wrapper< unary_operation >,
           boost::recursive_wrapper< if_expression >,
           boost::recursive_wrapper< while_expression >,
           boost::recursive_wrapper< return_expression >,
           boost::recursive_wrapper< block_expression >,
           boost::recursive_wrapper< index_expression >,
-          boost::recursive_wrapper< binary_operation >,
           boost::recursive_wrapper< call_expression >
         > expression;
 
-        struct binary_operation
-        {
-          expression left_operand;
-          identifier operation;
-          expression right_operand;
-        };
-
+        // for function pointers I'll need an indirect call expression?
         struct call_expression
         {
-          expression function;
+          function_signature function;
           std::vector< expression > arguments;
         };
 
