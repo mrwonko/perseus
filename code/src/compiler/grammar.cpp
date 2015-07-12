@@ -85,6 +85,7 @@ namespace perseus
     static rule< ast::function_argument > function_argument{ "function argument"s };
     static rule< ast::block_member > block_member{ "block member"s };
     static rule< bool > optional_mutable{ "optional mutable"s };
+    static rule< bool > optional_impure{ "optional impure"s };
 
 
     grammar::grammar()
@@ -93,8 +94,9 @@ namespace perseus
       // EOI = End of Input
       file = +function_definition > qi::eoi;
 
-      function_definition = function_ > identifier > paren_open > -( function_argument % comma ) > paren_close > -( arrow_right > identifier ) > expression;
+      function_definition = optional_impure >> function_ > identifier > paren_open > -( function_argument % comma ) > paren_close > -( arrow_right > identifier ) > expression;
       {
+        optional_impure = ( impure_ >> qi::attr( true ) ) | qi::attr( false );
         function_argument = identifier > colon > identifier;
         // this split is required to prevent left recursion, which in the parser turns into an infinite recursion.
         expression = operand >> *operation;
