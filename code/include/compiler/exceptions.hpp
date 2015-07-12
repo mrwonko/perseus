@@ -18,11 +18,11 @@ namespace perseus
   struct syntax_error : compile_error
   {
     using compile_error::compile_error;
-  }
+  };
 
   struct semantic_error : compile_error
   {
-    using syntax_error::syntax_error;
+    using compile_error::compile_error;
   };
 
   /**

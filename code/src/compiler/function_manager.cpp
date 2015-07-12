@@ -82,9 +82,12 @@ namespace perseus
       _functions.emplace( function_signature{ "+",{ type_id::i32, type_id::i32 } }, function_info{ opcode::add_i32, type_id::i32, 6, operator_associativity::left } );
     }
 
-    bool function_manager::register_function( function_signature&& signature, function_info&& info )
+    boost::optional< function_manager::function_map::const_iterator > function_manager::register_function( function_signature&& signature, function_info&& info )
     {
-      return _functions.emplace( std::make_pair( std::move( signature ), std::move( info ) ) ).second;
+      function_map::const_iterator it;
+      bool inserted;
+      std::tie( it, inserted ) = _functions.emplace( std::make_pair( std::move( signature ), std::move( info ) ) );
+      return inserted ? boost::make_optional( it ) : boost::optional< function_map::const_iterator >{};
     }
 
     bool function_manager::has_open_address_requests() const

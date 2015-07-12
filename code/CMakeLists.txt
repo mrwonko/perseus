@@ -14,6 +14,7 @@ find_package( Boost COMPONENTS unit_test_framework REQUIRED )
 set( SHARED_FILES
     "src/shared/opcodes.cpp" "include/shared/opcodes.hpp"
     "include/shared/documentation.hpp"
+    "include/shared/optional_apply.hpp"
 )
 
 set( COMPILER_FILES

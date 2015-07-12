@@ -67,6 +67,7 @@ struct function_definition
   std::vector< function_argument > arguments;
   boost::optional< identifier > type;
   expression body;
+  boost::optional< function_manager::function_map::const_iterator > manager_entry;
 };
 
 struct file

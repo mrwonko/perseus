@@ -1,5 +1,8 @@
 #include "compiler/types.hpp"
+#include "compiler/exceptions.hpp"
+#include "compiler/ast.hpp"
 
+#include <stdexcept>
 #include <map>
 
 namespace perseus
@@ -18,10 +21,12 @@ namespace perseus
         return 1;
       case type_id::i32:
         return 4;
+      default:
+        throw std::logic_error( "invalid type_id" );
       }
     }
 
-    bool get_type( const std::string& name, type_id& out_type )
+    bool get_type( const ast::identifier& name, type_id& out_type )
     {
       static std::map< std::string, type_id > types{
         { "i32"s, type_id::i32 },
@@ -36,6 +41,16 @@ namespace perseus
       return true;
     }
 
+    type_id get_type( const ast::identifier& name )
+    {
+      type_id id;
+      if( !get_type( name, id ) )
+      {
+        throw semantic_error{ "Invalid type: "s + static_cast< const std::string& >( name ), static_cast< const file_position& >( name ) };
+      }
+      return id;
+    }
+
     std::string get_name( type_id t )
     {
       switch( t )
@@ -46,6 +61,8 @@ namespace perseus
         return "bool"s;
       case type_id::i32:
         return "i32"s;
+      default:
+        throw std::logic_error( "invalid type_id" );
       }
     }
   }

@@ -130,7 +130,7 @@ namespace perseus
       /**
       @brief Registers a function, i.e. declares its signature valid
       */
-      bool register_function( function_signature&& signature, function_info&& info );
+      boost::optional< function_map::const_iterator > register_function( function_signature&& signature, function_info&& info );
       
       function_info& get_function( const function_signature& function )
       {
