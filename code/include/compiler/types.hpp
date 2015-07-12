@@ -19,5 +19,7 @@ namespace perseus
     std::uint32_t get_size( type_id t );
 
     bool get_type( const std::string& name, type_id& out_type );
+
+    std::string get_name( type_id t );
   }
 }
