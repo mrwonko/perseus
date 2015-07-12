@@ -36,7 +36,7 @@ namespace perseus
         // other
         let_,
         function_,
-        mut_,
+        mutable_,
         impure_,
 
         colon,
