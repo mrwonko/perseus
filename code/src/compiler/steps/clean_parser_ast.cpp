@@ -119,7 +119,7 @@ namespace perseus
       {
         std::stringstream error;
         error << function->first << " returns incorrect type " << get_name( function->second.return_type ) << "!";
-        throw semantic_error{ error.str(), pos };
+        throw type_error{ error.str(), pos };
       }
       if( !context.expected.is_purity_accepted( function->second.pure ) )
       {
@@ -217,7 +217,7 @@ namespace perseus
         clean::expression else_expression = convert( std::move( exp.else_expression ), context );
         if( then_expression.type != else_expression.type )
         {
-          throw semantic_error( "\"if\" branch types do not match: then branch returns "s + get_name( then_expression.type ) + ", else branch returns "s + get_name( else_expression.type ) + "!"s, condition.position );
+          throw type_error( "\"if\" branch types do not match: then branch returns "s + get_name( then_expression.type ) + ", else branch returns "s + get_name( else_expression.type ) + "!"s, condition.position );
         }
         return{ then_expression.type, condition.position, clean::if_expression{ std::move( condition ), std::move( then_expression ), std::move( else_expression ) } };
       }
@@ -226,7 +226,7 @@ namespace perseus
         clean::expression condition = convert( std::move( exp.condition ), context.expect( type_id::bool_ ) );
         if( !context.expected.is_type_accepted( type_id::void_ ) )
         {
-          throw semantic_error{ "Can't use while expression, void type illegal here!"s, condition.position };
+          throw type_error{ "Can't use while expression, void type illegal here!"s, condition.position };
         }
         clean::expression body = convert( std::move( exp.body ), context.expect( tag_any_type{} ) );
         return{ type_id::void_, condition.position, clean::while_expression{ std::move( condition ), std::move( body ) } };
@@ -254,7 +254,7 @@ namespace perseus
           if( !context.expected.is_type_accepted( type_id::void_ ) )
           {
             // TODO: track position
-            throw semantic_error( "Block can't be empty, void type illegal here!", pos );
+            throw type_error( "Block can't be empty, void type illegal here!", pos );
           }
           return{ type_id::void_, pos, clean::block_expression{ std::move( members ) } };
         }

@@ -25,6 +25,11 @@ namespace perseus
     using compile_error::compile_error;
   };
 
+  struct type_error : semantic_error
+  {
+    using semantic_error::semantic_error;
+  };
+
   /**
   @brief File that was to be compiled is not encoded correctly (stray utf-8 continuations)
   */
