@@ -47,22 +47,34 @@ int main( const int argc, const char* argv[] )
   std::stringstream stringsource;
   std::ifstream filesource;
   std::string filename;
+  std::istream* source;
   if( argv[ 1 ] == "-e"s )
   {
     stringsource = std::stringstream( argv[ 2 ] );
     filename = "<string>";
+    source = &stringsource;
   }
   else
   {
     filesource = std::ifstream( argv[ 1 ] );
     filename = argv[ 1 ];
+    source = &filesource;
   }
-  std::istream& source = argv[ 1 ] == "-e"s ? static_cast< std::istream&>( stringsource ) : filesource;
 
   try
   {
     perseus::detail::enhanced_istream_iterator input_it, input_end;
+    std::tie( input_it, input_end ) = perseus::detail::enhanced_iterators( *source );
     perseus::detail::skip_byte_order_mark( input_it, input_end );
+    // print input
+      std::cout << "Input:\n> ";
+    for( auto it = input_it; it != input_end; ++it )
+    {
+      std::cout << *it;
+      if( *it == '\n' )
+        std::cout << "> ";
+    }
+    std::cout << "\n" << std::endl;
     perseus::detail::token_definitions lexer;
     perseus::detail::token_iterator tokens_begin = lexer.begin( input_it, input_end );
     const perseus::detail::token_iterator tokens_end = lexer.end();
