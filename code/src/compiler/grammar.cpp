@@ -152,6 +152,29 @@ namespace perseus
           }
         }
       }
+
+      // in order for debug output to work, operator<<( std::ostream&, Attribute ) must be defined
+      /*
+      debug( expression );
+      debug( operand );
+      debug( operation );
+      debug( binary_operation );
+      debug( unary_operation );
+      debug( if_expression );
+      debug( while_expression );
+      debug( return_expression );
+      debug( call_expression );
+      debug( block_expression );
+      debug( parens_expression );
+      debug( index_expression );
+      debug( explicit_variable_declaration );
+      debug( deduced_variable_declaration );
+      debug( function_definition );
+      debug( function_argument );
+      debug( block_member );
+      debug( optional_mutable );
+      debug( optional_impure );
+      */
     }
 
     using skip_rule = qi::rule< token_iterator >;

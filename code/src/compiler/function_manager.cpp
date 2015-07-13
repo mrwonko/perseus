@@ -23,6 +23,21 @@ namespace perseus
       return size;
     }
 
+    std::ostream& operator<<( std::ostream& os, const function_signature& signature )
+    {
+      os << static_cast< const std::string& >( signature.name ) << "(";
+      for( auto it = signature.parameters.begin(); it != signature.parameters.end(); )
+      {
+        os << get_name( *it );
+        ++it;
+        if( it != signature.parameters.end() )
+        {
+          os << ", ";
+        }
+      }
+      os << ")";
+      return os;
+    }
 
     void function_info::set_address( instruction_pointer::value_type address, code_segment& code )
     {
@@ -79,7 +94,7 @@ namespace perseus
     function_manager::function_manager()
     {
       // function_signature{ identifier, { parameter types } }, function_info{ opcode, return type, precedence, associativity }
-      _functions.emplace( function_signature{ "+",{ type_id::i32, type_id::i32 } }, function_info{ opcode::add_i32, type_id::i32, 6, operator_associativity::left } );
+      _functions.emplace( function_signature{ "+",{ type_id::i32, type_id::i32 } }, function_info{ opcode::add_i32, type_id::i32, true, 6, operator_associativity::left } );
     }
 
     boost::optional< function_manager::function_map::const_iterator > function_manager::register_function( function_signature&& signature, function_info&& info )
@@ -88,6 +103,12 @@ namespace perseus
       bool inserted;
       std::tie( it, inserted ) = _functions.emplace( std::make_pair( std::move( signature ), std::move( info ) ) );
       return inserted ? boost::make_optional( it ) : boost::optional< function_map::const_iterator >{};
+    }
+
+    boost::optional< function_manager::function_map::const_iterator > function_manager::get_function( const function_signature& function ) const
+    {
+      function_map::const_iterator pos = _functions.find( function );
+      return pos == _functions.end() ? boost::optional< function_map::const_iterator >{} : boost::make_optional( pos );
     }
 
     bool function_manager::has_open_address_requests() const

@@ -2,12 +2,17 @@
 #include <iostream>
 #include <fstream>
 #include <utility>
+#include <cctype>
 
-#include <boost/spirit/home/lex/tokenize_and_parse.hpp>
+#include <boost/spirit/home/qi/parse.hpp>
 #include <boost/spirit/home/qi.hpp>
 
 #include "compiler/compiler.hpp"
 #include "compiler/steps.hpp"
+#include "compiler/exceptions.hpp"
+#include "compiler/iterators.hpp"
+#include "compiler/token_definitions.hpp"
+#include "compiler/grammar.hpp"
 #include "util/u32string_ostream.hpp"
 
 #include "print_parser_ast.hpp"
@@ -38,19 +43,77 @@ int main( const int argc, const char* argv[] )
     return 0;
   }
 
-  perseus::detail::ast::parser::file parser_ast;
-  bool success = true;
+  // open input stream
+  std::stringstream stringsource;
+  std::ifstream filesource;
+  std::string filename;
+  if( argv[ 1 ] == "-e"s )
+  {
+    stringsource = std::stringstream( argv[ 2 ] );
+    filename = "<string>";
+  }
+  else
+  {
+    filesource = std::ifstream( argv[ 1 ] );
+    filename = argv[ 1 ];
+  }
+  std::istream& source = argv[ 1 ] == "-e"s ? static_cast< std::istream&>( stringsource ) : filesource;
+
   try
   {
+    perseus::detail::enhanced_istream_iterator input_it, input_end;
+    perseus::detail::skip_byte_order_mark( input_it, input_end );
+    perseus::detail::token_definitions lexer;
+    perseus::detail::token_iterator tokens_begin = lexer.begin( input_it, input_end );
+    const perseus::detail::token_iterator tokens_end = lexer.end();
+
+    // print tokens
+    std::cout << "Tokens:" << std::endl;
+    for( perseus::detail::token_iterator tokens_it = tokens_begin; tokens_it != tokens_end; ++tokens_it )
+    {
+      auto& token = *tokens_it;
+      std::cout << " " << token.id() << " - \"";
+      for( char c : std::string( token.value().begin(), token.value().end() ) )
+      {
+        if( c == '\n' )
+          std::cout << "\\n";
+        else if( c == '\t' )
+          std::cout << "\\t";
+        else if( c == '\\' )
+          std::cout << "\\\\";
+        else if( c == '"' )
+          std::cout << "\\\"";
+        else if( std::isprint( c ) )
+          std::cout << c;
+        else
+          std::cout << "\\x" << std::hex << static_cast< unsigned int >( c );
+      }
+      std::cout << "\"" << std::endl;
+    }
+
+    // parse stream
+    perseus::detail::grammar grammar;
+    perseus::detail::skip_grammar skipper;
     perseus::compiler compiler;
-    if( argv[ 1 ] == "-e"s )
+    perseus::detail::ast::parser::file parser_ast;
+    bool success = boost::spirit::qi::phrase_parse( tokens_begin, tokens_end, grammar, skipper, parser_ast );
+    if( !success )
     {
-      parser_ast = compiler.parse( std::stringstream( argv[ 2 ] ), "<string>" );
+      std::cerr << "phrase_parse() returned false." << std::endl;
+      return 1;
     }
-    else
+    if( tokens_begin != tokens_end )
     {
-      parser_ast = compiler.parse( std::ifstream( argv[ 1 ] ), argv[ 1 ] );
+      std::cerr << "phrase_parse() did not consume all tokens." << std::endl;
+      return 1;
     }
+    parser::print_visitor{}( parser_ast );
+    std::cout << "\n# Extracting functions..." << std::endl;
+    auto functions = perseus::detail::extract_functions( parser_ast );
+    std::cout << "# Checking types and references..." << std::endl;
+    auto clean_ast = perseus::detail::clean_parser_ast( std::move( parser_ast ), functions );
+    std::cout << "# Cleanded version:\n" << std::endl;
+    clean::print_visitor{}( clean_ast );
   }
   catch( boost::spirit::qi::expectation_failure< perseus::detail::token_iterator >& e )
   {
@@ -61,23 +124,16 @@ int main( const int argc, const char* argv[] )
     }
     else
     {
-      std::cerr << "Unexpected token " << e.first->id() << " at " << e.first->value().begin().get_position() << std::endl;
+      std::cerr << "Expectation failure: " << e.first->id() << " at " << e.first->value().begin().get_position() << std::endl;
     }
-    success = false;
+  }
+  catch( perseus::compile_error& e )
+  {
+    std::cerr << "Compile error at " << e.location << ": " << e.what() << std::endl;
   }
   catch( std::exception& e )
   {
     std::cerr << "Exception: " << e.what() << std::endl;
-    success = false;
   }
-  if( !success )
-  {
-    std::cerr << "Could not parse file!" << std::endl;
-    return 1;
-  }
-  parser::print_visitor{}( parser_ast );
-  auto clean_ast = perseus::detail::clean_parser_ast( std::move( parser_ast ) );
-  std::cout << "\n# Cleanded version:\n" << std::endl;
-  clean::print_visitor{}( clean_ast );
   return 0;
 }

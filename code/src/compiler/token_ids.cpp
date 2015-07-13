@@ -79,7 +79,7 @@ namespace perseus
         case any:
           return os << "any";
         default:
-          return os << "token_id(" << static_cast< unsigned int >( token ) << ')';
+          return os << "token_id(0x" << std::hex << static_cast< unsigned int >( token ) << ')';
         }
       }
     }

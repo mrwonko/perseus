@@ -5,6 +5,7 @@
 #include <string>
 #include <cstdint>
 #include <utility>
+#include <ostream>
 
 #include <boost/optional/optional.hpp>
 
@@ -40,21 +41,26 @@ namespace perseus
       std::vector< type_id >::size_type parameters_size() const;
     };
 
+    std::ostream& operator<<( std::ostream& os, const function_signature& signature );
+
+    // TODO: native types
     class function_info
     {
     public:
       /// constructor
-      function_info( type_id return_type, unsigned int precedence = default_precedence, operator_associativity associativity = operator_associativity::left )
+      function_info( type_id return_type, bool pure = true, unsigned int precedence = default_precedence, operator_associativity associativity = operator_associativity::left )
         : return_type( return_type )
-        , precedence( precedence )
+        , pure( pure )
         , associativity( associativity )
+        , precedence( precedence )
       {
       }
       /// builtin function constructor
-      function_info( opcode code, type_id return_type, unsigned int precedence = default_precedence, operator_associativity associativity = operator_associativity::left )
+      function_info( opcode code, type_id return_type, bool pure = true, unsigned int precedence = default_precedence, operator_associativity associativity = operator_associativity::left )
         : return_type( return_type )
-        , precedence( precedence )
+        , pure( pure )
         , associativity( associativity )
+        , precedence( precedence )
         , _opcode( code )
       {
       }
@@ -68,8 +74,9 @@ namespace perseus
       function_info& operator=( const function_info& ) = delete;
 
       const type_id return_type;
-      const unsigned int precedence;
+      const bool pure;
       const operator_associativity associativity;
+      const unsigned int precedence;
       
       /**
       @brief Fulfils address requests with the given address
@@ -132,15 +139,7 @@ namespace perseus
       */
       boost::optional< function_map::const_iterator > register_function( function_signature&& signature, function_info&& info );
       
-      function_info& get_function( const function_signature& function )
-      {
-        return _functions.at( function );
-      }
-      
-      const function_info& get_function( const function_signature& function ) const
-      {
-        return _functions.at( function );
-      }
+      boost::optional< function_map::const_iterator > get_function( const function_signature& function ) const;
       
       bool has_open_address_requests() const;
       

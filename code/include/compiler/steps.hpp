@@ -11,6 +11,8 @@ namespace perseus
     @brief Traverses an AST to extract the function declarations
 
     Annotates the ast::parser::function_definition nodes with the created manager entry.
+
+    This essentially resolves forward references the recursive descent in clean_parser_ast() can't handle.
     @returns A function manager handling all the extracted functions
     @throws semantic_error when invalid types are referenced in function signatures
     */

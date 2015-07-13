@@ -29,27 +29,6 @@ struct return_expression
   expression value;
 };
 
-struct explicit_variable_declaration
-{
-  bool mut;
-  identifier variable;
-  identifier type;
-  expression initial_value;
-};
-
-struct deduced_variable_declaration
-{
-  bool mut;
-  identifier variable;
-  expression initial_value;
-};
-
-typedef boost::variant<
-  boost::recursive_wrapper< deduced_variable_declaration >,
-  boost::recursive_wrapper< explicit_variable_declaration >,
-  expression
-> block_member;
-
 struct block_expression
 {
   std::vector< block_member > body;
@@ -63,12 +42,19 @@ struct function_argument
 
 struct function_definition
 {
+#ifdef PERSEUS_AST_PARSER
   identifier name;
   std::vector< function_argument > arguments;
   boost::optional< identifier > type;
   bool pure;
+#endif
   expression body;
+#ifdef PERSEUS_AST_PARSER
+  // only added during the extract_functions step, initially missing
   boost::optional< function_manager::function_map::const_iterator > manager_entry;
+#elif defined PERSEUS_AST_CLEAN
+  function_manager::function_map::const_iterator manager_entry;
+#endif
 };
 
 struct file
