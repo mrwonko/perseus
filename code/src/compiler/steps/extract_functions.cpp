@@ -28,7 +28,7 @@ namespace perseus
           return get_type( arg.type );
         } );
         function_signature signature{ function.name, std::move( parameters ) };
-        function_info info{ optional_apply( function.type, []( const ast::identifier& type ) { return get_type( type ); } ).value_or( type_id::void_ ) };
+        function_info info{ optional_apply( function.type, []( const ast::identifier& type ) { return get_type( type ); } ).value_or( type_id::void_ ), function.pure };
         if( !( function.manager_entry = functions.register_function( std::move( signature ), std::move( info ) ) ) )
         {
           throw semantic_error{ "Duplicate function definition for "s + static_cast< const std::string& >( function.name ), static_cast< const file_position& >( function.name ) };
