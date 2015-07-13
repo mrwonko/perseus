@@ -178,16 +178,28 @@ namespace perseus
       clean::expression operator()( const std::int32_t& i ) const
       {
         // TODO: track position
+        if( !context.expected.is_type_accepted( type_id::i32 ) )
+        {
+          throw type_error{ "i32 type not valid here!", { 0, 0 } };
+        }
         return { type_id::i32, { 0, 0 }, i };
       }
       clean::expression operator()( const bool& b ) const
       {
         // TODO: track position
+        if( !context.expected.is_type_accepted( type_id::bool_ ) )
+        {
+          throw type_error{ "bool type not valid here!",{ 0, 0 } };
+        }
         return{ type_id::bool_, { 0, 0 }, b };
       }
       clean::expression operator()( const ast::void_expression& ) const
       {
         // TODO: track position
+        if( !context.expected.is_type_accepted( type_id::void_ ) )
+        {
+          throw type_error{ "void type not valid here!",{ 0, 0 } };
+        }
         return{ type_id::void_, { 0, 0 }, ast::void_expression{} };
       }
       clean::expression operator()( const ast::string_literal& lit ) const
