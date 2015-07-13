@@ -12,7 +12,7 @@ namespace perseus
     {
       enum token_id
       {
-        whitespace,
+        whitespace = 1,
         comment,
 
         // constants
