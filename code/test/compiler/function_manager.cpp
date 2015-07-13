@@ -4,7 +4,7 @@
 
 using namespace perseus::detail;
 
-typedef function_manager::function_map::const_iterator iterator;
+typedef const function_manager::function_map::value_type* iterator;
 
 BOOST_AUTO_TEST_SUITE( compiler )
 

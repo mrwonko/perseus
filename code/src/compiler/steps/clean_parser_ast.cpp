@@ -90,9 +90,9 @@ namespace perseus
     };
 
     /// @throws semantic_error on unknown signature
-    static function_manager::function_map::const_iterator find_function( const context& context, const function_signature& signature, const file_position& pos )
+    static const function_manager::function_map::value_type* find_function( const context& context, const function_signature& signature, const file_position& pos )
     {
-      function_manager::function_map::const_iterator function;
+      const function_manager::function_map::value_type* function;
       if( !context.functions.get_function( signature, function ) )
       {
         function_manager::function_map::const_iterator begin, end;
@@ -113,7 +113,7 @@ namespace perseus
       return function;
     }
 
-    static void check_function( const context& context, function_manager::function_map::const_iterator function, const file_position& pos )
+    static void check_function( const context& context, const function_manager::function_map::value_type* function, const file_position& pos )
     {
       if( !context.expected.is_type_accepted( function->second.return_type ) )
       {
@@ -307,7 +307,7 @@ namespace perseus
       {
         signature.parameters.push_back( argument.type );
       }
-      function_manager::function_map::const_iterator function = find_function( context, signature, position );
+      auto function = find_function( context, signature, position );
       check_function( context, function, position );
       return{ function->second.return_type, std::move( position ), clean::call_expression{ function, std::move( arguments ) } };
     }

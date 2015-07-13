@@ -52,7 +52,7 @@ struct function_definition
 #endif
   /// function_signature & function_info describing purity, arguments etc.
   /// filled in extract_functions()
-  function_manager::function_map::const_iterator manager_entry;
+  const function_manager::function_map::value_type* manager_entry;
 };
 
 struct file
