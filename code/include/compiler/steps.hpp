@@ -13,10 +13,11 @@ namespace perseus
     Annotates the ast::parser::function_definition nodes with the created manager entry.
 
     This essentially resolves forward references the recursive descent in clean_parser_ast() can't handle.
-    @returns A function manager handling all the extracted functions
+    @param ast The AST to extract function definitions from; its ast::parser::function_definition nodes get their manager_entry set.
+    @param out_functions The function manager handling all the extracted functions
     @throws semantic_error when invalid types are referenced in function signatures
     */
-    function_manager extract_functions( ast::parser::file& ast );
+    void extract_functions( ast::parser::file& ast, function_manager& out_functions );
     /**
     @brief Converts AST to one with proper binary operation nodes.
 

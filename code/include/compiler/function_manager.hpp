@@ -137,9 +137,9 @@ namespace perseus
       /**
       @brief Registers a function, i.e. declares its signature valid
       */
-      boost::optional< function_map::const_iterator > register_function( function_signature&& signature, function_info&& info );
+      bool register_function( function_signature&& signature, function_info&& info, function_map::const_iterator& out_result );
       
-      boost::optional< function_map::const_iterator > get_function( const function_signature& function ) const;
+      bool get_function( const function_signature& function, function_map::const_iterator& out_result ) const;
       
       bool has_open_address_requests() const;
       

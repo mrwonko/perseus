@@ -61,10 +61,12 @@ set( TEST_FILES
     "test/write_code_segment.hpp"
     "test/instruction_pointer.cpp"
     "test/stack.cpp"
+    "test/cpp.cpp"
     "test/compiler/iterators.cpp"
     "test/compiler/lexer.cpp"
     "test/compiler/parser.cpp"
     "test/compiler/literals.cpp"
+    "test/compiler/function_manager.cpp"
 )
 
 source_group( "src" REGULAR_EXPRESSION "src/.*" )

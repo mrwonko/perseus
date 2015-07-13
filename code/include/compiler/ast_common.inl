@@ -42,19 +42,17 @@ struct function_argument
 
 struct function_definition
 {
+  expression body;
+
 #ifdef PERSEUS_AST_PARSER
   identifier name;
   std::vector< function_argument > arguments;
   boost::optional< identifier > type;
   bool pure;
 #endif
-  expression body;
-#ifdef PERSEUS_AST_PARSER
-  // only added during the extract_functions step, initially missing
-  boost::optional< function_manager::function_map::const_iterator > manager_entry;
-#elif defined PERSEUS_AST_CLEAN
+  /// function_signature & function_info describing purity, arguments etc.
+  /// filled in extract_functions()
   function_manager::function_map::const_iterator manager_entry;
-#endif
 };
 
 struct file

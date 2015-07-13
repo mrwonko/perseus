@@ -121,11 +121,13 @@ int main( const int argc, const char* argv[] )
     }
     parser::print_visitor{}( parser_ast );
     std::cout << "\n# Extracting functions..." << std::endl;
-    auto functions = perseus::detail::extract_functions( parser_ast );
+    perseus::detail::function_manager functions;
+    perseus::detail::extract_functions( parser_ast, functions );
     std::cout << "# Checking types and references..." << std::endl;
-    auto clean_ast = perseus::detail::clean_parser_ast( std::move( parser_ast ), functions );
+    perseus::detail::ast::clean::file clean_ast = perseus::detail::clean_parser_ast( std::move( parser_ast ), functions );
     std::cout << "# Cleanded version:\n" << std::endl;
     clean::print_visitor{}( clean_ast );
+    std::cout << "\ndone." << std::endl;
   }
   catch( boost::spirit::qi::expectation_failure< perseus::detail::token_iterator >& e )
   {

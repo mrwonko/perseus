@@ -92,8 +92,8 @@ namespace perseus
     /// @throws semantic_error on unknown signature
     static function_manager::function_map::const_iterator find_function( const context& context, const function_signature& signature, const file_position& pos )
     {
-      auto function = context.functions.get_function( signature );
-      if( !function )
+      function_manager::function_map::const_iterator function;
+      if( !context.functions.get_function( signature, function ) )
       {
         function_manager::function_map::const_iterator begin, end;
         std::tie( begin, end ) = context.functions.get_functions( signature.name );
@@ -110,7 +110,7 @@ namespace perseus
         }
         throw semantic_error( error.str(), pos );
       }
-      return *function;
+      return function;
     }
 
     static void check_function( const context& context, function_manager::function_map::const_iterator function, const file_position& pos )
@@ -307,7 +307,7 @@ namespace perseus
       {
         signature.parameters.push_back( argument.type );
       }
-      auto function = find_function( context, signature, position );
+      function_manager::function_map::const_iterator function = find_function( context, signature, position );
       check_function( context, function, position );
       return{ function->second.return_type, std::move( position ), clean::call_expression{ function, std::move( arguments ) } };
     }
@@ -387,6 +387,7 @@ namespace perseus
     clean::file clean_parser_ast( parser::file&& file, const function_manager& functions )
     {
       ast::clean::file result;
+      result.functions.reserve( file.functions.size() );
       for( auto& function : file.functions )
       {
         std::vector< clean::function_argument > args;
@@ -394,11 +395,12 @@ namespace perseus
         {
           args.emplace_back( clean::function_argument{ std::move( arg.name ), std::move( arg.type ) } );
         }
-        type_id result_type = optional_apply( function.type, static_cast< type_id( *)( const ast::identifier& ) >( get_type ) ).value_or( type_id::void_ );
-        expectations expected{ function.pure, result_type };
-        context context{ expected, functions, result_type };
+        // set up context: expected return type, purity
+        type_id return_type = function.manager_entry->second.return_type;
+        expectations expected{ function.manager_entry->second.pure, return_type };
+        context context{ expected, functions, return_type };
         result.functions.emplace_back(
-          clean::function_definition{ convert( std::move( function.body ), context ), *function.manager_entry }
+          clean::function_definition{ convert( std::move( function.body ), context ), function.manager_entry }
         );
       }
       return result;

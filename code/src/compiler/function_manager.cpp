@@ -97,18 +97,23 @@ namespace perseus
       _functions.emplace( function_signature{ "+",{ type_id::i32, type_id::i32 } }, function_info{ opcode::add_i32, type_id::i32, true, 6, operator_associativity::left } );
     }
 
-    boost::optional< function_manager::function_map::const_iterator > function_manager::register_function( function_signature&& signature, function_info&& info )
+    bool function_manager::register_function( function_signature&& signature, function_info&& info, function_map::const_iterator& out_result )
     {
       function_map::const_iterator it;
       bool inserted;
       std::tie( it, inserted ) = _functions.emplace( std::make_pair( std::move( signature ), std::move( info ) ) );
-      return inserted ? boost::make_optional( it ) : boost::optional< function_map::const_iterator >{};
+      if( inserted )
+      {
+        out_result = it;
+        return true;
+      }
+      return false;
     }
 
-    boost::optional< function_manager::function_map::const_iterator > function_manager::get_function( const function_signature& function ) const
+    bool function_manager::get_function( const function_signature& function, function_map::const_iterator& out_result ) const
     {
-      function_map::const_iterator pos = _functions.find( function );
-      return pos == _functions.end() ? boost::optional< function_map::const_iterator >{} : boost::make_optional( pos );
+      out_result = _functions.find( function );
+      return out_result != _functions.end();
     }
 
     bool function_manager::has_open_address_requests() const
