@@ -181,7 +181,7 @@ namespace perseus
 
     // terminals
     static skip_rule whitespace{ qi::token( token_id::whitespace ), "whitespace"s };
-    static skip_rule comment{ qi::token( token_id::whitespace ), "comment"s };
+    static skip_rule comment{ qi::token( token_id::comment ), "comment"s };
     // start symbol
     static skip_grammar::start_type skip{ whitespace | comment };
 
