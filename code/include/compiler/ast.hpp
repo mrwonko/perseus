@@ -10,12 +10,20 @@
 
 #include "iterators.hpp"
 #include "token_definitions.hpp"
+#include "function_manager.hpp"
 
 // TODO: separate these into multiple files so you can only import ast::parser or ast::clean on demand?
 namespace perseus
 {
   namespace detail
   {
+    enum class value_category : unsigned char
+    {
+      lvalue,
+      prvalue,
+      xvalue
+    };
+
     namespace ast
     {
       struct string_literal : std::u32string, file_position
@@ -50,6 +58,7 @@ namespace perseus
         struct call_expression;
         struct index_expression;
         struct expression;
+        struct unary_operation;
         
         typedef boost::variant<
           void_expression,
@@ -77,6 +86,16 @@ namespace perseus
           std::vector< operation > tail;
         };
 
+        /**
+        @brief Unary operation such as -x
+        @note They're translated to function calls in ast::clean
+        */
+        struct unary_operation
+        {
+          identifier operation;
+          expression operand;
+        };
+
         struct binary_operation
         {
           identifier operation;
@@ -102,53 +121,87 @@ namespace perseus
           expression index;
         };
 
+        struct explicit_variable_declaration
+        {
+          bool mut;
+          identifier variable;
+          identifier type;
+          expression initial_value;
+        };
+
+        struct deduced_variable_declaration
+        {
+          bool mut;
+          identifier variable;
+          expression initial_value;
+        };
+
+        typedef boost::variant<
+          boost::recursive_wrapper< deduced_variable_declaration >,
+          boost::recursive_wrapper< explicit_variable_declaration >,
+          expression
+        > block_member;
+
 #include "ast_common.inl"
 #undef PERSEUS_AST_PARSER
       } // namespace parser
 
       namespace clean
       {
+
 #define PERSEUS_AST_CLEAN
 #include "ast_common_fwd.inl"
 
         struct binary_operation;
         struct call_expression;
-        struct index_expression;
-
-        typedef boost::variant<
-          void_expression,
-          string_literal,
-          std::int32_t,
-          bool,
-          identifier,
-          boost::recursive_wrapper< unary_operation >,
-          boost::recursive_wrapper< if_expression >,
-          boost::recursive_wrapper< while_expression >,
-          boost::recursive_wrapper< return_expression >,
-          boost::recursive_wrapper< block_expression >,
-          boost::recursive_wrapper< index_expression >,
-          boost::recursive_wrapper< binary_operation >,
-          boost::recursive_wrapper< call_expression >
-        > expression;
-
-        struct binary_operation
+        struct local_variable_reference
         {
-          expression left_operand;
-          identifier operation;
-          expression right_operand;
+          /// offset from top of stack at time of reference (negative)
+          std::int32_t offset;
         };
 
+        struct expression
+        {
+          // cached annotations
+          /// return type of this expression, so code generation can pop it if it's unused
+          type_id type;
+          file_position position;
+          //value_category category; // not yet implemented
+
+          boost::variant<
+            // constants
+            void_expression,
+            string_literal,
+            std::int32_t,
+            bool,
+            // local variable
+            local_variable_reference,
+            // recursive expression
+            boost::recursive_wrapper< if_expression >,
+            boost::recursive_wrapper< while_expression >,
+            boost::recursive_wrapper< return_expression >,
+            boost::recursive_wrapper< block_expression >,
+            boost::recursive_wrapper< call_expression >
+          > subexpression;
+        };
+
+        // for function pointers I'll need an indirect call expression?
         struct call_expression
         {
-          expression function;
+          function_manager::function_map::const_iterator function;
           std::vector< expression > arguments;
         };
 
-        struct index_expression
+        struct variable_declaration
         {
-          expression indexed;
-          expression index;
+          // type implicit in initial_value.type
+          expression initial_value;
         };
+
+        typedef boost::variant<
+          boost::recursive_wrapper< variable_declaration >,
+          expression
+        > block_member;
 
 #include "ast_common.inl"
 #undef PERSEUS_AST_CLEAN

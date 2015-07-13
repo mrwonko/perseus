@@ -17,5 +17,5 @@ BOOST_FUSION_ADAPT_STRUCT( perseus::detail::ast::parser::block_expression, body 
 BOOST_FUSION_ADAPT_STRUCT( perseus::detail::ast::parser::explicit_variable_declaration, mut, variable, type, initial_value );
 BOOST_FUSION_ADAPT_STRUCT( perseus::detail::ast::parser::deduced_variable_declaration, mut, variable, initial_value );
 BOOST_FUSION_ADAPT_STRUCT( perseus::detail::ast::parser::function_argument, name, type );
-BOOST_FUSION_ADAPT_STRUCT( perseus::detail::ast::parser::function_definition, name, arguments, type, body );
+BOOST_FUSION_ADAPT_STRUCT( perseus::detail::ast::parser::function_definition, pure, name, arguments, type, body );
 BOOST_FUSION_ADAPT_STRUCT( perseus::detail::ast::parser::file, functions );

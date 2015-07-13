@@ -14,6 +14,7 @@ find_package( Boost COMPONENTS unit_test_framework REQUIRED )
 set( SHARED_FILES
     "src/shared/opcodes.cpp" "include/shared/opcodes.hpp"
     "include/shared/documentation.hpp"
+    "include/shared/optional_apply.hpp"
 )
 
 set( COMPILER_FILES
@@ -30,6 +31,9 @@ set( COMPILER_FILES
     "src/compiler/compiler.cpp" "include/compiler/compiler.hpp"
     "include/compiler/steps.hpp"
     "src/compiler/steps/clean_parser_ast.cpp"
+    "src/compiler/steps/extract_functions.cpp"
+    "src/compiler/types.cpp" "include/compiler/types.hpp"
+    "src/compiler/function_manager.cpp" "include/compiler/function_manager.hpp"
 )
 
 set( VM_FILES
@@ -67,6 +71,7 @@ source_group( "src" REGULAR_EXPRESSION "src/.*" )
 source_group( "src\\vm" REGULAR_EXPRESSION "src/vm/.*" )
 source_group( "src\\shared" REGULAR_EXPRESSION "src/shared/.*" )
 source_group( "src\\compiler" REGULAR_EXPRESSION "src/compiler/.*" )
+source_group( "src\\compiler\\steps" REGULAR_EXPRESSION "src/compiler/steps/.*" )
 
 source_group( "include" REGULAR_EXPRESSION "include/.*" )
 source_group( "include\\vm" REGULAR_EXPRESSION "include/vm/.*" )

@@ -5,6 +5,7 @@
 #include <string>
 
 #include "compiler/ast.hpp"
+#include "compiler/types.hpp"
 
 #include "print_ast.hpp"
 
@@ -26,24 +27,47 @@ namespace clean
 
 #include "print_ast.inl"
 
-    void operator()( const ast::index_expression& exp ) const
+    void operator()( const ast::function_definition& func )
     {
-      indent() << "<index>" << std::endl;
-      recurse( exp.indexed );
-      recurse( exp.index );
+      indent()
+        << "<function "
+        << func.manager_entry->first.name
+        << "(";
+      bool first = true;
+      for( perseus::detail::type_id type : func.manager_entry->first.parameters )
+      {
+        if( !first )
+        {
+          std::cout << ", ";
+        }
+        std::cout << perseus::detail::get_name( type );
+        first = false;
+      }
+      std::cout << ")"
+        << " -> "
+        << perseus::detail::get_name( func.manager_entry->second.return_type )
+        << ">"
+        << std::endl;
+      recurse( func.body );
     }
 
-    void operator()( const ast::binary_operation& exp ) const
+    void operator()( const ast::variable_declaration& dec ) const
     {
-      indent() << "<binary " << static_cast< const std::string& >( exp.operation ) << ">" << std::endl;
-      recurse( exp.right_operand );
-      recurse( exp.left_operand );
+      indent() << "<variable declaration>" << std::endl;
+      recurse( dec.initial_value );
+    }
+
+    void operator()( const ast::local_variable_reference& dec ) const
+    {
+      indent() << "<variable reference at offset " << dec.offset << ">" << std::endl;
     }
 
     void operator()( const ast::call_expression& exp ) const
     {
-      indent() << "<call>" << std::endl;
-      recurse( exp.function );
+      indent()
+        << "<call "
+        << exp.function->first.name
+        << ">" << std::endl;
       for( const ast::expression& arg : exp.arguments )
       {
         recurse( arg );
@@ -53,14 +77,15 @@ namespace clean
     // called by block_member visitation
     void operator()( const ast::expression& exp ) const
     {
-      boost::apply_visitor( *this, exp );
+      indent() << "<" << get_name( exp.type ) << " expression>" << std::endl;
+      boost::apply_visitor( print_visitor{ _indent + 2 * INDENT_SPACES }, exp.subexpression );
     }
 
   private:
 
     void recurse( const ast::expression& exp ) const
     {
-      boost::apply_visitor( print_visitor{ _indent + INDENT_SPACES }, exp );
+      print_visitor{ _indent + INDENT_SPACES }( exp );
     }
     void recurse( const ast::block_member& member ) const
     {

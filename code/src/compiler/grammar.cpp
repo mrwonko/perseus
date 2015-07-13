@@ -60,7 +60,7 @@ namespace perseus
     PERSEUS_TERMINAL( let_, "let" );
     PERSEUS_TERMINAL( function_, "function" );
 
-    PERSEUS_TERMINAL( mut_, "mut" );
+    PERSEUS_TERMINAL( mutable_, "mutable" );
     PERSEUS_TERMINAL( impure_, "impure" );
 #undef PERSEUS_TERMINAL
     
@@ -84,7 +84,8 @@ namespace perseus
     static rule< ast::function_definition > function_definition{ "function definition"s };
     static rule< ast::function_argument > function_argument{ "function argument"s };
     static rule< ast::block_member > block_member{ "block member"s };
-    static rule< bool > optional_mut{ "optional mut"s };
+    static rule< bool > optional_mutable{ "optional mutable"s };
+    static rule< bool > optional_impure{ "optional impure"s };
 
 
     grammar::grammar()
@@ -93,8 +94,9 @@ namespace perseus
       // EOI = End of Input
       file = +function_definition > qi::eoi;
 
-      function_definition = function_ > identifier > paren_open > -( function_argument % comma ) > paren_close > -( arrow_right > identifier ) > expression;
+      function_definition = optional_impure >> function_ > identifier > paren_open > -( function_argument % comma ) > paren_close > -( arrow_right > identifier ) > expression;
       {
+        optional_impure = ( impure_ >> qi::attr( true ) ) | qi::attr( false );
         function_argument = identifier > colon > identifier;
         // this split is required to prevent left recursion, which in the parser turns into an infinite recursion.
         expression = operand >> *operation;
@@ -124,11 +126,11 @@ namespace perseus
               block_member = expression | explicit_variable_declaration | deduced_variable_declaration;
               {
                 // let [mut] x : t = v
-                explicit_variable_declaration = let_ >> optional_mut >> identifier >> colon >> identifier >> equals >> expression; // > (expectation) won't compile? I don't even?
+                explicit_variable_declaration = let_ >> optional_mutable >> identifier >> colon >> identifier >> equals >> expression; // > (expectation) won't compile? I don't even?
                 // let [mut] x = v
-                deduced_variable_declaration = let_ >> optional_mut >> identifier >> ( equals > expression ); // similar deal - only compiles with the parens?!
+                deduced_variable_declaration = let_ >> optional_mutable >> identifier >> ( equals > expression ); // similar deal - only compiles with the parens?!
                 {
-                  optional_mut = ( mut_ >> qi::attr( true ) ) | qi::attr( false );
+                  optional_mutable = ( mutable_ >> qi::attr( true ) ) | qi::attr( false );
                 }
               }
             }
@@ -150,13 +152,36 @@ namespace perseus
           }
         }
       }
+
+      // in order for debug output to work, operator<<( std::ostream&, Attribute ) must be defined
+      /*
+      debug( expression );
+      debug( operand );
+      debug( operation );
+      debug( binary_operation );
+      debug( unary_operation );
+      debug( if_expression );
+      debug( while_expression );
+      debug( return_expression );
+      debug( call_expression );
+      debug( block_expression );
+      debug( parens_expression );
+      debug( index_expression );
+      debug( explicit_variable_declaration );
+      debug( deduced_variable_declaration );
+      debug( function_definition );
+      debug( function_argument );
+      debug( block_member );
+      debug( optional_mutable );
+      debug( optional_impure );
+      */
     }
 
     using skip_rule = qi::rule< token_iterator >;
 
     // terminals
     static skip_rule whitespace{ qi::token( token_id::whitespace ), "whitespace"s };
-    static skip_rule comment{ qi::token( token_id::whitespace ), "comment"s };
+    static skip_rule comment{ qi::token( token_id::comment ), "comment"s };
     // start symbol
     static skip_grammar::start_type skip{ whitespace | comment };
 

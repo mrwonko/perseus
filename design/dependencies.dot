@@ -1,0 +1,37 @@
+digraph dependencies
+{
+    memory_management[label="memory management"];
+    type_classes[label="type classes"];
+    variadic_templates[label="variadic templates"];
+    custom_types[label="custom types"];
+    function_pointers[label="function pointers"];
+    stack_unwinding[label="stack unwinding"];
+    native_types[label="native types"];
+    move_semantics[label="move semantics"];
+
+    modules;
+    strings -> constants;
+    strings -> memory_management;
+    memory_management -> destructors;
+    strings -> arrays;
+    arrays -> templates;
+    arrays -> type_classes;
+    variadic_templates -> templates;
+    function_pointers -> variadic_templates;
+    type_classes -> templates;
+    templates -> custom_types;
+    coroutines -> function_pointers;
+    coroutines -> memory_management;
+    closures -> memory_management;
+    closures -> function_pointers;
+    defer -> destructors;
+    persistence -> coroutines;
+    persistence -> type_classes;
+    persistence -> stack_unwinding;
+    exceptions -> stack_unwinding;
+    debugger -> stack_unwinding;
+    native_types -> type_classes;
+    native_types -> destructors;
+    memory_management -> move_semantics;
+    move_semantics -> type_classes;
+}

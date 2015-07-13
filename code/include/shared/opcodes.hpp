@@ -411,7 +411,7 @@ namespace perseus
 
       Reads bytes from the top of the stack and writes them at the given offset into the current stack.
 
-      The read data is not removed from the stack; if that is desired, issue a discard as well.
+      The read data is not removed from the stack; if that is desired, issue a pop as well.
 
       ## Parameters
 

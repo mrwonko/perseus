@@ -43,8 +43,8 @@ namespace perseus
           return os << "\"true\"";
         case false_:
           return os << "\"false\"";
-        case mut_:
-          return os << "\"mut\"";
+        case mutable_:
+          return os << "\"mutable\"";
         case impure_:
           return os << "\"impure\"";
 
@@ -79,7 +79,7 @@ namespace perseus
         case any:
           return os << "any";
         default:
-          return os << "token_id(" << static_cast< unsigned int >( token ) << ')';
+          return os << "token_id(0x" << std::hex << static_cast< unsigned int >( token ) << ')';
         }
       }
     }
