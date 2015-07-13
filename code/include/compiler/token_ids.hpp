@@ -12,7 +12,7 @@ namespace perseus
     {
       enum token_id
       {
-        whitespace = boost::spirit::lex::min_token_id,
+        whitespace,
         comment,
 
         // constants
