@@ -119,6 +119,8 @@ namespace perseus
     {
     public:
       typedef std::map< function_signature, function_info > function_map;
+      // HACK: this should be function_map::const_iterator, but that throws an exception. Legitimately, I fear, but I can't figure out why or what's broken, so I'm using a raw pointer instead, which is technically legal but can't check for read-after-free.
+      typedef function_map::value_type* function_pointer;
 
       /**
       Constructor. Registers built-in functions.
@@ -137,9 +139,9 @@ namespace perseus
       /**
       @brief Registers a function, i.e. declares its signature valid
       */
-      bool register_function( function_signature&& signature, function_info&& info, const function_map::value_type*& out_result );
+      bool register_function( function_signature&& signature, function_info&& info, function_pointer& out_result );
       
-      bool get_function( const function_signature& function, const function_map::value_type*& out_result ) const;
+      bool get_function( const function_signature& function, function_pointer& out_result );
       
       bool has_open_address_requests() const;
       

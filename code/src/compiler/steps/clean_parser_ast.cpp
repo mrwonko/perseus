@@ -83,16 +83,16 @@ namespace perseus
         return context{ expectations{ expected.pure, std::move( type ) }, functions, return_type };
       }
       const expectations expected;
-      const function_manager& functions;
+      function_manager& functions;
       /// return type of current function, for return expressions
       const type_id return_type;
       // TODO: scope
     };
 
     /// @throws semantic_error on unknown signature
-    static const function_manager::function_map::value_type* find_function( const context& context, const function_signature& signature, const file_position& pos )
+    static function_manager::function_pointer find_function( const context& context, const function_signature& signature, const file_position& pos )
     {
-      const function_manager::function_map::value_type* function;
+      function_manager::function_pointer function;
       if( !context.functions.get_function( signature, function ) )
       {
         function_manager::function_map::const_iterator begin, end;
@@ -113,7 +113,7 @@ namespace perseus
       return function;
     }
 
-    static void check_function( const context& context, const function_manager::function_map::value_type* function, const file_position& pos )
+    static void check_function( const context& context, function_manager::function_pointer function, const file_position& pos )
     {
       if( !context.expected.is_type_accepted( function->second.return_type ) )
       {
@@ -384,7 +384,7 @@ namespace perseus
       }
     }
 
-    clean::file clean_parser_ast( parser::file&& file, const function_manager& functions )
+    clean::file clean_parser_ast( parser::file&& file, function_manager& functions )
     {
       ast::clean::file result;
       result.functions.reserve( file.functions.size() );

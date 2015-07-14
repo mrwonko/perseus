@@ -188,7 +188,7 @@ namespace perseus
         // for function pointers I'll need an indirect call expression?
         struct call_expression
         {
-          const function_manager::function_map::value_type* function;
+          function_manager::function_pointer function;
           std::vector< expression > arguments;
         };
 

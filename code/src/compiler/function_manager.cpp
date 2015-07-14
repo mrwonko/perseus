@@ -13,7 +13,7 @@ namespace perseus
       return std::tie( name, parameters ) < std::tie( rhs.name, rhs.parameters );
     }
 
-    std::vector< type_id >::size_type function_signature::parameters_size() const
+    std::int32_t function_signature::parameters_size() const
     {
       std::vector< type_id >::size_type size = 0;
       for( type_id parameter : parameters )
@@ -97,9 +97,9 @@ namespace perseus
       _functions.emplace( function_signature{ "+",{ type_id::i32, type_id::i32 } }, function_info{ opcode::add_i32, type_id::i32, true, 6, operator_associativity::left } );
     }
 
-    bool function_manager::register_function( function_signature&& signature, function_info&& info, const function_map::value_type*& out_result )
+    bool function_manager::register_function( function_signature&& signature, function_info&& info, function_pointer& out_result )
     {
-      function_map::const_iterator it;
+      function_map::iterator it;
       bool inserted;
       std::tie( it, inserted ) = _functions.emplace( std::make_pair( std::move( signature ), std::move( info ) ) );
       if( inserted )
@@ -110,7 +110,7 @@ namespace perseus
       return false;
     }
 
-    bool function_manager::get_function( const function_signature& function, const function_map::value_type*& out_result ) const
+    bool function_manager::get_function( const function_signature& function, function_pointer& out_result )
     {
       auto it = _functions.find( function );
       if( it == _functions.end() )
