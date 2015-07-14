@@ -93,7 +93,7 @@ namespace perseus
         struct unary_operation
         {
           identifier operation;
-          expression operand;
+          operand operand;
         };
 
         struct binary_operation

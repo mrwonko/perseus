@@ -129,6 +129,7 @@ namespace perseus
     }
 
     static clean::expression convert( parser::expression&& exp, const context& context );
+    static clean::expression convert( parser::operand&& op, const context& context );
 
     //    Block Member conversion (expression/variable declaration)
 
