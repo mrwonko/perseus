@@ -38,7 +38,7 @@ namespace perseus
       std::vector< type_id > parameters;
 
       bool operator<( const function_signature& rhs ) const;
-      std::vector< type_id >::size_type parameters_size() const;
+      std::int32_t parameters_size() const;
     };
 
     std::ostream& operator<<( std::ostream& os, const function_signature& signature );
@@ -87,9 +87,14 @@ namespace perseus
       */
       void write_address( code_segment& code );
       
+      bool has_opcode() const
+      {
+        return _opcode.is_initialized();
+      }
+
       bool get_opcode( opcode& out_result ) const
       {
-        if( _opcode.is_initialized() )
+        if( _opcode )
         {
           out_result = *_opcode;
           return true;

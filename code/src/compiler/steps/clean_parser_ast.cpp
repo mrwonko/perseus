@@ -2,7 +2,6 @@
 #include "compiler/exceptions.hpp"
 #include "shared/optional_apply.hpp"
 
-#include <boost/variant/static_visitor.hpp>
 #include <boost/variant/apply_visitor.hpp>
 
 #include <utility>
@@ -175,6 +174,8 @@ namespace perseus
 
     struct convert_operand
     {
+      //    Constants
+
       clean::expression operator()( const std::int32_t& i ) const
       {
         // TODO: track position
@@ -207,12 +208,18 @@ namespace perseus
         // TODO: string support
         throw semantic_error( "Strings not yet supported!"s, lit );
       }
+
+      //    Variable references
+
       clean::expression operator()( const ast::identifier& identifier ) const
       {
         // TODO: variable lookup
         // TODO: first class functions
         throw std::runtime_error( "variables not yet usable in expressions" );
       }
+
+      //    Unary Operation
+
       clean::expression operator()( parser::unary_operation& op ) const
       {
         file_position pos = std::move( static_cast< file_position& >( op.operation ) );
@@ -222,6 +229,9 @@ namespace perseus
         check_function( context, function, pos );
         return{ function->second.return_type, std::move( pos ), clean::call_expression{ function, { std::move( operand ) } } };
       }
+
+      //    If Expression
+
       clean::expression operator()( parser::if_expression& exp ) const
       {
         clean::expression condition = convert( std::move( exp.condition ), context.expect( type_id::bool_ ) );
@@ -233,6 +243,9 @@ namespace perseus
         }
         return{ then_expression.type, condition.position, clean::if_expression{ std::move( condition ), std::move( then_expression ), std::move( else_expression ) } };
       }
+
+      //    While Expression
+
       clean::expression operator()( parser::while_expression& exp ) const
       {
         clean::expression condition = convert( std::move( exp.condition ), context.expect( type_id::bool_ ) );
@@ -243,11 +256,17 @@ namespace perseus
         clean::expression body = convert( std::move( exp.body ), context.expect( tag_any_type{} ) );
         return{ type_id::void_, condition.position, clean::while_expression{ std::move( condition ), std::move( body ) } };
       }
+
+      //    Return Expression
+
       clean::expression operator()( parser::return_expression& exp ) const
       {
         clean::expression return_value = convert( std::move( exp.value ), context.expect( context.return_type ) );
         return{ context.return_type, return_value.position, clean::return_expression{ std::move( return_value ) } };
       }
+
+      //    Block Expression
+
       clean::expression operator()( parser::block_expression& block ) const
       {
         std::vector< clean::block_member > members;
@@ -284,6 +303,9 @@ namespace perseus
         type_id type = boost::apply_visitor( block_type{}, members.back() );
         return{ type, pos, clean::block_expression{ std::move( members ) } };
       }
+
+      //    Expression
+
       clean::expression operator()( parser::expression& exp ) const
       {
         return convert( std::move( exp ), context );
