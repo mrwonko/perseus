@@ -150,6 +150,7 @@ namespace perseus
       
       bool has_open_address_requests() const;
       
+      /// generate only those builtin functions whose address has been requested
       void write_builtin_functions( code_segment& code );
 
       /**

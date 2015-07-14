@@ -95,6 +95,24 @@ namespace perseus
     {
       // function_signature{ identifier, { parameter types } }, function_info{ opcode, return type, precedence, associativity }
       _functions.emplace( function_signature{ "+",{ type_id::i32, type_id::i32 } }, function_info{ opcode::add_i32, type_id::i32, true, 6, operator_associativity::left } );
+      _functions.emplace( function_signature{ "-",{ type_id::i32, type_id::i32 } }, function_info{ opcode::subtract_i32, type_id::i32, true, 6, operator_associativity::left } );
+      _functions.emplace( function_signature{ "*",{ type_id::i32, type_id::i32 } }, function_info{ opcode::multiply_i32, type_id::i32, true, 7, operator_associativity::left } );
+      _functions.emplace( function_signature{ "/",{ type_id::i32, type_id::i32 } }, function_info{ opcode::divide_i32, type_id::i32, true, 7, operator_associativity::left } );
+      _functions.emplace( function_signature{ "%",{ type_id::i32, type_id::i32 } }, function_info{ opcode::modulo_i32, type_id::i32, true, 7, operator_associativity::left } );
+
+      _functions.emplace( function_signature{ "-",{ type_id::i32 } }, function_info{ opcode::negate_i32, type_id::i32, true } );
+
+      _functions.emplace( function_signature{ "==",{ type_id::i32, type_id::i32 } }, function_info{ opcode::equals_i32, type_id::bool_, true, 4, operator_associativity::none } );
+      _functions.emplace( function_signature{ "!=",{ type_id::i32, type_id::i32 } }, function_info{ opcode::not_equals_i32, type_id::bool_, true, 4, operator_associativity::none } );
+      _functions.emplace( function_signature{ "<",{ type_id::i32, type_id::i32 } }, function_info{ opcode::less_than_i32, type_id::bool_, true, 4, operator_associativity::none } );
+      _functions.emplace( function_signature{ "<=",{ type_id::i32, type_id::i32 } }, function_info{ opcode::less_than_or_equals_i32, type_id::bool_, true, 4, operator_associativity::none } );
+      // TODO: think about > & >=, i.e. allow for operand swapping somehow
+
+      _functions.emplace( function_signature{ "&&",{ type_id::bool_, type_id::bool_} }, function_info{ opcode::and_b, type_id::bool_, true, 3, operator_associativity::right } );
+      _functions.emplace( function_signature{ "||",{ type_id::bool_, type_id::bool_ } }, function_info{ opcode::or_b, type_id::bool_, true, 2, operator_associativity::right } );
+      _functions.emplace( function_signature{ "==",{ type_id::bool_, type_id::bool_ } }, function_info{ opcode::equals_b, type_id::bool_, true, 4, operator_associativity::none } );
+      _functions.emplace( function_signature{ "!=",{ type_id::bool_, type_id::bool_ } }, function_info{ opcode::not_equals_b, type_id::bool_, true, 4, operator_associativity::none } );
+      _functions.emplace( function_signature{ "!",{ type_id::bool_ } }, function_info{ opcode::negate_b, type_id::bool_, true } );
     }
 
     bool function_manager::register_function( function_signature&& signature, function_info&& info, function_pointer& out_result )
@@ -133,7 +151,7 @@ namespace perseus
         function_info& info = entry.second;
         assert( !info.address_set() );
         opcode op;
-        if( info.get_opcode( op ) )
+        if( info.get_opcode( op ) && info.has_requests() )
         {
           info.set_address( code.size(), code );
           generate_builtin_operation( op, entry.first.parameters_size(), get_size( info.return_type ), code );
