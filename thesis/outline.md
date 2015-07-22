@@ -1,26 +1,23 @@
-*   Introduction
-    *   Problem/Context
-    *   Goals
-        *   Scope/Limits
-    *   Approach/Method
-        *   How to reach the goal?
-        *   Chapter structure
-*   Fundamentals/Theory (>=25%?)
-    *   Programming Language Design, Paradigms
-    *   Compilers
-    *   Interpreted vs Compiled, VM vs Native
-*   Realization
-    *   Analysis
-        *   Requirements
-    *   Concept
-        *   General approach
-        *   Software Architecture
-    *   Implementation
-        *   Programming language
-        *   Libraries used
-        *   Important modules
-    *   Summary & conclusion
-        *   Results vs Requirements
-        *   Future development, limitations
-            *   immediate
-            *   long-term
+*   The need for a new programming language (Introduction)
+    *   Target audience
+    *   [Context]
+    *   [Goals]
+    *   [Approach/Summary: what did I do, generally?]
+*   On creating programming languages (Theory; >=25%?)
+    *   Compiler construction
+    *   Language design
+*   Creating Perseus (Realization)
+    *   Desired features (Requirements)
+    *   [Concept]
+        *   [General approach]
+        *   [Software architecture]
+    *   [Implementation]
+        *   [Why modern C++?]
+        *   [Libraries used]
+        *   [Important modules]
+        
+    *   [Summary & conclusion]
+        *   [What did I achieve?]
+        *   [Future plans/possibilities]
+
+[] = placeholder
