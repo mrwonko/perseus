@@ -107,7 +107,7 @@ namespace perseus
     // append functions
     while( !_impl->files.empty() )
     {
-      generate_code( detail::clean_parser_ast( std::move( _impl->files.back() ), function_manager ), code );
+      generate_code( detail::simplify_and_annotate( std::move( _impl->files.back() ), function_manager ), code );
       _impl->files.pop_back();
     }
     if( function_manager.has_open_address_requests() )

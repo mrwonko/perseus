@@ -407,7 +407,7 @@ namespace perseus
       }
     }
 
-    clean::file clean_parser_ast( parser::file&& file, function_manager& functions )
+    clean::file simplify_and_annotate( parser::file&& file, function_manager& functions )
     {
       ast::clean::file result;
       result.functions.reserve( file.functions.size() );
