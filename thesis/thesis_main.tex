@@ -1,0 +1,50 @@
+
+% Kile expects the root document to contain \documentclass
+\iffalse\documentclass{scrreprt}\fi
+
+% Hint: "include" did not work for me using:
+% This is pdfTeX, Version 3.1415926-2.4-1.40.13 (TeX Live 2012/Debian)
+% Replaced "include" with "input" to make it work.
+
+\input{template/header}
+
+\begin{document}
+
+\pagenumbering{Roman}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+% Title Page
+\include{template/title}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\tableofcontents
+\listoffigures
+\lstlistoflistings
+\cleardoublepage
+
+
+\pagenumbering{arabic}
+
+\include{chapter/Einleitung}
+\include{chapter/Grundlagen}
+\include{chapter/Ist_Analyse}
+\include{chapter/Anforderungsanalyse}
+\include{chapter/Entwicklungsanalyse}
+\include{chapter/Zusammenfassung}
+\include{chapter/Ausblick}
+\include{chapter/Literaturverzeichnis}
+
+\include{template/footer}
+
+\end{document}
