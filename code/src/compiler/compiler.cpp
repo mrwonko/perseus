@@ -12,6 +12,7 @@
 #include <vector>
 #include <utility>
 #include <stdexcept>
+#include <iostream>
 
 namespace perseus
 {
@@ -75,13 +76,24 @@ namespace perseus
       throw std::logic_error{ "Called compiler::link() again after failure without calling compiler::reset() first!" };
     }
     _impl->linking = true; // set it now in case of exceptions since we don't roll back on failure
-    // collect available functions
+
     detail::function_manager function_manager;
+
+    // register builtin functions
+    detail::function_manager::function_pointer print_i32_function, print_bool_function;
+    function_manager.register_function( detail::function_signature{ "print"s, { detail::type_id::i32 } }, detail::function_info{ detail::type_id::void_, false }, print_i32_function );
+    function_manager.register_function( detail::function_signature{ "print"s, { detail::type_id::bool_ } }, detail::function_info{ detail::type_id::void_, false }, print_bool_function );
+
+    // collect available functions
     for( auto& file_ast : _impl->files )
     {
       detail::extract_functions( file_ast, function_manager );
     }
-    //    generate code
+
+    //        generate code
+
+    //    entry point
+
     // find main function
     detail::code_segment code;
     detail::function_manager::function_pointer main_function;
@@ -104,7 +116,31 @@ namespace perseus
     // exit
     code.push< detail::opcode >( detail::opcode::exit );
 
-    // append functions
+    //    generate builtin functions
+    std::vector< detail::syscall > syscalls;
+    auto generate_builtin_code = [ &syscalls, &code ]( detail::function_manager::function_pointer function, detail::syscall&& definition )
+    {
+      function->second.set_address( code.size(), code );
+      code.push< detail::opcode >( detail::opcode::syscall );
+      code.push< std::uint32_t >( syscalls.size() );
+      code.push< detail::opcode >( detail::opcode::return_ );
+      code.push< std::uint32_t >( function->first.parameters_size() );
+      syscalls.emplace_back( std::move( definition ) );
+    };
+
+    // print i32
+    generate_builtin_code( print_i32_function, []( stack& s ) {
+      const char* memory = s.data() + s.size() - sizeof( detail::instruction_pointer::value_type ) - detail::get_size( detail::type_id::i32 );
+      std::cout << *reinterpret_cast< const int* >( memory ) << std::endl;
+    } );
+    // print bool
+    generate_builtin_code( print_bool_function, []( stack& s ) {
+      const char* memory = s.data() + s.size() - sizeof( detail::instruction_pointer::value_type ) - detail::get_size( detail::type_id::bool_ );
+      bool value = *memory;
+      std::cout << std::boolalpha << value << std::endl;
+    } );
+
+    //    append functions
     while( !_impl->files.empty() )
     {
       generate_code( detail::simplify_and_annotate( std::move( _impl->files.back() ), function_manager ), code );
@@ -115,7 +151,7 @@ namespace perseus
       throw std::logic_error{ "Unhandled address requests?!" };
     }
     _impl->linking = false;
-    return detail::processor{ std::move( code ) };
+    return detail::processor{ std::move( code ), std::move( syscalls ) };
   }
 
 }
