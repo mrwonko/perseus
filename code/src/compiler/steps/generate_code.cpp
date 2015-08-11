@@ -110,19 +110,28 @@ namespace perseus
         //    then expression
         auto pre_then_stack_size = c.stack_size;
         generate_code( exp.then_expression, c );
-        // jump past else
-        c.code.push< opcode >( opcode::relative_jump );
-        auto end_offset_placeholder = write_placeholder< int32_t >( c.code );
-        auto end_jump_address = c.code.size();
+        // jump past else (if there is any)
+        const bool has_else = boost::get< ast::void_expression >( &exp.else_expression.subexpression ) == nullptr;
+        detail::value_placeholder< int32_t > end_offset_placeholder{};
+        int32_t end_jump_address{};
+        if( has_else )
+        {
+          c.code.push< opcode >( opcode::relative_jump );
+          end_offset_placeholder = write_placeholder< int32_t >( c.code );
+          end_jump_address = c.code.size();
+        }
 
         //    else expression
         // else label
         replace_placeholder< int32_t >( c.code, else_offset_placeholder, static_cast< int32_t >( c.code.size() - else_jump_address ) );
-        c.stack_size = pre_then_stack_size; // due to the jump, the then result is not pushed onto the stack at this point
-        generate_code( exp.else_expression, c );
+        if( has_else )
+        {
+          c.stack_size = pre_then_stack_size; // due to the jump, the then result is not pushed onto the stack at this point
+          generate_code( exp.else_expression, c );
 
-        //    past-else label
-        replace_placeholder< int32_t >( c.code, end_offset_placeholder, static_cast< int32_t >( c.code.size() - end_jump_address ) );
+          //    past-else label
+          replace_placeholder< int32_t >( c.code, end_offset_placeholder, static_cast< int32_t >( c.code.size() - end_jump_address ) );
+        }
       }
 
       //    While Loop
