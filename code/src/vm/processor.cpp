@@ -300,6 +300,18 @@ namespace perseus
           co.stack.push< std::uint8_t >( op1 <= op2 );
           break;
         }
+        case opcode::greater_than_i32:
+        {
+          const std::int32_t op2 = co.stack.pop< std::int32_t >(), op1 = co.stack.pop< std::int32_t >();
+          co.stack.push< std::uint8_t >( op1 > op2 );
+          break;
+        }
+        case opcode::greater_than_or_equals_i32:
+        {
+          const std::int32_t op2 = co.stack.pop< std::int32_t >(), op1 = co.stack.pop< std::int32_t >();
+          co.stack.push< std::uint8_t >( op1 >= op2 );
+          break;
+        }
         case opcode::negate_i32:
           co.stack.push< std::int32_t >( -co.stack.pop< std::int32_t >() );
           break;

@@ -106,6 +106,8 @@ namespace perseus
       _functions.emplace( function_signature{ "!=",{ type_id::i32, type_id::i32 } }, function_info{ opcode::not_equals_i32, type_id::bool_, true, 4, operator_associativity::none } );
       _functions.emplace( function_signature{ "<",{ type_id::i32, type_id::i32 } }, function_info{ opcode::less_than_i32, type_id::bool_, true, 4, operator_associativity::none } );
       _functions.emplace( function_signature{ "<=",{ type_id::i32, type_id::i32 } }, function_info{ opcode::less_than_or_equals_i32, type_id::bool_, true, 4, operator_associativity::none } );
+      _functions.emplace( function_signature{ ">",{ type_id::i32, type_id::i32 } }, function_info{ opcode::greater_than_i32, type_id::bool_, true, 4, operator_associativity::none } );
+      _functions.emplace( function_signature{ ">=",{ type_id::i32, type_id::i32 } }, function_info{ opcode::greater_than_or_equals_i32, type_id::bool_, true, 4, operator_associativity::none } );
       // TODO: think about > & >=, i.e. allow for operand swapping somehow
 
       _functions.emplace( function_signature{ "&&",{ type_id::bool_, type_id::bool_} }, function_info{ opcode::and_b, type_id::bool_, true, 3, operator_associativity::right } );
