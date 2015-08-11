@@ -82,9 +82,13 @@ namespace perseus
 
       //    Variable Reference
 
-      void operator()( const ast::clean::local_variable_reference& ) const
+      void operator()( const ast::clean::local_variable_reference& ref ) const
       {
-        throw std::logic_error{ "Variable usage not yet implemented, but such a tree should not have been created?!"s };
+        auto size = get_size( type );
+        c.code.push< opcode >( opcode::relative_load_stack );
+        c.code.push< std::uint32_t >( size );
+        c.code.push< std::int32_t >( ref.offset );
+        c.push( size );
       }
 
       //    If Condition
@@ -291,11 +295,12 @@ namespace perseus
       }
 
       context& c;
+      type_id type;
     };
 
     static void generate_code( const ast::clean::expression& expression, context& c )
     {
-      boost::apply_visitor( generate_expression_code{ c }, expression.subexpression );
+      boost::apply_visitor( generate_expression_code{ c, expression.type }, expression.subexpression );
     }
 
     static void generate_code( const ast::clean::function_definition& function, context& c )

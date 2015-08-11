@@ -1,6 +1,7 @@
 #include "compiler/steps.hpp"
 #include "compiler/exceptions.hpp"
 #include "shared/optional_apply.hpp"
+#include "vm/instruction_pointer.hpp"
 
 #include <boost/variant/apply_visitor.hpp>
 
@@ -74,18 +75,31 @@ namespace perseus
       }
     };
 
+    struct variable
+    {
+      int offset;
+      type_id type;
+    };
+
+    using scope = std::map< std::string, variable >;
+
     struct context
     {
       /// change expectations
       context expect( expectations::expected_type type ) const
       {
-        return context{ expectations{ expected.pure, std::move( type ) }, functions, return_type };
+        return context{ expectations{ expected.pure, std::move( type ) }, functions, return_type, stack_size, variables };
+      }
+      context push( int bytes ) const
+      {
+        return context{ expected, functions, return_type, stack_size + bytes, variables };
       }
       const expectations expected;
       function_manager& functions;
       /// return type of current function, for return expressions
       const type_id return_type;
-      // TODO: scope
+      int stack_size;
+      scope variables;
     };
 
     /// @throws semantic_error on unknown signature
@@ -135,16 +149,9 @@ namespace perseus
 
     struct convert_block_member
     {
-      void check_declaration_valid( const file_position& pos ) const
-      {
-        if( !context.expected.is_type_accepted( type_id::void_ ) )
-        {
-          throw semantic_error{ "Variable declaration not valid here!", pos };
-        }
-      }
       clean::block_member operator()( parser::expression& exp ) const
       {
-        return convert( std::move( exp ), context);
+        return convert( std::move( exp ), static_cast< const perseus::detail::context& >( context ) );
       }
       clean::block_member operator()( parser::explicit_variable_declaration& dec ) const
       {
@@ -152,21 +159,35 @@ namespace perseus
         type_id type = get_type( dec.type );
         // declared variable not yet visible in initial value expression
         clean::expression initial_value = convert( std::move( dec.initial_value ), context.expect( type ) );
-        // TODO: add variable to scope
+        add_variable_to_context( std::move( dec.variable ), type );
         return clean::variable_declaration{ std::move( initial_value ) };
       }
       clean::block_member operator()( parser::deduced_variable_declaration& dec ) const
       {
         check_declaration_valid( dec.variable );
         clean::expression initial_value = convert( std::move( dec.initial_value ), context.expect( tag_not_void{} ) );
-        // TODO: add variable to scope
+        add_variable_to_context( std::move( dec.variable ), initial_value.type );
         return clean::variable_declaration{ std::move( initial_value ) };
       }
 
-      const context& context;
+      context& context;
+
+    private:
+      void check_declaration_valid( const file_position& pos ) const
+      {
+        if( !context.expected.is_type_accepted( type_id::void_ ) )
+        {
+          throw semantic_error{ "Variable declaration not valid here!", pos };
+        }
+      }
+      void add_variable_to_context( std::string&& name, type_id type ) const
+      {
+        context.variables[ std::move( name ) ] = { context.stack_size, type };
+        context.stack_size += get_size( type );
+      }
     };
 
-    static clean::block_member convert( parser::block_member&& member, const context& context )
+    static clean::block_member convert( parser::block_member&& member, context& context )
     {
       return boost::apply_visitor( convert_block_member{ context }, std::move( member ) );
     }
@@ -214,9 +235,17 @@ namespace perseus
 
       clean::expression operator()( const ast::identifier& identifier ) const
       {
-        // TODO: variable lookup
         // TODO: first class functions
-        throw std::runtime_error( "variables not yet usable in expressions" );
+        auto it = context.variables.find( identifier );
+        if( it == context.variables.end() )
+        {
+          throw semantic_error( "No such variable: "s + identifier, identifier );
+        }
+        if( !context.expected.is_type_accepted( it->second.type ) )
+        {
+          throw type_error{ "Variable "s + identifier + " has incorrect type "s + get_name( it->second.type ), identifier };
+        }
+        return clean::expression{ it->second.type, identifier, clean::local_variable_reference{ it->second.offset - context.stack_size } };
       }
 
       //    Unary Operation
@@ -273,13 +302,23 @@ namespace perseus
         std::vector< clean::block_member > members;
         // TODO: track position
         file_position pos{ 0, 0 };
+        // use the same context for all members since its stack size and variables change
+        perseus::detail::context member_context = context.expect( tag_any_type{} );
         for( auto it = block.body.begin(); it != block.body.end(); )
         {
           parser::block_member& member = *it;
           bool first = it == block.body.begin();
           ++it;
           // type only matters for last member
-          members.emplace_back( convert( std::move( member ), context.expect( it == block.body.end() ? context.expected.type : tag_any_type{} ) ) );
+          if( it == block.body.end() )
+          {
+            perseus::detail::context type_context = member_context.expect( context.expected.type );
+            members.emplace_back( convert( std::move( member ), type_context ) );
+          }
+          else
+          {
+            members.emplace_back( convert( std::move( member ), member_context ) );
+          }
         }
         if( members.empty() )
         {
@@ -373,10 +412,14 @@ namespace perseus
       // TODO FIXME: support more than 2 operands, i.e. handle precedence & associativity
       if( exp.tail.empty() )
       {
+        // simple operand
+
         return convert( std::move( exp.head ), context );
       }
       else if( exp.tail.size() == 1 )
       {
+        // binary expression, including call & index
+
         parser::operation& operation = exp.tail.front();
         parser::call_expression* call_exp = boost::get< parser::call_expression >( &operation );
         if( call_exp )
@@ -389,20 +432,27 @@ namespace perseus
           }
           std::vector< clean::expression > arguments;
           arguments.reserve( call_exp->arguments.size() );
+          // stack grows due to multiple arguments being pushed
+          int stack_offset = 0;
           for( auto& arg : call_exp->arguments )
           {
-            arguments.emplace_back( convert( std::move( arg ), context.expect( tag_not_void{} ) ) );
+            clean::expression exp = convert( std::move( arg ), context.expect( tag_not_void{} ).push( stack_offset ) );
+            stack_offset += get_size( exp.type );
+            arguments.emplace_back( std::move( exp ) );
           }
           return generate_call( context, std::move( static_cast< std::string& >( *function_name ) ), std::move( arguments ), std::move( static_cast< file_position& >( *function_name ) ) );
         }
         else
         {
           clean::expression lhs = convert( std::move( exp.head ), context.expect( tag_not_void{} ) );
-          return boost::apply_visitor( convert_operation{ std::move( lhs ), context }, std::move( exp.tail.front() ) );
+          const perseus::detail::context convert_context = context.push( get_size( lhs.type ) );
+          return boost::apply_visitor( convert_operation{ std::move( lhs ), convert_context }, std::move( exp.tail.front() ) );
         }
       }
       else
       {
+        // n-ary expression (n > 2)
+
         throw semantic_error{ "Sorry, but for now operator precedence must be explicitly defined using parens."s, { 0, 0 } };
       }
     }
@@ -413,17 +463,23 @@ namespace perseus
       result.functions.reserve( file.functions.size() );
       for( auto& function : file.functions )
       {
-        std::vector< clean::function_argument > args;
-        for( parser::function_argument& arg : function.arguments )
+        scope initial_scope;
         {
-          args.emplace_back( clean::function_argument{ std::move( arg.name ), std::move( arg.type ) } );
+          int offset = -static_cast< int >( sizeof( instruction_pointer::value_type ) ); // return address
+          for( auto it = function.arguments.rbegin(); it != function.arguments.rend(); ++it )
+          {
+            auto& arg = *it;
+            type_id type = get_type( arg.type );
+            offset -= get_size( type );
+            initial_scope.emplace( scope::value_type{ std::move( arg.name ), variable{ offset, type } } );
+          }
         }
         // set up context: expected return type, purity
         type_id return_type = function.manager_entry->second.return_type;
         expectations expected{ function.manager_entry->second.pure, return_type };
-        context context{ expected, functions, return_type };
+        context initial_context{ expected, functions, return_type, 0, std::move( initial_scope ) };
         result.functions.emplace_back(
-          clean::function_definition{ convert( std::move( function.body ), context ), function.manager_entry }
+          clean::function_definition{ convert( std::move( function.body ), static_cast< const context& >( initial_context ) ), function.manager_entry }
         );
       }
       return result;
