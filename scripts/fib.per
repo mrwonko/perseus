@@ -1,9 +1,14 @@
-function fib( x : i32 ) -> i32
-    if x <= 1
-        x
-    else
-        // these parens are required because function calls are treated as an operator, and operator precedence is not yet resolved. it's a bit silly.
-        ( fib( x - 1 ) ) + ( fib( x - 2 ) )
+impure function fib( x : i32, print_all : bool ) -> i32
+{
+    let result =
+        if x <= 1
+            x
+        else
+            ( fib( x - 1, print_all ) ) + ( fib( x - 2, false ) );
+    if print_all
+        print( result );
+    result
+}
 
-function main() -> i32
-    fib( 6 )
+impure function main() -> i32
+    fib( 6, true )
