@@ -65,7 +65,7 @@ namespace perseus
       void write( size_type address, const T& value )
       {
         static_assert( std::is_trivially_copyable< T >::value, "code_segment data must be trivially copyable!" );
-        if( address + sizeof( T ) >= size() )
+        if( address + sizeof( T ) > size() )
         {
           throw std::out_of_range( "Write outside of code_segment!" );
         }

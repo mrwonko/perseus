@@ -1,0 +1,11 @@
+impure function print_if_big( x : i32 )
+    if x >= 10
+        print( x )
+
+impure function main()
+{
+    print_if_big( 0 );
+    print_if_big( 10 );
+    print_if_big( 42 );
+    print_if_big( 1337 )
+}
