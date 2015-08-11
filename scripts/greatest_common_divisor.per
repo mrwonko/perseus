@@ -1,0 +1,14 @@
+function greatest_common_divisor( a : i32, b : i32 ) -> i32
+    if b > a
+        greatest_common_divisor( b, a )
+    else
+    {
+        let remainder = a % b;
+        if remainder == 0
+            b
+        else
+            greatest_common_divisor( b, remainder )
+    }
+
+function main() -> i32
+    greatest_common_divisor( 42, 35 )
