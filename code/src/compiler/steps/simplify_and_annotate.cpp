@@ -430,17 +430,35 @@ namespace perseus
           {
             throw semantic_error{ "Functions must be referred to by identifier! (No first-class functions yet.)"s, {0,0} };
           }
+
+
+          function_signature signature{ std::move( static_cast< std::string& >( *function_name ) ),{} };
+          signature.parameters.reserve( call_exp->arguments.size() );
+          for( const parser::expression& argument : call_exp->arguments )
+          {
+            // this expression tree is unusable due to invalid local variable stack offsets, but we need to create it to determinate the type
+            // the offsets are off by the size of the function's return value, for which memory is allocated on the stack prior to the call
+            // but since we need the parameter types to determine the return type, some duplicate work is required
+            // (luckily function call arguments are typically rather simple, so this isn't totally terrible)
+            clean::expression exp = convert( parser::expression( argument ), context.expect( tag_not_void{} ) );
+            signature.parameters.push_back( exp.type );
+          }
+          file_position& position = *function_name;
+          auto function = find_function( context, signature, position );
+          check_function( context, function, position );
+          
+
           std::vector< clean::expression > arguments;
           arguments.reserve( call_exp->arguments.size() );
           // stack grows due to multiple arguments being pushed
-          int stack_offset = 0;
+          int stack_offset = get_size( function->second.return_type );
           for( auto& arg : call_exp->arguments )
           {
             clean::expression exp = convert( std::move( arg ), context.expect( tag_not_void{} ).push( stack_offset ) );
             stack_offset += get_size( exp.type );
             arguments.emplace_back( std::move( exp ) );
           }
-          return generate_call( context, std::move( static_cast< std::string& >( *function_name ) ), std::move( arguments ), std::move( static_cast< file_position& >( *function_name ) ) );
+          return{ function->second.return_type, std::move( position ), clean::call_expression{ function, std::move( arguments ) } };
         }
         else
         {
