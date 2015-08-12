@@ -1,0 +1,158 @@
+\chapter{Einleitung}
+
+    \section{\"Uberblick}
+        \subsection{Spam}
+        \subsection{Eggs}
+
+    \section{Motivation}
+
+    \section{Ziel}
+
+    \section{\"Uberblick \"uber die Arbeit}
+
+\chapter{Grundlagen}
+
+    \section{Objective C und NS Bibliotheken}
+        \cite{Knuth:1998:ACP:280635}
+
+    \section{Apple Betriebssysteme - iOS}
+    \section{Androidsysteme}
+    \section{Kommunikation via HTTP}
+    \section{SSL}
+    \section{REST-Abfragen}
+    \section{Model-View-Controller}
+    \section{verwendete Pattern}
+        \subsection{Command-Pattern}
+        \subsection{Singleton}
+        \subsection{Factory Methode}
+    \section{Spring}
+
+\chapter{Ist-Analyse}
+
+\chapter{Anforderungsanalyse}
+
+\chapter{Entwicklungsanalyse}
+    \section{Entwicklung des Konzeptes}
+    \section{Erstellen von Mock-Services}
+
+\chapter{Zusammenfassung}
+
+\chapter{Ausblick}
+
+\chapter{Bibliography}
+
+    \bibliography{thesis} % create with BibTeX
+
+
+
+*   Abstract (Summary)
+*   The need for a new programming language (Introduction)
+    *   Target audience
+    *   [Context]
+    *   [Goals]
+    *   [Approach/Summary: what did I do, generally?]
+*   On creating programming languages (Theory; >=25%?)
+    *   introduction to parsing
+    *   designing virtual machines
+        *   fetch \& execute
+        *   stack-based vs registers
+        *   choosing opcodes
+        *   coroutines
+        *   error handling
+    *   Language design
+*   Creating Perseus (Realization)
+    *   Desired features (Requirements)
+    *   Design
+        *   [General approach]
+        *   [Software architecture]
+    *   [Implementation]
+        *   Why modern C++?
+        *   [Libraries used]
+        *   [Important modules]
+*   Conclusion
+    *   [What did I achieve?]
+    *   [Future plans/possibilities]
+
+[] = placeholder
+
+Things to mention in the thesis:
+    * RAII
+	* Heap allocations
+	* Opcode Encoding
+	* Generally: why bytecode?
+	* Why C++? Why C++14?
+	* Why Boost.Spirit?
+	* Why coroutines?
+	* Why little metadata on stack? (RTTI for classes aside)
+	* Why are pointers stack-relative?
+	* Error handling - C++ exceptions etc.
+	* No VM calls in native functions
+	* Initial release - coroutines \& strings?
+		* Memory management - potential leaks on delete when using heap
+		* Lifetime - destructors; moving? Copying?
+	* Addressing - distinguishing between stack \& heap? Different opcodes?
+	* Persistence \& code changes
+		* Don't save code addresses verbatim, use identifiers \& offsets instead?
+	* utf-32 input preprocessing and how Spirit doesn't like that
+	* Line numbers for error messages
+	* Token attributes (vs iterator ranges)
+	* Namespaces - perseus / perseus::detail
+	* Pointy brackets <> for templates vs operators (ambiguity, difficulty of parsing)
+	* Boost.spirit woes
+		* Documentation
+		* Accidental infinite recursion in templates (parens\_expression)
+	* Boost.Spirit X3
+		* http://boost-spirit.com/home/2015/05/16/spirit-3-0-0/
+		* May 15th
+	* Function call / array subscription are binary-ish operations; how are they handled wrt precedence?
+		* Fixed as highest precedence?
+			* Probably makes sense
+		* Function call is more difficult since its second operand is not an expression but an argument list
+		* Overloading? Seems reasonable for array subscription, at least; as in expose the type class for that
+	* Infix operator precedence/associativity
+		* Can't mix left \& right of same precedence
+		* Can't mix non-associative of same precedence (a==b==c)
+	* Function pointers
+		* Function calls have an expression type as the function for this reason
+		* Identifier may be ambiguous though, needs argument types?
+		* Type-wise they require variadic templates?
+	* Native functions
+	* Native types
+	* Feature dependencies
+	* Indexing = operator []
+	* Iterators in AST, how that crashed, how I'm now using pointers and unhappy about it
+
+
+H\"auslein:
+
+Einleitung:
+In diesem Teil geht es um drei Aspekte. Zum einen soll ganz am Anfang die Themenstellung in einen allgemeinen Problemkontext eingeordnet werden, indem dieser kurz (ca. 1--2 Seiten) beschrieben wird. Davon ausgehend wird die konkrete Zielsetzung der Bachelorarbeit dargestellt. Was soll mit der Bachelorarbeit konkret erreicht werden? Welche Erkenntnis, welches Produkt, welche Software-L\"osung soll am Ende der Arbeit vorhanden sein? In diesem Teil kann auch erl\"autert werden, welche Aspekte bewusst aus der Arbeit ausgeschlossen werden. Als drittes Element der Einleitung kommt eine Beschreibung der Vorgehensweise hinzu. Sie beantwortet die Frage, wie das Ziel erreicht werden soll. Welche Themen werden in welchem Kapitel Leitlinien zum Betriebspraktikum und zu Bachelorarbeiten behandelt und warum? Wie ist die prinzipielle Argumentationslinie? Die Darstellung der Vorgehensweise bietet die Chance, den roten Faden durch die Arbeit deutlich zu machen und den Leser bereits auf diesen roten Faden einzustimmen.
+
+Hauptteil (ca. 60 Seiten)
+*   theoretisch/methodisch
+    
+    methodischen Grundlagen, die im weiteren Verlauf bei der Probleml\"osung im praktischen Teil eine wichtige Rolle spielen
+    
+    Detailgrad so hoch, wie für Verst\"andnis n\"otig (Leser ist anonymer Informatiker)
+    
+    25\%
+    
+*   praktisch
+    
+    L\"osung bzgl. Zielsetzung --. Bezug zu methodischem Teil herstellen
+    
+    *   Analyseteil
+    
+        Anforderungen, ggf. Ist-Analyse (getrennt von Soll-Analyse!)
+        
+    *   Konzeption (Approach)
+        
+        Ansatz, d.h. z.B. Architektur, Module und ihre Kommunikation
+    
+    *   Implementation
+    
+        Verwendete Mittel (z.B. Sprachen), Umsetzung wesentlicher Module, ggf. Quellcode-Ebene
+        
+    *   Zusammenfassung \& Ausblick
+        
+        Ergebnisse zusammenfassen, bewerten bzgl. Zielsetzung, Perspektiven
