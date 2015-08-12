@@ -1,13 +1,16 @@
 function greatest_common_divisor( a : i32, b : i32 ) -> i32
+    // note that "if/else" is an expression - it has a return value. For this reason the then and else expressions need to have the same type
     if b > a
         greatest_common_divisor( b, a )
     else
+    // we need a block to be able to declare variables, because it defines the variable's scope
     {
         let remainder = a % b;
         if remainder == 0
             b
         else
             greatest_common_divisor( b, remainder )
+        // note the lack of a trailing semicolon - that would imply an empty (void) expression at the end, but we want the block to evaluate to the result of the if expression, the last block member.
     }
 
 function main() -> i32
