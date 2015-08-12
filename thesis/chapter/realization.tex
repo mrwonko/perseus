@@ -1,93 +1,229 @@
 % Lösung bzgl. Zielsetzung -- Bezug zu methodischem Teil herstellen
 
-*   Creating Perseus (Realization)
-    *   [Implementation]
-        *   Why modern C++?
-        *   [Libraries used]
-        *   [Important modules]
-
 % (Ist-Analyse)
-%\chapter{Ist-Analyse}
+\chapter{State of the art}
 
-%   * Stand der Technik, insb. bzgl. VMs / Einordnung
+    \section{Common Virtual Machines}
+        % Stand der Technik, insb. bzgl. VMs / Einordnung
+        
+        \subsection{Java Virtual Machine}
+            Dalvik?
+        
+        \subsection{Weitere?}
+        
+        Lua VM, C\# VM (Name?), LLVM, CPython, ...?
+        
+    \section{Common Compiler Generators}
+        % passt das hier hin?
 
-% Anforderungsanalyse
-\chapter{Anforderungsanalyse}
+% Anforderungsanalyse / Requirements
+\chapter{Desired language features}
 
-%   Desired features (Requirements)
+    \section{Essential}
+    
+        \subsection{Comments}
+        
+        \subsection{Integral and boolean types}
+    
+        \subsection{Arithmetic Expressions}
+        
+            Literals
+        
+        \subsection{Variables}
+            
+            no assignments yet
+        
+        \subsection{Functions}
+        
+            with parameters, importantly
+        
+        \subsection{Conditional Expressions}
+    
+    \section{Additional}
+        % should I go into this much detail here? Describing what the language might one day become?
+        
+        \subsection{Operator Precedence}
+            Can't mix left \& right of same precedence
+            
+            Can't mix non-associative of same precedence ($a==b==c$)
+            \subsubsection{Custom Operators}
+    
+        \subsection{Native Functions}
+        
+            i.e. calling native functions from scripts, and how they are not serializable/can't yield
+        
+        \subsection{Native Types}
+            i.e. wrappers for C++ Types; tightly coupled with type system (move section there?)
+    
+        \subsection{Arrays}
+        
+        \subsection{Strings}
+            32 bit characters
+        
+        \subsection{Pointers}
+            or references
+            
+            stack vs heap
+            
+            and how they are not serializable
+        
+        \subsection{First Class Functions}
+            and why they effectively require variadic templates
+            
+            and how creating them from identifiers can be ambiguous due to overloading
+        
+        \subsection{Type System}
+            \subsubsection{Structures}
+            \subsubsection{Type Classes}
+            \subsubsection{Templates}
+                or something like them
+                
+                maybe a note on how <> style templates are difficult to parse?
+        
+        \subsection{Persistence}
+        
+            code changes? $\rightarrow$ serializable/yielding functions must not have changed, but others may (save function identifier \& offset)
+        
+        \subsection{Dynamic memory}
+            \subsubsection{Move Semantics}
+        
+        \subsection{Coroutines}
+        
+            VM should be built with them already in mind
+            
+            beware memory leaks on deletion (i.e. needs stack unwinding)
+        
+        \subsection{Tail recursion}
+    
+\chapter{VM Requirements}
+    \section{Fetch and Execute}
+    
+    \section{Stack}
+        grow arbitrarily
+    
+    % do I talk about future requirements? Like Stack Unwinding?
 
-%   * Testing
-%   * Persistence \& code changes
-%       * Don't save code addresses verbatim, use identifiers \& offsets instead?
-%   * Heap allocations
-%   * Why coroutines?
-%   * Generally: why bytecode?
-%   * Why little metadata on stack? (RTTI for classes aside)
-%   * Why are pointers stack-relative?
-%   * Error handling - C++ exceptions etc.
-%   * No VM calls in native functions
-%   * Initial Release - feature set?
-%   * Memory management - potential leaks on delete when using heap
-%   * Lifetime - destructors; moving? Copying?
-%   * utf-32 input preprocessing and how Spirit doesn't like that
-%   * Addressing - distinguishing between stack \& heap? Different opcodes?
-%   * Pointy brackets <> for templates vs operators (ambiguity, difficulty of parsing)
-%   * Infix operator precedence/associativity
-%       * Can't mix left \& right of same precedence
-%       * Can't mix non-associative of same precedence (a==b==c)
-%   * Native functions
-%   * Native types
-%   * Feature dependencies
-%   * Function pointers
-%       * Function calls have an expression type as the function for this reason
-%       * Identifier may be ambiguous though, needs argument types?
-%       * Type-wise they require variadic templates?
-
-
-%*  Design
-
+\chapter{Design} % TODO: better name?
 % Ansatz, d.h. z.B. Architektur, Module und ihre Kommunikation
+    \section{Choice of programming language}
+        \subsection{Why C++?}
+        \subsection{Why C++14?}
+    
+    \section{Choice of libraries}
+        \subsection{Why Boost.Spirit?}
+            no separate generation step, uses C++ templates instead (at the cost of compile time - lots of it)
+            
+            header-only
+            
+            recursive descent parser $\rightarrow$ no left recursions
+            \subsubsection{Choice of version}
+                why v2 and not x3?
+                
+                released May 15th
+                
+                see http://boost-spirit.com/home/2015/05/16/spirit-3-0-0/
+        \subsection{Why Boost.Test?}
+    
+    % TODO: should I talk about coding standards at all?
+    
+    % Namespaces - perseus / perseus::detail
+    % Generally: why bytecode?
+    \section{Modules}
+    
+        % I suppose a diagram would be useful here?
+    
+        \subsection{Compiler}
+        
+            \subsubsection{Lexer}
+            Line numbers for error messages (\& Token attributes vs iterator ranges)
+            
+            utf-32 input preprocessing and how Spirit doesn't like that, but how it's only of interest in string literals anyway
+            
+            \subsubsection{Parser}
+            
+            \subsubsection{Code Generation}
+            
+        \subsection{Virtual Machines}
+        
+            Error handling - C++ exceptions etc.
+            
+            Why are pointers stack-relative?
+            
+            Why little metadata on stack? (except RTTI for yielding)
+            
+            \subsubsection{code segment}
+                opcode encoding
+            \subsubsection{coroutine}
+            \subsubsection{stack}
+            \subsubsection{processor}
+        
+        \subsection{Unit Tests}
 
-%*  [General approach]
-%   * Why C++? Why C++14?
-%   * Why Boost.Spirit?
-%   * Boost.Spirit X3
-%       * http://boost-spirit.com/home/2015/05/16/spirit-3-0-0/
-%       * May 15th
-%   * Line numbers for error messages
-%   * Namespaces - perseus / perseus::detail
-
-%*  [Software architecture]
 
 % Entwicklungsanalyse
-\chapter{Entwicklungsanalyse}
+\chapter{Remarkable developments during development} % TODO: name
 
-% Umsetzung wesentlicher Module, ggf. Quellcode-Ebene
+    % Umsetzung wesentlicher Module, ggf. Quellcode-Ebene
+    
+    \section{Coming to terms with Boost}
+    
+        Trouble finding information in the documentation -- it's there, just hard to find.
+        
+        Accidental left-recursion leading to infinite loops, resulting in stack overflows.
+    
+    \section{Grammar definition}
+    
+        Sourcecode sample: this is what the definition looks like.
+        
+        Here's how the results are combined to create the syntax tree.
+        
+        Explain expectations.
+        
+        Operation-List in lieu of left-recursion, and how that needs to be post-processed to take care of precedences. And why those are not coded into the grammar. And how it also contains calls and indexing, making the lack of precedence resolution slightly more awkward.
+    
+    \section{Types}
+        
+        Represented as enum, only int, bool and void.
+    
+    \section{Function Manager}
+    
+        Iterators to entries in AST, how that crashed for no apparent reason, how I'm now using pointers and unhappy about it but how it's just as legal.
+    
+    \section{Code Generation}
+    
+        transformation from parser tree into clean tree
+    
+        placeholders for jump offsets
+        
+    \section{Code Segment}
+        
+        opcode encoding/decoding
+        
+    \section{Virtual Machine}
+        
+        switch-statement for opcode execution
 
-%   * Opcode Encoding
-%   * utf-32 input preprocessing and how Spirit doesn't like that
-%   * Token attributes (vs iterator ranges)
-%   * Boost.spirit woes
-%       * Documentation
-%       * Accidental infinite recursion in templates (parens\_expression)
-%   * Function call / array subscription are binary-ish operations; how are they handled wrt precedence?
-%       * Indexing = operator []
-%       * Fixed as highest precedence?
-%           * Probably makes sense
-%       * Function call is more difficult since its second operand is not an expression but an argument list
-%       * Overloading? Seems reasonable for array subscription, at least; as in expose the type class for that
-%   * Iterators in AST, how that crashed, how I'm now using pointers and unhappy about it%
-
-    \section{Entwicklung des Konzeptes}
-    \section{Erstellen von Mock-Services}
-
+\chapter{Evaluating the results}
 % Zusammenfassung
-\chapter{Zusammenfassung}
-%*  [What did I achieve?]
-
-% Ausblick
-\chapter{Ausblick}
-
+% What did I achieve?
 % Ergebnisse zusammenfassen, bewerten bzgl. Zielsetzung, Perspektiven
 
+I will probably want to put some example scripts here?
+
+\chapter{Future prospects}
+% Ausblick
 %*  [Future plans/possibilities]
+
+    \section{Simple additions}
+        
+        variable assignments
+        
+        operator precedence resolution
+        
+        modules
+        
+        better separation into API and internal headers
+    
+    \section{Complex changes}
+        
+        just about all the remaining language features

@@ -1,39 +1,62 @@
-\chapter{Grundlagen}
+\chapter{The basics of designing, compiling and executing programming languages}
 
-%*  On creating programming languages (Theory; >=25%?)
-%   *   introduction to parsing
-%   *   designing virtual machines
-%       *   fetch \& execute
-%       *   stack-based vs registers
-%       *   choosing opcodes
-%       *   coroutines
-%       *   error handling
-%   *   Language design
-%
-%*   theoretisch/methodisch
-%    
-%    methodischen Grundlagen, die im weiteren Verlauf bei der Probleml\"osung im praktischen Teil eine wichtige Rolle spielen
-%    
-%    Detailgrad so hoch, wie für Verst\"andnis n\"otig (Leser ist anonymer Informatiker)
-%    
-%    25\%
+% theoretische methodischen Grundlagen, die im weiteren Verlauf bei der Problemlösung im praktischen Teil eine wichtige Rolle spielen
+% Detailgrad so hoch, wie für Verständnis nötig (Leser ist anonymer Informatiker)
+% >= 25%
 
-%   * RAII
-%   * Visitor-Pattern
-%   * Templates
-%   * Macros?
-
-    \section{Objective C und NS Bibliotheken}
-        Foo\cite{Knuth:1998:ACP:280635}
-
-    \section{Apple Betriebssysteme - iOS}
-    \section{Androidsysteme}
-    \section{Kommunikation via HTTP}
-    \section{SSL}
-    \section{REST-Abfragen}
-    \section{Model-View-Controller}
-    \section{verwendete Pattern}
-        \subsection{Command-Pattern}
-        \subsection{Singleton}
-        \subsection{Factory Methode}
-    \section{Spring}
+    \section{Designing programming languages}
+    
+        simplicity and power
+        
+        static vs dynamic typing
+        
+        paradigms
+        
+        type inference
+        
+        constness
+        
+        purity
+    
+    \section{Compilers}
+    
+        Chomsky hierarchy
+        
+        Lexer
+        
+        Parser -- LL, LR, GLR, ...
+        
+        Code generation: tail recursion? separate optimization subsection?
+    
+    \section{Virtual Machines}
+    
+        VM vs Native code
+        
+        Existing machines?
+        
+        \subsection{Details} % TODO: name
+            fetch \& execute
+            
+            stack based vs registers
+            
+            opcodes \& choosing them
+            
+            coroutines
+            
+            error handling
+    
+    \section{Patterns and features used}
+    
+        RAII
+        
+        Sum Types
+        
+        Optional
+        
+        Iterators
+        
+        Visitor
+        
+        Templates
+        
+        (Macros)
