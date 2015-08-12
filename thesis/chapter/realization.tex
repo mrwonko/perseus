@@ -1,0 +1,93 @@
+% Lösung bzgl. Zielsetzung -- Bezug zu methodischem Teil herstellen
+
+*   Creating Perseus (Realization)
+    *   [Implementation]
+        *   Why modern C++?
+        *   [Libraries used]
+        *   [Important modules]
+
+% (Ist-Analyse)
+%\chapter{Ist-Analyse}
+
+%   * Stand der Technik, insb. bzgl. VMs / Einordnung
+
+% Anforderungsanalyse
+\chapter{Anforderungsanalyse}
+
+%   Desired features (Requirements)
+
+%   * Testing
+%   * Persistence \& code changes
+%       * Don't save code addresses verbatim, use identifiers \& offsets instead?
+%   * Heap allocations
+%   * Why coroutines?
+%   * Generally: why bytecode?
+%   * Why little metadata on stack? (RTTI for classes aside)
+%   * Why are pointers stack-relative?
+%   * Error handling - C++ exceptions etc.
+%   * No VM calls in native functions
+%   * Initial Release - feature set?
+%   * Memory management - potential leaks on delete when using heap
+%   * Lifetime - destructors; moving? Copying?
+%   * utf-32 input preprocessing and how Spirit doesn't like that
+%   * Addressing - distinguishing between stack \& heap? Different opcodes?
+%   * Pointy brackets <> for templates vs operators (ambiguity, difficulty of parsing)
+%   * Infix operator precedence/associativity
+%       * Can't mix left \& right of same precedence
+%       * Can't mix non-associative of same precedence (a==b==c)
+%   * Native functions
+%   * Native types
+%   * Feature dependencies
+%   * Function pointers
+%       * Function calls have an expression type as the function for this reason
+%       * Identifier may be ambiguous though, needs argument types?
+%       * Type-wise they require variadic templates?
+
+
+%*  Design
+
+% Ansatz, d.h. z.B. Architektur, Module und ihre Kommunikation
+
+%*  [General approach]
+%   * Why C++? Why C++14?
+%   * Why Boost.Spirit?
+%   * Boost.Spirit X3
+%       * http://boost-spirit.com/home/2015/05/16/spirit-3-0-0/
+%       * May 15th
+%   * Line numbers for error messages
+%   * Namespaces - perseus / perseus::detail
+
+%*  [Software architecture]
+
+% Entwicklungsanalyse
+\chapter{Entwicklungsanalyse}
+
+% Umsetzung wesentlicher Module, ggf. Quellcode-Ebene
+
+%   * Opcode Encoding
+%   * utf-32 input preprocessing and how Spirit doesn't like that
+%   * Token attributes (vs iterator ranges)
+%   * Boost.spirit woes
+%       * Documentation
+%       * Accidental infinite recursion in templates (parens\_expression)
+%   * Function call / array subscription are binary-ish operations; how are they handled wrt precedence?
+%       * Indexing = operator []
+%       * Fixed as highest precedence?
+%           * Probably makes sense
+%       * Function call is more difficult since its second operand is not an expression but an argument list
+%       * Overloading? Seems reasonable for array subscription, at least; as in expose the type class for that
+%   * Iterators in AST, how that crashed, how I'm now using pointers and unhappy about it%
+
+    \section{Entwicklung des Konzeptes}
+    \section{Erstellen von Mock-Services}
+
+% Zusammenfassung
+\chapter{Zusammenfassung}
+%*  [What did I achieve?]
+
+% Ausblick
+\chapter{Ausblick}
+
+% Ergebnisse zusammenfassen, bewerten bzgl. Zielsetzung, Perspektiven
+
+%*  [Future plans/possibilities]
