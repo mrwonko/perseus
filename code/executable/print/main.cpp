@@ -124,7 +124,7 @@ int main( const int argc, const char* argv[] )
     perseus::detail::function_manager functions;
     perseus::detail::extract_functions( parser_ast, functions );
     std::cout << "# Checking types and references..." << std::endl;
-    perseus::detail::ast::clean::file clean_ast = perseus::detail::clean_parser_ast( std::move( parser_ast ), functions );
+    perseus::detail::ast::clean::file clean_ast = perseus::detail::simplify_and_annotate( std::move( parser_ast ), functions );
     std::cout << "# Cleanded version:\n" << std::endl;
     clean::print_visitor{}( clean_ast );
     std::cout << "\ndone." << std::endl;

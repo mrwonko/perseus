@@ -1,0 +1,15 @@
+impure function fib( x : i32, print_all : bool ) -> i32
+{
+    let result =
+        if x <= 1
+            x
+        else
+            // note the silly parens - they are required due to calls being handled similar to operators, whose precedence is not yet resolved
+            ( fib( x - 1, print_all ) ) + ( fib( x - 2, false ) );
+    if print_all
+        print( result ); // no else required since print()'s return type is void
+    result
+}
+
+impure function main() -> i32
+    fib( 6, true )

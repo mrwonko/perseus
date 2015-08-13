@@ -1,0 +1,225 @@
+% Lösung bzgl. Zielsetzung -- Bezug zu methodischem Teil herstellen
+
+% (Ist-Analyse)
+\chapter{State of the art}
+
+    \section{Common Virtual Machines}
+        % Stand der Technik, insb. bzgl. VMs / Einordnung
+        
+        \subsection{Java Virtual Machine}
+            Dalvik?
+        
+        \subsection{Weitere?}
+        
+        Lua VM, C\# VM (CLR - Common Language Runtime, for CIL - Common Intermediate Language), LLVM, CPython, ...?
+        
+    \section{Common Compiler Generators}
+        % passt das hier hin?
+        flex, bison etc.
+
+% Anforderungsanalyse / Requirements
+\chapter{Requirements}
+
+    \section{Target Language}
+    
+        \subsection{Comments}
+        
+        \subsection{Integral and boolean types}
+    
+        \subsection{Arithmetic Expressions}
+        
+            Literals
+            
+            Operator precedence
+            
+            Can't mix left \& right of same precedence
+            
+            Can't mix non-associative of same precedence ($a==b==c$)
+        
+        \subsection{Variables}
+            
+            no assignments yet
+        
+        \subsection{Functions}
+        
+            with parameters, importantly
+        
+        \subsection{Conditional Expressions}
+        
+        \subsection{Future features}
+            
+            \subsubsection{Persistence}
+                
+            \subsubsection{Custom operators}
+                
+                so precedence can't be inherent in the grammar
+                
+            \subsubsection{Native functions}
+                
+            \subsubsection{Pointers \& Dynamic Memory}
+                
+                including function pointers
+                
+                e.g. used for strings
+                
+            \subsubsection{Coroutines}
+            
+            \subsubsection{Tail Recursion}
+            
+    
+    \section{Compiler}
+        
+        \subsection{Errors}
+            
+            include file location
+            
+        \subsection{UTF-8 string literals}
+            
+        \subsection{Probably more...}
+            
+            But what?
+        
+    \section{VM}
+        
+        \subsection{Fetch and Execute}
+            
+        \subsection{Coroutines}
+            
+            \subsubsection{Stack}
+                
+                grow arbitrarily
+            
+        \subsection{Memory Management}
+            
+            that is, the need for pointers at some point, both to stacks and heap, and how to do that nicely, considering the stack may grow, i.e. relocate
+    
+    % do I talk about future requirements? Like Stack Unwinding?
+
+\chapter{Design} % TODO: better name?
+% Ansatz, d.h. z.B. Architektur, Module und ihre Kommunikation
+    \section{Choice of programming language}
+        \subsection{Why C++?}
+        \subsection{Why C++14?}
+    
+    \section{Choice of libraries}
+        \subsection{Why Boost.Spirit?}
+            no separate generation step, uses C++ templates instead (at the cost of compile time - lots of it)
+            
+            header-only
+            
+            recursive descent parser $\rightarrow$ no left recursions
+            \subsubsection{Choice of version}
+                why v2 and not x3?
+                
+                released May 15th
+                
+                see http://boost-spirit.com/home/2015/05/16/spirit-3-0-0/
+        \subsection{Why Boost.Test?}
+    
+    % TODO: should I talk about coding standards at all?
+    
+    % Namespaces - perseus / perseus::detail
+    % Generally: why bytecode?
+    \section{Modules}
+    
+        % I suppose a diagram would be useful here?
+    
+        \subsection{Compiler}
+        
+            \subsubsection{Lexer}
+            Line numbers for error messages (\& Token attributes vs iterator ranges)
+            
+            utf-32 input preprocessing and how Spirit doesn't like that, but how it's only of interest in string literals anyway
+            
+            \subsubsection{Parser}
+            
+            \subsubsection{Code Generation}
+            
+        \subsection{Virtual Machines}
+        
+            Error handling - C++ exceptions etc.
+            
+            Why are pointers stack-relative?
+            
+            Why little metadata on stack? (except RTTI for yielding)
+            
+            \subsubsection{code segment}
+                opcode encoding
+            \subsubsection{coroutine}
+            \subsubsection{stack}
+            \subsubsection{processor}
+        
+        \subsection{Unit Tests}
+
+
+% Entwicklungsanalyse
+\chapter{Implementation}
+
+    % Umsetzung wesentlicher Module, ggf. Quellcode-Ebene
+    
+    \section{Coming to terms with Boost}
+    
+        Trouble finding information in the documentation -- it's there, just hard to find.
+        
+        Accidental left-recursion leading to infinite loops, resulting in stack overflows.
+    
+    \section{Grammar definition}
+    
+        Sourcecode sample: this is what the definition looks like.
+        
+        Here's how the results are combined to create the syntax tree.
+        
+        Explain expectations.
+        
+        Operation-List in lieu of left-recursion, and how that needs to be post-processed to take care of precedences. And why those are not coded into the grammar. And how it also contains calls and indexing, making the lack of precedence resolution slightly more awkward.
+    
+    \section{Types}
+        
+        Represented as enum, only int, bool and void.
+    
+    \section{Function Manager}
+    
+        Iterators to entries in AST, how that crashed for no apparent reason, how I'm now using pointers and unhappy about it but how it's just as legal.
+    
+    \section{Code Generation}
+    
+        transformation from parser tree into clean tree
+    
+        placeholders for jump offsets
+        
+    \section{Code Segment}
+        
+        opcode encoding/decoding
+        
+    \section{Virtual Machine}
+        
+        switch-statement for opcode execution
+
+\chapter{Evaluating the results}
+% Zusammenfassung
+% What did I achieve?
+% Ergebnisse zusammenfassen, bewerten bzgl. Zielsetzung, Perspektiven
+
+I will probably want to put some example scripts here?
+
+\chapter{Future prospects}
+% Ausblick
+%*  [Future plans/possibilities]
+
+    \section{Simple additions}
+        
+        variable assignments
+        
+        operator precedence resolution
+        
+        modules
+        
+        better separation into API and internal headers
+        
+        better errors
+        
+        change pointers to ptrdiff\_t
+    
+    \section{Complex changes}
+        
+        just about all the remaining language features

@@ -13,7 +13,7 @@ namespace perseus
       return std::tie( name, parameters ) < std::tie( rhs.name, rhs.parameters );
     }
 
-    std::vector< type_id >::size_type function_signature::parameters_size() const
+    std::int32_t function_signature::parameters_size() const
     {
       std::vector< type_id >::size_type size = 0;
       for( type_id parameter : parameters )
@@ -95,11 +95,30 @@ namespace perseus
     {
       // function_signature{ identifier, { parameter types } }, function_info{ opcode, return type, precedence, associativity }
       _functions.emplace( function_signature{ "+",{ type_id::i32, type_id::i32 } }, function_info{ opcode::add_i32, type_id::i32, true, 6, operator_associativity::left } );
+      _functions.emplace( function_signature{ "-",{ type_id::i32, type_id::i32 } }, function_info{ opcode::subtract_i32, type_id::i32, true, 6, operator_associativity::left } );
+      _functions.emplace( function_signature{ "*",{ type_id::i32, type_id::i32 } }, function_info{ opcode::multiply_i32, type_id::i32, true, 7, operator_associativity::left } );
+      _functions.emplace( function_signature{ "/",{ type_id::i32, type_id::i32 } }, function_info{ opcode::divide_i32, type_id::i32, true, 7, operator_associativity::left } );
+      _functions.emplace( function_signature{ "%",{ type_id::i32, type_id::i32 } }, function_info{ opcode::modulo_i32, type_id::i32, true, 7, operator_associativity::left } );
+
+      _functions.emplace( function_signature{ "-",{ type_id::i32 } }, function_info{ opcode::negate_i32, type_id::i32, true } );
+
+      _functions.emplace( function_signature{ "==",{ type_id::i32, type_id::i32 } }, function_info{ opcode::equals_i32, type_id::bool_, true, 4, operator_associativity::none } );
+      _functions.emplace( function_signature{ "!=",{ type_id::i32, type_id::i32 } }, function_info{ opcode::not_equals_i32, type_id::bool_, true, 4, operator_associativity::none } );
+      _functions.emplace( function_signature{ "<",{ type_id::i32, type_id::i32 } }, function_info{ opcode::less_than_i32, type_id::bool_, true, 4, operator_associativity::none } );
+      _functions.emplace( function_signature{ "<=",{ type_id::i32, type_id::i32 } }, function_info{ opcode::less_than_or_equals_i32, type_id::bool_, true, 4, operator_associativity::none } );
+      _functions.emplace( function_signature{ ">",{ type_id::i32, type_id::i32 } }, function_info{ opcode::greater_than_i32, type_id::bool_, true, 4, operator_associativity::none } );
+      _functions.emplace( function_signature{ ">=",{ type_id::i32, type_id::i32 } }, function_info{ opcode::greater_than_or_equals_i32, type_id::bool_, true, 4, operator_associativity::none } );
+
+      _functions.emplace( function_signature{ "&&",{ type_id::bool_, type_id::bool_} }, function_info{ opcode::and_b, type_id::bool_, true, 3, operator_associativity::right } );
+      _functions.emplace( function_signature{ "||",{ type_id::bool_, type_id::bool_ } }, function_info{ opcode::or_b, type_id::bool_, true, 2, operator_associativity::right } );
+      _functions.emplace( function_signature{ "==",{ type_id::bool_, type_id::bool_ } }, function_info{ opcode::equals_b, type_id::bool_, true, 4, operator_associativity::none } );
+      _functions.emplace( function_signature{ "!=",{ type_id::bool_, type_id::bool_ } }, function_info{ opcode::not_equals_b, type_id::bool_, true, 4, operator_associativity::none } );
+      _functions.emplace( function_signature{ "!",{ type_id::bool_ } }, function_info{ opcode::negate_b, type_id::bool_, true } );
     }
 
-    bool function_manager::register_function( function_signature&& signature, function_info&& info, function_map::const_iterator& out_result )
+    bool function_manager::register_function( function_signature&& signature, function_info&& info, function_pointer& out_result )
     {
-      function_map::const_iterator it;
+      function_map::iterator it;
       bool inserted;
       std::tie( it, inserted ) = _functions.emplace( std::make_pair( std::move( signature ), std::move( info ) ) );
       if( inserted )
@@ -110,10 +129,15 @@ namespace perseus
       return false;
     }
 
-    bool function_manager::get_function( const function_signature& function, function_map::const_iterator& out_result ) const
+    bool function_manager::get_function( const function_signature& function, function_pointer& out_result )
     {
-      out_result = _functions.find( function );
-      return out_result != _functions.end();
+      auto it = _functions.find( function );
+      if( it == _functions.end() )
+      {
+        return false;
+      }
+      out_result = it;
+      return true;
     }
 
     bool function_manager::has_open_address_requests() const
@@ -128,7 +152,7 @@ namespace perseus
         function_info& info = entry.second;
         assert( !info.address_set() );
         opcode op;
-        if( info.get_opcode( op ) )
+        if( info.get_opcode( op ) && info.has_requests() )
         {
           info.set_address( code.size(), code );
           generate_builtin_operation( op, entry.first.parameters_size(), get_size( info.return_type ), code );

@@ -30,8 +30,9 @@ set( COMPILER_FILES
     "src/compiler/iterators.cpp" "include/compiler/iterators.hpp"
     "src/compiler/compiler.cpp" "include/compiler/compiler.hpp"
     "include/compiler/steps.hpp"
-    "src/compiler/steps/clean_parser_ast.cpp"
     "src/compiler/steps/extract_functions.cpp"
+    "src/compiler/steps/simplify_and_annotate.cpp"
+    "src/compiler/steps/generate_code.cpp"
     "src/compiler/types.cpp" "include/compiler/types.hpp"
     "src/compiler/function_manager.cpp" "include/compiler/function_manager.hpp"
 )
@@ -116,5 +117,11 @@ add_executable( perseus_print
     ${UTIL_FILES}
 )
 
+add_executable( runperseus
+    "executable/run.cpp"
+    ${UTIL_FILES}
+)
+
 target_link_libraries( testsuite ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY} perseus )
+target_link_libraries( runperseus perseus )
 target_link_libraries( perseus_print perseus )

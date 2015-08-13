@@ -105,7 +105,7 @@ namespace perseus
           operand = string | integer | true_ | false_ | identifier | unary_operation | if_expression | while_expression | return_expression | block_expression | parens_expression;
           {
             // `op` x
-            unary_operation = operator_identifier > expression;
+            unary_operation = operator_identifier > operand;
 
             // if cond then_body else_body
             // Logically there's always an else, but it may be "nothing" (i.e. void).

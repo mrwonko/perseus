@@ -38,7 +38,7 @@ namespace perseus
       std::vector< type_id > parameters;
 
       bool operator<( const function_signature& rhs ) const;
-      std::vector< type_id >::size_type parameters_size() const;
+      std::int32_t parameters_size() const;
     };
 
     std::ostream& operator<<( std::ostream& os, const function_signature& signature );
@@ -87,9 +87,14 @@ namespace perseus
       */
       void write_address( code_segment& code );
       
+      bool has_opcode() const
+      {
+        return _opcode.is_initialized();
+      }
+
       bool get_opcode( opcode& out_result ) const
       {
-        if( _opcode.is_initialized() )
+        if( _opcode )
         {
           out_result = *_opcode;
           return true;
@@ -119,6 +124,7 @@ namespace perseus
     {
     public:
       typedef std::map< function_signature, function_info > function_map;
+      typedef function_map::iterator function_pointer;
 
       /**
       Constructor. Registers built-in functions.
@@ -137,12 +143,13 @@ namespace perseus
       /**
       @brief Registers a function, i.e. declares its signature valid
       */
-      bool register_function( function_signature&& signature, function_info&& info, function_map::const_iterator& out_result );
+      bool register_function( function_signature&& signature, function_info&& info, function_pointer& out_result );
       
-      bool get_function( const function_signature& function, function_map::const_iterator& out_result ) const;
+      bool get_function( const function_signature& function, function_pointer& out_result );
       
       bool has_open_address_requests() const;
       
+      /// generate only those builtin functions whose address has been requested
       void write_builtin_functions( code_segment& code );
 
       /**

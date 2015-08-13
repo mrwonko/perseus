@@ -1,0 +1,35 @@
+% Kile expects the root document to contain \documentclass
+\iffalse\documentclass{scrreprt}\fi
+
+% Hint: "include" did not work for me using:
+% This is pdfTeX, Version 3.1415926-2.4-1.40.13 (TeX Live 2012/Debian)
+% Replaced "include" with "input" to make it work.
+\input{template/header}
+
+\begin{document}
+
+\pagenumbering{Roman}
+
+% Title Page
+\include{template/title}
+
+\tableofcontents
+\listoffigures
+\lstlistoflistings
+\cleardoublepage
+
+
+\pagenumbering{arabic}
+
+% Thesis should not exceed 100 pages in total
+\include{chapter/introduction}	
+% the main part follows (should be about 60 pages)
+\include{chapter/theory}
+\include{chapter/realization}
+
+\include{chapter/bibliography}
+
+% Eidesstattliche Erklärung
+\include{template/footer}
+
+\end{document}

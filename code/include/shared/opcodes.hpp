@@ -718,6 +718,32 @@ namespace perseus
       */
       less_than_or_equals_i32,
       /**
+      # 32 bit signed int greater than
+
+      ## Input
+
+      -   operand2 (4 bytes)
+      -   operand1 (4 bytes)
+
+      ## Output
+
+      -   result (1 byte) - operand1 > operand2
+      */
+      greater_than_i32,
+      /**
+      # 32 bit signed int greater than or equals
+
+      ## Input
+
+      -   operand2 (4 bytes)
+      -   operand1 (4 bytes)
+
+      ## Output
+
+      -   result (1 byte) - operand1 >= operand2
+      */
+      greater_than_or_equals_i32,
+      /**
       # 32 bit signed int negation
 
       ## Input

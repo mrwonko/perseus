@@ -93,7 +93,7 @@ namespace perseus
         struct unary_operation
         {
           identifier operation;
-          expression operand;
+          operand operand;
         };
 
         struct binary_operation
@@ -188,7 +188,7 @@ namespace perseus
         // for function pointers I'll need an indirect call expression?
         struct call_expression
         {
-          function_manager::function_map::const_iterator function;
+          function_manager::function_pointer function;
           std::vector< expression > arguments;
         };
 

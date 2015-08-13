@@ -1,12 +1,17 @@
 #pragma once
 
-#include "compiler/ast.hpp"
-
 #include <istream>
 #include <memory>
 
+#include "vm/processor.hpp"
+
 namespace perseus
 {
+  namespace detail
+  {
+    class code_segment;
+  }
+
   /// The compiler takes care of turning source files into @ref detail::code_segment "byte code".
   class compiler
   {
@@ -26,12 +31,20 @@ namespace perseus
 
     /**
     Parse the given Input Stream into a Syntax Tree, or throw an exception on failure.
+
+    The resulting syntax tree is kept internally and used during linking.
     @param source_stream source code to parse
     @param filename name of the source file, for errors
-    @return the syntax tree representation of the source code
     @todo document the various exceptions thrown on parse failure
     */
-    detail::ast::parser::file parse( std::istream& source_stream, const std::string& filename ) const;
+    void parse( std::istream& source_stream, const std::string& filename );
+
+    void reset();
+
+    /**
+    Generates code for all the parsed files. Places code to call main() at address 0.
+    */
+    detail::processor link();
   private:
     struct impl;
     std::unique_ptr< impl > _impl;
