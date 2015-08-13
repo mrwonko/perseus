@@ -123,11 +123,7 @@ namespace perseus
       std::tie( it, inserted ) = _functions.emplace( std::make_pair( std::move( signature ), std::move( info ) ) );
       if( inserted )
       {
-#ifdef PERSEUS_FUNCTION_POINTER_HACK
-        out_result = &*it;
-#else
         out_result = it;
-#endif
         return true;
       }
       return false;
@@ -140,11 +136,7 @@ namespace perseus
       {
         return false;
       }
-#ifdef PERSEUS_FUNCTION_POINTER_HACK
-      out_result = &*it;
-#else
       out_result = it;
-#endif
       return true;
     }
 

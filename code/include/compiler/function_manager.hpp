@@ -124,13 +124,7 @@ namespace perseus
     {
     public:
       typedef std::map< function_signature, function_info > function_map;
-      // HACK: this should be function_map::iterator, but that throws an exception. Legitimately, I fear, but I can't figure out why or what's broken, so I'm using a raw pointer instead, which is technically legal but can't check for read-after-free.
-#define PERSEUS_FUNCTION_POINTER_HACK
-#ifdef PERSEUS_FUNCTION_POINTER_HACK
-      typedef function_map::value_type* function_pointer;
-#else
       typedef function_map::iterator function_pointer;
-#endif;
 
       /**
       Constructor. Registers built-in functions.
