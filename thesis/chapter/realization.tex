@@ -11,15 +11,16 @@
         
         \subsection{Weitere?}
         
-        Lua VM, C\# VM (Name?), LLVM, CPython, ...?
+        Lua VM, C\# VM (CLR - Common Language Runtime, for CIL - Common Intermediate Language), LLVM, CPython, ...?
         
     \section{Common Compiler Generators}
         % passt das hier hin?
+        flex, bison etc.
 
 % Anforderungsanalyse / Requirements
-\chapter{Desired language features}
+\chapter{Requirements}
 
-    \section{Essential}
+    \section{Target Language}
     
         \subsection{Comments}
         
@@ -28,6 +29,12 @@
         \subsection{Arithmetic Expressions}
         
             Literals
+            
+            Operator precedence
+            
+            Can't mix left \& right of same precedence
+            
+            Can't mix non-associative of same precedence ($a==b==c$)
         
         \subsection{Variables}
             
@@ -38,68 +45,53 @@
             with parameters, importantly
         
         \subsection{Conditional Expressions}
-    
-    \section{Additional}
-        % should I go into this much detail here? Describing what the language might one day become?
         
-        \subsection{Operator Precedence}
-            Can't mix left \& right of same precedence
+        \subsection{Future features}
             
-            Can't mix non-associative of same precedence ($a==b==c$)
-            \subsubsection{Custom Operators}
-    
-        \subsection{Native Functions}
-        
-            i.e. calling native functions from scripts, and how they are not serializable/can't yield
-        
-        \subsection{Native Types}
-            i.e. wrappers for C++ Types; tightly coupled with type system (move section there?)
-    
-        \subsection{Arrays}
-        
-        \subsection{Strings}
-            32 bit characters
-        
-        \subsection{Pointers}
-            or references
-            
-            stack vs heap
-            
-            and how they are not serializable
-        
-        \subsection{First Class Functions}
-            and why they effectively require variadic templates
-            
-            and how creating them from identifiers can be ambiguous due to overloading
-        
-        \subsection{Type System}
-            \subsubsection{Structures}
-            \subsubsection{Type Classes}
-            \subsubsection{Templates}
-                or something like them
+            \subsubsection{Persistence}
                 
-                maybe a note on how <> style templates are difficult to parse?
-        
-        \subsection{Persistence}
-        
-            code changes? $\rightarrow$ serializable/yielding functions must not have changed, but others may (save function identifier \& offset)
-        
-        \subsection{Dynamic memory}
-            \subsubsection{Move Semantics}
-        
-        \subsection{Coroutines}
-        
-            VM should be built with them already in mind
+            \subsubsection{Custom operators}
+                
+                so precedence can't be inherent in the grammar
+                
+            \subsubsection{Native functions}
+                
+            \subsubsection{Pointers \& Dynamic Memory}
+                
+                including function pointers
+                
+                e.g. used for strings
+                
+            \subsubsection{Coroutines}
             
-            beware memory leaks on deletion (i.e. needs stack unwinding)
+            \subsubsection{Tail Recursion}
+            
+    
+    \section{Compiler}
         
-        \subsection{Tail recursion}
-    
-\chapter{VM Requirements}
-    \section{Fetch and Execute}
-    
-    \section{Stack}
-        grow arbitrarily
+        \subsection{Errors}
+            
+            include file location
+            
+        \subsection{UTF-8 string literals}
+            
+        \subsection{Probably more...}
+            
+            But what?
+        
+    \section{VM}
+        
+        \subsection{Fetch and Execute}
+            
+        \subsection{Coroutines}
+            
+            \subsubsection{Stack}
+                
+                grow arbitrarily
+            
+        \subsection{Memory Management}
+            
+            that is, the need for pointers at some point, both to stacks and heap, and how to do that nicely, considering the stack may grow, i.e. relocate
     
     % do I talk about future requirements? Like Stack Unwinding?
 
@@ -161,7 +153,7 @@
 
 
 % Entwicklungsanalyse
-\chapter{Remarkable developments during development} % TODO: name
+\chapter{Implementation}
 
     % Umsetzung wesentlicher Module, ggf. Quellcode-Ebene
     
@@ -223,6 +215,10 @@ I will probably want to put some example scripts here?
         modules
         
         better separation into API and internal headers
+        
+        better errors
+        
+        change pointers to ptrdiff\_t
     
     \section{Complex changes}
         
