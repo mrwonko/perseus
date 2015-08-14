@@ -2,28 +2,33 @@
 
 % (Ist-Analyse)
 \chapter{State of the art}
+        
+    % immer erwähnen, was man nutzt, und nie nur das
+        
+    \section{Common Compiler Generators}
+        % passt das hier hin?
+        flex, bison, yacc, boost.spirit etc.
 
     \section{Common Virtual Machines}
         % Stand der Technik, insb. bzgl. VMs / Einordnung
         
-        \subsection{Java Virtual Machine}
-            Dalvik?
+        %\subsection{Java Virtual Machine}
+        
+        \subsection{LLVM}
+        
+        \subsection{node.js}
+        
+        % auch inhärent singlethreaded
         
         \subsection{Weitere?}
         
         Lua VM, C\# VM (CLR - Common Language Runtime, for CIL - Common Intermediate Language), LLVM, CPython, ...?
-        
-    \section{Common Compiler Generators}
-        % passt das hier hin?
-        flex, bison etc.
 
 % Anforderungsanalyse / Requirements
 \chapter{Requirements}
 
     \section{Target Language}
     
-        \subsection{Comments}
-        
         \subsection{Integral and boolean types}
     
         \subsection{Arithmetic Expressions}
@@ -46,6 +51,8 @@
         
         \subsection{Conditional Expressions}
         
+        \subsection{Comments}
+        
         \subsection{Future features}
             
             \subsubsection{Persistence}
@@ -63,6 +70,8 @@
                 e.g. used for strings
                 
             \subsubsection{Coroutines}
+            	
+            	yield etc.
             
             \subsubsection{Tail Recursion}
             
@@ -195,10 +204,15 @@
         
         switch-statement for opcode execution
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Schluss: Wichtigster Teil (zusammen mit Einführung) %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 \chapter{Evaluating the results}
 % Zusammenfassung
 % What did I achieve?
 % Ergebnisse zusammenfassen, bewerten bzgl. Zielsetzung, Perspektiven
+% lessons learned
 
 I will probably want to put some example scripts here?
 
