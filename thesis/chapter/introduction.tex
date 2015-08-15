@@ -3,35 +3,55 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Einleitung
-\chapter{Introduction} % TODO name?
+\chapter{Introduction} %TODO name?
 
-explain the language's name somewhere in this chapter
-
+%TODO explain the language's name somewhere in this chapter
+    
     \section{Target audience}
     This thesis is written under the assumption that the reader has a solid understanding of the basics of computer science.
     % TODO more detail?
+
+	\section{Goal} %TODO better title?
+	% Ziel
+	% konkrete Zielsetzung; auch: was nicht?
+	% TODO
+	
+	I have a concept for a programming language called Perseus. I envision a strongly typed scripting language with native serialization support -- crucially also for execution contexts, so a paused script can be saved and later resumed, possibly on a different computer.
+	
+	My goal for this thesis was to create prototypes of a compiler and a virtual machine implementing a small sub set of it, just enough to do basic computations. These can later be built upon to create a full-blown language, but that is outside of the scope of this thesis.
+	
+	\lstperseus
+	\begin{lstlisting}[caption={Desired target language}]
+function fib( x : i32 ) -> i32
+    // if the function body is a single expression, no {}-delimited block is required
+    if x <= 1
+        x
+    else
+        fib( x - 1 ) + fib( x - 2 )
+
+impure function main()
+{
+	let index : i32 = 10;
+	// variable types can be deduced from their initialization
+	let result = fib( index );
+	// print is an impure built-in function (i.e. it has side effects, in this case writing something), so main() needs to be impure as well to be able to call it
+	print( result )
+}
+	\end{lstlisting}
+	
+	I will focus on the design and implementation of the compiler and the virtual machine, not the language itself; not least because it is not fully developed yet.
     
     
-    \section{Why a new programming language?}
-    % Motivation
-    % Einordnung der Thesis in allgemeinen Problemkontext -- diesen dazu kurz beschreiben (ca. 1--2 Seiten)
-    % TODO
-    
-    \section{Why a new VM?}
-    
-    in short: serialization of coroutines
-    
-    
-    \section{Goal} % TODO better title?
-    % Ziel
-    % konkrete Zielsetzung; auch: was nicht?
-    % TODO
-    
-    not to create the full language, just a small core
-    
-    %TODO example target source code
-    
-    
-    \section{Approach} % TODO better title
-    % Beschreibung der Vorgehensweise -- wie soll Ziel erreicht werden? Welche Themen in welchen Kapiteln, warum? Prinzipielle Argumentationslinie? -> roten Faden deutlich machen
-    % TODO
+	\section{Approach} %TODO better title
+	% Beschreibung der Vorgehensweise -- wie soll Ziel erreicht werden? Welche Themen in welchen Kapiteln, warum? Prinzipielle Argumentationslinie? -> roten Faden deutlich machen
+	%TODO
+	
+	
+	\section{Why a new programming language?}
+	% Motivation
+	% Einordnung der Thesis in allgemeinen Problemkontext -- diesen dazu kurz beschreiben (ca. 1--2 Seiten)
+	%TODO
+	
+	\section{Why a new VM?}
+	
+	in short: serialization of coroutines

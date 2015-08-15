@@ -114,3 +114,24 @@
 \lstinputlisting[frame=lines,aboveskip=2\bigskipamount,#1]{#2}
 \end{spacing}
 }
+
+\newcommand{\lstperseus}[0]{
+	\lstset{
+		language=C
+	}
+	\lstset{
+		morekeywords={i32,bool,function,mutable,impure,let},
+		keywordstyle={\underbar},
+		frame=lines
+	}
+}
+
+\newcommand{\lstcpp}[0]{
+	\lstset{
+		language=C++
+	}
+	\lstset{
+		keywordstyle={\underbar},
+		frame=lines
+	}
+}
