@@ -27,6 +27,12 @@
 % Anforderungsanalyse / Requirements
 \chapter{Requirements}
 
+	%TODO where does this go? requirements? 
+	%Native machine code would require porting work for each new platform. By using a virtual machine, any platform that's capable of running it is supported. My virtual machine requirements are mainly support for coroutines and stack inspection/unwinding, so coroutines can be serialized and aborted properly, and the ability to embed it in C++.
+	
+	% LLVM: no coroutines, no stack inspection(?)
+	% JVM/CLR: garbage collected
+
     \section{Target Language}
     
         \subsection{Integral and boolean types}

@@ -25,7 +25,7 @@
 	\lstperseus
 	\begin{lstlisting}[caption={Desired target language}]
 function fib( x : i32 ) -> i32
-    // if the function body is a single expression, no {}-delimited block is required
+    // if the body is a single expression, no {}-block is required
     if x <= 1
         x
     else
@@ -54,8 +54,17 @@ impure function main()
 	\section{Why a new programming language?}
 	% Motivation
 	% Einordnung der Thesis in allgemeinen Problemkontext -- diesen dazu kurz beschreiben (ca. 1--2 Seiten)
-	%TODO
 	
-	\section{Why a new VM?}
+	There are plenty of programming languages to choose from -- why would I want yet another one? In short because I have yet to find one that satisfies all my requirements: I want a safe powerful strongly typed scripting language with elements from functional and object-oriented programming languages that has coroutines which can be serialized to a cross-platform binary format to be later resumed, possibly on a different computer. It should be easy to embed in C++ applications, have no garbage collection and avoid null- and dangling pointers.
 	
-	in short: serialization of coroutines
+	AngelScript\cite{angelscript} is an example of a statically typed scripting languages for embedding in C++, but it doesn't have coroutines that can be serialized, has null-pointers and it's type system is not powerful enough, lacking generic types. And while Lua\cite{lua}, which embeds nicely in C, has coroutines that can be serialized using Pluto\cite{pluto}, it is dynamically typed and uses garbage collection. Rust\cite{rust} has a lot of what I'm looking for, serialization aside, but it's no scripting language.
+	
+	So since I know of no such language, I've decided to work on one myself.
+	
+	\section{Why a new virtual machine?}
+	
+	To compile a new language I need a new compiler. But do I also need a custom byte code and a custom virtual machine to run it? Why can't I target an existing virtual machine or native machine code?
+	
+	Again it boils down to existing solutions not satisfying all my requirements, in particular coroutine support and absence of garbage collection. For a more detailed analysis refer to the ``Requirements'' chapter.
+	
+	%TODO is it really the requirements chapter?
