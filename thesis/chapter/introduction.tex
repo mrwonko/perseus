@@ -16,9 +16,11 @@
 	% konkrete Zielsetzung; auch: was nicht?
 	% TODO
 	
-	I have a concept for a programming language called Perseus. I envision a strongly typed scripting language with native serialization support -- crucially also for execution contexts, so a paused script can be saved and later resumed, possibly on a different computer.
+	I have a concept for a programming language called Perseus. I envision a strongly typed scripting language with native serialization support for execution contexts, so a paused script can be saved and later resumed, possibly on a different computer.
 	
-	My goal for this thesis was to create prototypes of a compiler and a virtual machine implementing a small sub set of it, just enough to do basic computations. These can later be built upon to create a full-blown language, but that is outside of the scope of this thesis.
+	My goal for this thesis was to create prototypes of a compiler and a virtual machine implementing a small subset of it, mostly consisting of basic arithmetic and relational operations, functions and variables. Those prototypes can later be built upon to create a full-blown language, but that is outside of the scope of this thesis.
+	
+	The aim was for the following program to work -- as we shall see, I achieved that with the exception of one quirk.
 	
 	\lstperseus
 	\begin{lstlisting}[caption={Desired target language}]
@@ -39,7 +41,7 @@ impure function main()
 }
 	\end{lstlisting}
 	
-	I will focus on the design and implementation of the compiler and the virtual machine, not the language itself; not least because it is not fully developed yet.
+	I will not go into much detail on the language itself in this thesis -- the focus is on the compiler and the virtual machine, not least because the language is still a work in progress.
     
     
 	\section{Approach} %TODO better title
