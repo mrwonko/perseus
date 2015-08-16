@@ -32,6 +32,7 @@
 	
 	% LLVM: no coroutines, no stack inspection(?)
 	% JVM/CLR: garbage collected
+	% maybe use a table?
 
     \section{Target Language}
     
@@ -218,6 +219,8 @@
     \section{Virtual Machine}
         
         switch-statement for opcode execution
+        
+        \subsection{Aggregate return bug}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Schluss: Wichtigster Teil (zusammen mit Einführung) %
@@ -229,26 +232,76 @@
 % Ergebnisse zusammenfassen, bewerten bzgl. Zielsetzung, Perspektiven
 % lessons learned
 
-I will probably want to put some example scripts here?
+I pretty much got where I wanted: A small core of Perseus can be compiled and executed. Let's see how close I came to my desired target language example (Listing~\ref{lst:target_language}):
+
+\lstperseus
+\begin{lstlisting}[caption={Actual resulting language example}]
+function fib( x : i32 ) -> i32
+    if x <= 1
+        x
+    else
+    	// precedence must be explicitly defined since function calls are syntactically treated similar to binary operators and operator precedence is not resolved yet.
+        ( fib( x - 1 ) ) + ( fib( x - 2 ) )
+
+impure function main()
+{
+	let index : i32 = 10;
+	let result = fib( index );
+	print( result )
+}
+\end{lstlisting}
+
+That's pretty much where I wanted to be, sans operator precedence resolution. The error messages for invalid code still leave a lot to be desired though -- they often lack information on the location of the problem. It's technically possible to include this information, and it sometimes is included already, but it was no priority during initial development, so future work in this area is required.
+
+Meanwhile the virtual machine already has support for coroutines in anticipation for their future addition to the language. New opcodes, e.g. for unsigned integer and floating point arithmetic, are easy to add. The main challenge in extending it will probably be the addition of stack inspection and unwinding.
+
+One of my main difficulties during development was figuring out how exactly to use certain features of Boost.Spirit, the compiler generator I chose. But in the end it did its job well and I'm still satisfied with it for the same reasons I initially chose it: I don't need a separate generation step thanks to the usage of C++ templates; and while getting the syntax right so it compiles was tricky, once that was done it usually worked as intended -- such are the benefits of a powerful static type system.
+
+I also ran into some compiler bugs due to developing on the bleeding edge, using the latest C++ features on a preview release of the compiler, but I still think using modern C++ was a good idea; it made writing fast, correct and elegant code a good deal easier than C++98, and all the compiler bugs I've encountered have since been fixed.
 
 \chapter{Future prospects}
 % Ausblick
 %*  [Future plans/possibilities]
 
+As I mentioned I've only just implemented a very simple core of the language; there is a lot of room for improvement. There are a couple of comparatively simple features that can be added immediately, but few of them make the language any more powerful. Such changes are for the most part larger in nature, requiring more work, but they are required for the language to become viable.
+
     \section{Simple additions}
-        
-        variable assignments
-        
-        operator precedence resolution
-        
-        modules
-        
-        better separation into API and internal headers
-        
-        better errors
-        
-        change pointers to ptrdiff\_t
     
-    \section{Complex changes}
-        
-        just about all the remaining language features
+    	\subsection{Operator precedence resolution}
+    	
+    	The most important change at the moment is probably the resolution of operator precedence. Having to manually define precedence using parentheses is inconvenient at best and downright ridiculous in the case of function calls; having to write
+    	\lstperseus
+		\begin{lstlisting}
+(myFunction()) + 1
+		\end{lstlisting}
+		instead of
+		\begin{lstlisting}
+myFunction() + 1
+		\end{lstlisting}
+		is not acceptable in any way.
+		
+		\subsection{Variable assignments}
+		
+		There is also currently no way of changing a variable's value; all variables are effectively immutable. To enable usage of iterative algorithms assignment is necessary, and adding it is fairly straightforward, since determining a variable's location in memory has already been solved for usage of variables in expressions.
+		
+		\subsection{Tail recursion}
+		
+		Optimizing tail recursion calls to simply jump back to the beginning of the function is mostly a matter of recognizing them, in which case slightly different code is generated. Not a major change.
+		
+		\subsection{Better errors}
+		
+		The syntax tree is not sufficiently annotated with file locations to always get useful errors, but it could and should be.
+		
+		\subsection{Cleaner API}
+		
+		The header files are not currently sufficiently separated into interface and implementation; it should be made clearer to the user what he is supposed to include by having those headers in a separate directory.
+	
+	\section{Complex changes}
+		
+		\subsection{Upgrade to Boost.Spirit 3}
+		
+		I'm using version 2 of Boost.Spirit, which was the latest stable version when I started developing. The next version has since been released, with potential improvements in compile time, speed and ease of use. I should consider switching to it while my code base is still relatively small, before adding many new features.
+		
+		\subsection{New language features}
+		
+		Perseus still lacks many features, which need to be added in the future. These include modules, so the code can be separated into smaller pieces; a proper type system that lets the user define custom types; some form of dynamic memory management, on which strings depend; first class functions with closures; coroutines; and the persistence that is so central to the language.
