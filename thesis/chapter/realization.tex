@@ -5,9 +5,29 @@
         
     % immer erwähnen, was man nutzt, und nie nur das
         
-    \section{Common Compiler Generators}
-        % passt das hier hin?
-        flex, bison, yacc, boost.spirit etc.
+	\section{Common Compiler Generators}
+    	
+		Lexers and parsers are rarely hand-written any more, since there are plenty of tools to generate them using formal definitions. Let's look at some common free and open source examples.
+		
+		\subsection{flex}
+		
+			flex\cite{flex} generates lexers in C from a definition file describing the tokens using regular expressions and code to be executed upon their recognition, for example suspending scanning and returning a token. The generated C source code is then compiled to get an executable lexer.
+			
+			%TODO is one of the oldest (?)
+		
+		\subsection{bison}
+			
+			bison\cite{bison} generates LALR and GLR Parsers in C, C++ and Java from a definition file describing the context-free grammar to be accepted. The generated source code is then compiled to get an executable parser.
+		
+		\subsection{Boost.Spirit}
+			
+			Boost.Spirit\cite{spirit} is a C++ parser and lexer library. (It also has a module for generator definitions, but that is of no interest here.) It's different from flex and bison (and most other compiler generators) in that it doesn't have a separate generation step; the definitions are made in standard C++.
+			
+			Boost.Spirit.Lex, the lexer component, lets you define the tokens using strings containing regular expressions. These are parsed and used to generate a deterministic finite automaton at run time, which means the computations will be repeated at each execution and syntactic errors in the regular expressions can't be detected during compilation. It does have the option to generate equivalent static C++ source code for the automaton on execution, which can then be used in place of the run time version for improved performance. Besides requiring no external tools for compilation it's also very easy to integrate with Boost.Spirit.Qi.
+			
+			Boost.Spirit.Qi is the parser component.
+			
+			%TODO
 
     \section{Common Virtual Machines}
         % Stand der Technik, insb. bzgl. VMs / Einordnung
