@@ -23,11 +23,9 @@
 			
 			Boost.Spirit\cite{spirit} is a C++ parser and lexer library. (It also has a module for generator definitions, but that is of no interest here.) It's different from flex and bison (and most other compiler generators) in that it doesn't have a separate generation step; the definitions are made in standard C++.
 			
-			Boost.Spirit.Lex, the lexer component, lets you define the tokens using strings containing regular expressions. These are parsed and used to generate a deterministic finite automaton at run time, which means the computations will be repeated at each execution and syntactic errors in the regular expressions can't be detected during compilation. It does have the option to generate equivalent static C++ source code for the automaton on execution, which can then be used in place of the run time version for improved performance. Besides requiring no external tools for compilation it's also very easy to integrate with Boost.Spirit.Qi.
+			Boost.Spirit.Lex, the lexer component, lets you define the tokens using strings containing regular expressions. These are parsed and used to generate a deterministic finite automaton at run time, which has the downside that the computations will be repeated at each execution and syntactic errors in the regular expressions can't be detected during compilation. To offset this there's the option to generate equivalent static C++ source code for the calculated automaton on execution, which can then be used in place of the run time version for improved performance. Besides requiring no external tools for compilation it's also very easy to integrate with Boost.Spirit.Qi.
 			
-			Boost.Spirit.Qi is the parser component.
-			
-			%TODO
+			Boost.Spirit.Qi is the parser component. Making heavy use of templates it allows for the definition of the grammar using overloaded operators, creating a recursive descent parser. Instead of calculating a parsing table it uses backtracking, removing the need for a separate tool prior to compilation. It avoids ambiguity through its operator definitions: An alternative $a|b$ is defined as ``if $a$ matches, use that; only try $b$ if it does not,'' while repetitions (including optional symbols) are greedy, matching as much as possible.
 
     \section{Common Virtual Machines}
         % Stand der Technik, insb. bzgl. VMs / Einordnung
