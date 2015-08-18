@@ -276,6 +276,182 @@ One of the main difficulties during development was figuring out how exactly to 
 
 Due to the usage of the latest C++14 features on a preview release of the Microsoft Visual C++ Compiler, a couple of compiler bugs were encountered, but its usage was still justified in that it made writing fast, correct and elegant code noticeably easier than it would have been in C++98. The compiler has since had its full release, which fixed all the bugs that had been encountered.
 
+
+\section{Resulting translation by example}
+
+Taking listing \ref{lst:result_language} as an example, what do the steps of compilation look like? First, the lexer turns the source code into roughly the following token stream -- except whitespaces and comments are omitted in this listing for brevity, and some indentation was added to aid comprehension:
+
+\begin{codelisting}[caption="Abridged tokens of listing \ref{lst:result_language}"]
+"function", identifier(fib), "(", identifier(x), ":", identifier(i32), ")", "->", identifier(i32),
+    "if", identifier(x), operator(<=), decimal literal(1),
+        identifier(x),
+    "else",
+        "(", identifier(fib), "(", identifier(x), operator(-), decimal literal(1), ")", ")", operator(+), "(", identifier(fib), "(", identifier(x), operator(-), decimal literal(2), ")", ")"
+
+"impure", "function", identifier(main), "(", ")",
+"{"
+    "let", identifier(index), ":", identifier(i32), "=", decimal literal(10), ";"
+    "let", identifier(result), "=", identifier(fib), "(", identifier(index), ")", ";"
+    identifier(print), "(", identifier(result), ")",
+"}"
+\end{codelisting}
+
+The parser builds the syntax tree shown in figure \ref{fig:result_language_parser_tree} from these tokens. This syntax tree is then transformed in various ways: Expressions are rearranged, variable references resolved, types checked etc. The result is the transformed syntax tree shown in figure \ref{fig:result_language_transformed_tree}.
+
+\begin{figure}
+\begin{forest}
+[\textit{file}
+	[{fib() $\rightarrow$ i32}
+		[\textit{arguments}
+			[{x : i32}]
+		]
+		[\textit{expression}
+			[\textit{operand}
+				[\textit{if}
+					% x <= 1
+					[\textit{expression}
+						[\textit{operand}
+							[x]
+						]
+						[\textit{operations}
+							[{$<=$}
+								[{$1$}]
+							]
+						]
+					]
+					% x
+					[\textit{expression}
+						[\textit{operand}
+							[x]
+						]
+					]
+					% fib(x-1) + fib(x-2)
+					[\textit{expression}
+						[\textit{operand}
+							% fib(x-1)
+							[\textit{expression}
+								[\textit{operand}
+									[fib]
+								]
+								[\textit{operations}
+									[\textit{call}
+										[\textit{expression}
+											[\textit{operand}
+												[x]
+											]
+											[\textit{operations}
+												[{$-$}
+													[{$1$}]
+												]
+											]
+										]
+									]
+								]
+							]
+						]
+						[\textit{operations}
+							[{$+$}
+								% fib(x-2)
+								[\textit{expression}
+									[\textit{operand}
+										[fib]
+									]
+									[\textit{operations}
+										[\textit{call}
+											[\textit{expression}
+												[\textit{operand}
+													[x]
+												]
+												[\textit{operations}
+													[{$-$}
+														[{$2$}]
+													]
+												]
+											]
+										]
+									]
+								]
+							]
+						]
+					]
+				]
+			]
+		]
+	]
+	[{main() $\rightarrow$ ()}
+		[{[omitted for brevity]}]
+	]
+]
+\end{forest}
+\caption{Abridged syntax tree of listing \ref{lst:result_language}}
+\label{fig:result_language_parser_tree}
+\end{figure}
+
+\begin{figure}
+\begin{forest}
+[\textit{file}
+	[{fib() $\rightarrow$ i32}
+		[\textit{expression}
+			[\textit{if}
+				[\textit{expression} : bool
+					[{$<=$}
+						[\textit{expression}
+							[i32 var at -8]
+						]
+						[\textit{expression}
+							[$1$]
+						]
+					]
+				]
+				[\textit{expression}
+					[i32 var at -8]
+				]
+				[\textit{expression}
+					[{$+$}
+						[\textit{expression}
+							[fib()
+								[\textit{expression}
+									[{$-$}
+										[\textit{expression}
+											[i32 var at -12]
+										]
+										[\textit{expression}
+											[$1$]
+										]
+									]
+								]
+							]
+						]
+						[\textit{expression}
+							[fib()
+								[\textit{expression}
+									[{$-$}
+										[\textit{expression}
+											[i32 var at -16]
+										]
+										[\textit{expression}
+											[$2$]
+										]
+									]
+								]
+							]
+						]
+					]
+				]
+			]
+		]
+	]
+	[{main() $\rightarrow$ ()}
+		[{[omitted for brevity]}]
+	]
+]
+\end{forest}
+\caption{Abridged transformed syntax tree of listing \ref{lst:result_language}}
+\label{fig:result_language_transformed_tree}
+\end{figure}
+
+%TODO byte code
+
 \chapter{Future prospects}
 % Ausblick
 %*  [Future plans/possibilities]

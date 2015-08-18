@@ -9,3 +9,5 @@
 *.synctex.gz
 *.pdf
 *.tdo
+*.auxlock
+*.for.tmp
