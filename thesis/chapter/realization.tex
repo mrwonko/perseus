@@ -7,11 +7,11 @@
         
 	\section{Common Compiler Generators}
     	
-		Lexers and parsers are rarely hand-written any more, since there are plenty of tools to generate them using formal definitions. Let's look at some common free and open source examples.
+		Lexers and parsers are rarely hand-written any more, since there are plenty of tools to generate them using formal definitions. Let's compare some free and open source examples that can target C/C++ representing different approaches.
 		
 		\subsection{flex}
 		
-			flex\cite{flex} generates lexers in C from a definition file describing the tokens using regular expressions and code to be executed upon their recognition, for example suspending scanning and returning a token. The generated C source code is then compiled to get an executable lexer.
+			flex\cite{flex} generates lexers in C from a definition file describing the tokens using regular expressions and code to be executed upon their recognition, for example suspending scanning and returning a token. The generated C source code is then compiled to get an executable lexer. flex is often used together with bison.
 			
 			%TODO is one of the oldest (?)
 		
@@ -27,23 +27,35 @@
 			
 			Boost.Spirit.Qi is the parser component. Making heavy use of templates it allows for the definition of the grammar using overloaded operators, creating a recursive descent parser. Instead of calculating a parsing table it uses backtracking, removing the need for a separate tool prior to compilation. It avoids ambiguity through its operator definitions: An alternative $a|b$ is defined as ``if $a$ matches, use that; only try $b$ if it does not,'' while repetitions (including optional symbols) are greedy, matching as much as possible.
 
-    \section{Common Virtual Machines}
-        % Stand der Technik, insb. bzgl. VMs / Einordnung
-        
-        %\subsection{Java Virtual Machine}
-        
-        \subsection{LLVM}
-        
-        \subsection{node.js}
-        
-        % auch inhärent singlethreaded
-        
-        \subsection{Weitere?}
-        
-        Lua VM, C\# VM (CLR - Common Language Runtime, for CIL - Common Intermediate Language), LLVM, CPython, ...?
+	\section{Common Virtual Machines}
+		% Stand der Technik, insb. bzgl. VMs / Einordnung
+		
+		There are numerous virtual machines a compiler may target. Let's look at some interesting ones.
+		
+		%TODO wording?
+		
+		\subsection{Java Virtual Machine}
+		
+			The Java Virtual Machine (JVM) was initially created for Java, but has since been targeted by other languages as well. It is stack-based and uses garbage collection to manage its memory.
+			
+			%TODO more?
+		
+		%TODO is Node.js really worth mentioning? It doesn't quite fit?
+		%\subsection{Node.js}
+			
+		%	Node.js is a JavaScript runtime environment with a focus on asynchronous execution. It doesn't execute any kind of byte code, it executes JavaScript, and may not completely fit the definition of a virtual machine.
+		
+		\subsection{LLVM}
+		
+		%TODO
+		intermediate representation, compiler \& interpreter, no coroutines, optional gc
+		
+		%\subsection{Weitere?}
+		
+		%Lua VM, C\# VM (CLR - Common Language Runtime, for CIL - Common Intermediate Language), CPython, ...?
 
 % Anforderungsanalyse / Requirements
-\chapter{Requirements}
+\chapter{Requirements}\label{requirements}
 
 	%TODO where does this go? requirements? 
 	%Native machine code would require porting work for each new platform. By using a virtual machine, any platform that's capable of running it is supported. My virtual machine requirements are mainly support for coroutines and stack inspection/unwinding, so coroutines can be serialized and aborted properly, and the ability to embed it in C++.
@@ -136,6 +148,7 @@
     \section{Choice of programming language}
         \subsection{Why C++?}
         \subsection{Why C++14?}
+        %why MSVC2015RC?
     
     \section{Choice of libraries}
         \subsection{Why Boost.Spirit?}
