@@ -43,6 +43,8 @@ namespace perseus
           return os << "\"true\"";
         case false_:
           return os << "\"false\"";
+        case let_:
+          return os << "\"let\"";
         case mutable_:
           return os << "\"mutable\"";
         case impure_:
