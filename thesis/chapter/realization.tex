@@ -252,8 +252,7 @@
 
 The goal was mostly reached: A small core of Perseus can be compiled and executed. Compared to the desired target language example (Listing~\ref{lst:target_language}), this is what the actual syntax looks like:
 
-\lstperseus
-\begin{lstlisting}[caption={Actual resulting language example}]
+\begin{perseuslisting}[caption={Actual resulting language example},label={lst:result_language}]
 function fib( x : i32 ) -> i32
     if x <= 1
         x
@@ -267,7 +266,7 @@ impure function main()
 	let result = fib( index );
 	print( result )
 }
-\end{lstlisting}
+\end{perseuslisting}
 
 That's pretty much on target, sans operator precedence resolution. The error messages for invalid code still leave a lot to be desired though -- they often lack information on the location of the problem. It's technically possible to include this information, and it sometimes is included already, but it was no priority during initial development, so future work in this area is required.
 
@@ -288,14 +287,13 @@ As mentioned only a very simple core of the language has been implemented; there
     	\subsection{Operator precedence resolution}
     	
     	The most important change at the moment is probably the resolution of operator precedence. Having to manually define precedence using parentheses is inconvenient at best and downright ridiculous in the case of function calls; having to write
-    	\lstperseus
-		\begin{lstlisting}
+		\begin{perseuslisting}
 (myFunction()) + 1
-		\end{lstlisting}
+		\end{perseuslisting}
 		instead of
-		\begin{lstlisting}
+		\begin{perseuslisting}
 myFunction() + 1
-		\end{lstlisting}
+		\end{perseuslisting}
 		is not acceptable in any way.
 		
 		\subsection{Variable assignments}

@@ -22,8 +22,7 @@
 	
 	The aim was for the following program to work -- as we shall see, this was achieved with the exception of one detail.
 	
-	\lstperseus
-	\begin{lstlisting}[caption={Desired target language example},label={lst:target_language}]
+	\begin{perseuslisting}[caption={Desired target language example},label={lst:target_language}]
 function fib( x : i32 ) -> i32
     // if the body is a single expression, no {}-block is required
     if x <= 1
@@ -39,7 +38,7 @@ impure function main()
 	// print is an impure built-in function (i.e. it has side effects, in this case writing something), so main() needs to be impure as well to be able to call it
 	print( result )
 }
-	\end{lstlisting}
+	\end{perseuslisting}
 	
 	The language itself is not of much interest in this thesis -- the focus is on the compiler and the virtual machine, not least because the language is still a work in progress.
     

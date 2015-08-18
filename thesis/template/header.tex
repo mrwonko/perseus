@@ -119,23 +119,34 @@
 \end{spacing}
 }
 
-\newcommand{\lstperseus}[0]{
-	\lstset{
-		language=C
+\lstnewenvironment{perseuslisting}[1][]
+	{
+		\lstset{
+			language=C,
+			morekeywords={i32,bool,function,mutable,impure,let},
+			keywordstyle={\underbar},
+			frame=lines,
+			#1
+		}
 	}
-	\lstset{
-		morekeywords={i32,bool,function,mutable,impure,let},
-		keywordstyle={\underbar},
-		frame=lines
-	}
-}
+	{}
 
-\newcommand{\lstcpp}[0]{
-	\lstset{
-		language=C++
+\lstnewenvironment{cpplisting}[1][]
+	{
+		\lstset{
+			language=C++,
+			keywordstyle={\underbar},
+			frame=lines,
+			#1
+		}
 	}
-	\lstset{
-		keywordstyle={\underbar},
-		frame=lines
+	{}
+
+\lstnewenvironment{codelisting}[1][]
+	{
+		\lstset{
+			frame=lines,
+			#1
+		}
 	}
-}
+	{}
