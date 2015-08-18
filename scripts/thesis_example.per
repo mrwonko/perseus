@@ -1,0 +1,13 @@
+function fib( x : i32 ) -> i32
+    if x <= 1
+        x
+    else
+    	// precedence must be explicitly defined since function calls are syntactically treated similar to binary operators and operator precedence is not resolved yet.
+        ( fib( x - 1 ) ) + ( fib( x - 2 ) )
+
+impure function main()
+{
+	let index : i32 = 10;
+	let result = fib( index );
+	print( result )
+}
