@@ -151,6 +151,182 @@ namespace perseus
       throw std::logic_error{ "Unhandled address requests?!" };
     }
     _impl->linking = false;
+
+    //    Debug Hack: Print Instructions
+    detail::instruction_pointer ip{ code };
+
+    std::cout << "\n\n\n";
+
+    while( ip.value() < code.size() )
+    {
+      const detail::opcode instruction = ip.read< detail::opcode >(); switch( instruction )
+      {
+      case detail::opcode::no_operation:
+        std::cout << "no_operation" << std::endl;
+        break;
+      case detail::opcode::exit:
+        std::cout << "exit" << std::endl;
+        break;
+      case detail::opcode::syscall:
+        std::cout << "syscall index=" << ip.read< std::uint32_t >() << std::endl;
+        break;
+      case detail::opcode::low_level_break:
+        std::cout << "low_level_break" << std::endl;
+        break;
+
+      //    Coroutines
+      case detail::opcode::absolute_coroutine:
+        std::cout << "absolute_coroutine address=" << ip.read< detail::instruction_pointer::value_type >() << std::endl;
+        break;
+      case detail::opcode::indirect_coroutine:
+        std::cout << "relative_coroutine" << std::endl;
+        break;
+      case detail::opcode::resume_coroutine:
+        std::cout << "resume_coroutine size=" << ip.read< std::uint32_t >() << std::endl;
+        break;
+      case detail::opcode::resume_pushing_everything:
+        std::cout << "resume_pushing_everything" << std::endl;
+        break;
+      case detail::opcode::coroutine_state:
+        std::cout << "coroutine_state" << std::endl;
+        break;
+      case detail::opcode::delete_coroutine:
+        std::cout << "delete_coroutine" << std::endl;
+        break;
+      case detail::opcode::coroutine_return:
+        std::cout << "coroutine_return size=" << ip.read< std::uint32_t >() << std::endl;
+        break;
+      case detail::opcode::yield:
+        std::cout << "coroutine_yield size=" << ip.read< std::uint32_t >() << std::endl;
+        break;
+      case detail::opcode::push_coroutine_identifier:
+        std::cout << "push_coroutine_identifier" << std::endl;
+        break;
+
+        //    Push/Pop
+      case detail::opcode::push_8:
+        std::cout << "push_8 value=" << static_cast< int >( ip.read< char >() ) << std::endl;
+        break;
+      case detail::opcode::push_32:
+        std::cout << "push_32 value=" << ip.read< std::int32_t >() << std::endl;
+        break;
+      case detail::opcode::reserve:
+        std::cout << "reserve size=" <<  ip.read< std::uint32_t >() << std::endl;
+        break;
+      case detail::opcode::pop:
+        std::cout << "pop size=" << ip.read< std::uint32_t >() << std::endl;
+        break;
+
+        //    Load/Store
+      case detail::opcode::absolute_load_current_stack:
+        std::cout << "absolute_load_current_stack size=" << ip.read< std::uint32_t >() << std::endl;
+        break;
+      case detail::opcode::absolute_load_stack:
+        std::cout << "absolute_load_stack size=" << ip.read< std::uint32_t >() << std::endl;
+        break;
+      case detail::opcode::relative_load_stack:
+        std::cout << "relative_load_stack size=" << ip.read< std::uint32_t >();
+        std::cout << " offset=" << ip.read< std::int32_t >() << std::endl;
+        break;
+      case detail::opcode::absolute_store_current_stack:
+        std::cout << "absolute_store_current_stack size=" << ip.read< std::uint32_t >() << std::endl;
+        break;
+      case detail::opcode::absolute_store_stack:
+        std::cout << "absolute_store_stack size=" << ip.read< std::uint32_t >() << std::endl;
+        break;
+      case detail::opcode::relative_store_stack:
+        std::cout << "relative_store_stack size=" << ip.read< std::uint32_t >();
+        std::cout << " offset=" << ip.read< std::int32_t >() << std::endl;
+        break;
+      case detail::opcode::push_stack_size:
+        std::cout << "push_stack_size" << std::endl;
+        break;
+
+        //    Jumps/Calls
+      case detail::opcode::absolute_jump:
+        std::cout << "absolute_jump address=" <<  ip.read< std::uint32_t >() << std::endl;
+        break;
+      case detail::opcode::relative_jump:
+        std::cout << "relative_jump offset=" << ip.read< std::int32_t >() << std::endl;
+        break;
+      case detail::opcode::relative_jump_if_false:
+        std::cout << "relative_jump_if_false offset=" << ip.read< std::int32_t >() << std::endl;
+        break;
+      case detail::opcode::indirect_jump:
+        std::cout << "indirect_jump" << std::endl;
+        break;
+      case detail::opcode::call:
+        std::cout << "call address=" << ip.read< std::uint32_t >() << std::endl;
+        break;
+      case detail::opcode::indirect_call:
+        std::cout << "indirect_call" << std::endl;
+        break;
+      case detail::opcode::return_:
+        std::cout << "return parameter_size=" << ip.read< std::uint32_t >() << std::endl;
+        break;
+
+      //    Boolean operations
+      case detail::opcode::and_b:
+        std::cout << "and_bool" << std::endl;
+        break;
+      case detail::opcode::or_b:
+        std::cout << "or_bool" << std::endl;
+        break;
+      case detail::opcode::equals_b:
+        std::cout << "equals_bool" << std::endl;
+        break;
+      case detail::opcode::not_equals_b:
+        std::cout << "not_equals_bool" << std::endl;
+        break;
+      case detail::opcode::negate_b:
+        std::cout << "negate_bool" << std::endl;
+        break;
+
+        //    32 bit integer operations
+      case detail::opcode::add_i32:
+        std::cout << "add_i32" << std::endl;
+        break;
+      case detail::opcode::subtract_i32:
+        std::cout << "subtract_i32" << std::endl;
+        break;
+      case detail::opcode::multiply_i32:
+        std::cout << "multiply_i32" << std::endl;
+        break;
+      case detail::opcode::divide_i32:
+        std::cout << "divide_i32" << std::endl;
+        break;
+      case detail::opcode::equals_i32:
+        std::cout << "equals_i32" << std::endl;
+        break;
+      case detail::opcode::not_equals_i32:
+        std::cout << "not_equals_i32" << std::endl;
+        break;
+      case detail::opcode::less_than_i32:
+        std::cout << "less_than_i32" << std::endl;
+        break;
+      case detail::opcode::less_than_or_equals_i32:
+        std::cout << "less_than_or_equals_i32" << std::endl;
+        break;
+      case detail::opcode::greater_than_i32:
+        std::cout << "greater_than_i32" << std::endl;
+        break;
+      case detail::opcode::greater_than_or_equals_i32:
+        std::cout << "greater_than_or_equals_i32" << std::endl;
+        break;
+      case detail::opcode::negate_i32:
+        std::cout << "negate_i32" << std::endl;
+        break;
+      case detail::opcode::modulo_i32:
+        std::cout << "modulo_i32" << std::endl;
+        break;
+
+      default:
+        throw invalid_opcode( "Invalid opcode " + std::to_string( static_cast< std::underlying_type_t< detail::opcode > >( instruction ) ) );
+      }
+    }
+
+    std::cout << "\n\n" << std::endl;
+
     return detail::processor{ std::move( code ), std::move( syscalls ) };
   }
 
