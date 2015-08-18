@@ -250,7 +250,7 @@
 % Ergebnisse zusammenfassen, bewerten bzgl. Zielsetzung, Perspektiven
 % lessons learned
 
-I pretty much got where I wanted: A small core of Perseus can be compiled and executed. Let's see how close I came to my desired target language example (Listing~\ref{lst:target_language}):
+The goal was mostly reached: A small core of Perseus can be compiled and executed. Compared to the desired target language example (Listing~\ref{lst:target_language}), this is what the actual syntax looks like:
 
 \lstperseus
 \begin{lstlisting}[caption={Actual resulting language example}]
@@ -269,19 +269,19 @@ impure function main()
 }
 \end{lstlisting}
 
-That's pretty much where I wanted to be, sans operator precedence resolution. The error messages for invalid code still leave a lot to be desired though -- they often lack information on the location of the problem. It's technically possible to include this information, and it sometimes is included already, but it was no priority during initial development, so future work in this area is required.
+That's pretty much on target, sans operator precedence resolution. The error messages for invalid code still leave a lot to be desired though -- they often lack information on the location of the problem. It's technically possible to include this information, and it sometimes is included already, but it was no priority during initial development, so future work in this area is required.
 
 Meanwhile the virtual machine already has support for coroutines in anticipation for their future addition to the language. New opcodes, e.g. for unsigned integer and floating point arithmetic, are easy to add. The main challenge in extending it will probably be the addition of stack inspection and unwinding.
 
-One of my main difficulties during development was figuring out how exactly to use certain features of Boost.Spirit, the compiler generator I chose. But in the end it did its job well and I'm still satisfied with it for the same reasons I initially chose it: I don't need a separate generation step thanks to the usage of C++ templates; and while getting the syntax right so it compiles was tricky, once that was done it usually worked as intended -- such are the benefits of a powerful static type system.
+One of the main difficulties during development was figuring out how exactly to use certain features of Boost.Spirit, the compiler generator used. It eventually did its job, removing an additional compiler generation step from the build process as intended; and by taking advantage of C++'s powerful static type system most errors could be caught at compile time.
 
-I also ran into some compiler bugs due to developing on the bleeding edge, using the latest C++ features on a preview release of the compiler, but I still think using modern C++ was a good idea; it made writing fast, correct and elegant code a good deal easier than C++98, and all the compiler bugs I've encountered have since been fixed.
+Due to the usage of the latest C++14 features on a preview release of the Microsoft Visual C++ Compiler, a couple of compiler bugs were encountered, but its usage was still justified in that it made writing fast, correct and elegant code noticeably easier than it would have been in C++98. The compiler has since had its full release, which fixed all the bugs that had been encountered.
 
 \chapter{Future prospects}
 % Ausblick
 %*  [Future plans/possibilities]
 
-As I mentioned I've only just implemented a very simple core of the language; there is a lot of room for improvement. There are a couple of comparatively simple features that can be added immediately, but few of them make the language any more powerful. Such changes are for the most part larger in nature, requiring more work, but they are required for the language to become viable.
+As mentioned only a very simple core of the language has been implemented; there is a lot of room for improvement. There are a couple of comparatively simple features that can be added immediately, but few of them make the language any more powerful. Such changes are for the most part larger in nature, requiring more work, but they are required for the language to become viable.
 
     \section{Simple additions}
     
@@ -318,7 +318,7 @@ myFunction() + 1
 		
 		\subsection{Upgrade to Boost.Spirit 3}
 		
-		I'm using version 2 of Boost.Spirit, which was the latest stable version when I started developing. The next version has since been released, with potential improvements in compile time, speed and ease of use. I should consider switching to it while my code base is still relatively small, before adding many new features.
+		Version 2 of Boost.Spirit is used, which was the latest stable version when development started. The next version has since been released, with potential improvements in compile time, speed and ease of use. An upgrade should be considered while the code base is still relatively small, before adding many new features.
 		
 		\subsection{New language features}
 		

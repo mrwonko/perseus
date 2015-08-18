@@ -16,11 +16,11 @@
 	% konkrete Zielsetzung; auch: was nicht?
 	% TODO
 	
-	I have a concept for a programming language called Perseus. I envision a strongly typed scripting language with native serialization support for execution contexts, so a paused script can be saved and later resumed, possibly on a different computer.
+	Perseus is to be a strongly typed scripting language with native serialization support for execution contexts, so a paused script can be saved and later resumed, possibly on a different computer.
 	
-	My goal for this thesis was to create prototypes of a compiler and a virtual machine implementing a small subset of it, mostly consisting of basic arithmetic and relational operations, functions and variables. Those prototypes can later be built upon to create a full-blown language, but that is outside of the scope of this thesis.
+	This Thesis aims to create prototypes of a compiler and a virtual machine implementing a small subset of Perseus, mostly consisting of basic arithmetic and relational operations, functions and variables. Those prototypes can later be built upon to create a full-blown language, but that is outside of the scope of this thesis.
 	
-	The aim was for the following program to work -- as we shall see, I achieved that with the exception of one quirk.
+	The aim was for the following program to work -- as we shall see, this was achieved with the exception of one detail.
 	
 	\lstperseus
 	\begin{lstlisting}[caption={Desired target language example},label={lst:target_language}]
@@ -41,13 +41,13 @@ impure function main()
 }
 	\end{lstlisting}
 	
-	I will not go into much detail on the language itself in this thesis -- the focus is on the compiler and the virtual machine, not least because the language is still a work in progress.
+	The language itself is not of much interest in this thesis -- the focus is on the compiler and the virtual machine, not least because the language is still a work in progress.
     
     
 	\section{Approach} %TODO better title
 	% Beschreibung der Vorgehensweise -- wie soll Ziel erreicht werden? Welche Themen in welchen Kapiteln, warum? Prinzipielle Argumentationslinie? -> roten Faden deutlich machen
 	
-	After this introduction I start by recapitulating the necessary theory behind compilers and virtual machines and explaining the important software patterns used in my solution. I also look into the available technology before I go on to describe in detail the requirements -- what exactly are the compiler and the virtual machine supposed to do? Then I explain my design -- how I planned to fulfill those requirements -- followed by details on the implementation of said design. Finally I evaluate my results, comparing them to my plans.
+	After this introduction this thesis starts by recapitulating the necessary theory behind compilers and virtual machines and explaining the important software patterns used. It also looks into the available technology before it goes on to describe in detail the requirements -- what exactly are the compiler and the virtual machine supposed to do? Then it explains the design -- how those requirements were to be fulfilled -- followed by details on the implementation of said design. Finally the results are evaluated.
 	
 	%TODO sufficient?
 	
@@ -55,16 +55,12 @@ impure function main()
 	% Motivation
 	% Einordnung der Thesis in allgemeinen Problemkontext -- diesen dazu kurz beschreiben (ca. 1--2 Seiten)
 	
-	There are plenty of programming languages to choose from -- why would I want yet another one? In short because I have yet to find one that satisfies all my requirements: I want a safe powerful strongly typed scripting language with elements from functional and object-oriented programming languages that has coroutines which can be serialized to a cross-platform binary format to be later resumed, possibly on a different computer. It should be easy to embed in C++ applications, have no garbage collection and avoid null- and dangling pointers.
+	There are plenty of programming languages to choose from -- why create yet another one? In short because there appears to be a niche that no language fills yet: A safe powerful strongly typed scripting language with elements from functional and object-oriented programming languages that has coroutines which can be serialized to a cross-platform binary format to be later resumed, possibly on a different computer. It should be easy to embed in C++ applications, have no garbage collection and avoid null- and dangling pointers.
 	
-	AngelScript\cite{angelscript} is an example of a statically typed scripting languages for embedding in C++, but it doesn't have coroutines that can be serialized, has null-pointers and it's type system is not powerful enough, lacking generic types. And while Lua\cite{lua}, which embeds nicely in C, has coroutines that can be serialized using Pluto\cite{pluto}, it is dynamically typed and uses garbage collection. Rust\cite{rust} has a lot of what I'm looking for, serialization aside, but it's no scripting language.
+	AngelScript\cite{angelscript} is an example of a statically typed scripting languages for embedding in C++, but it doesn't have coroutines that can be serialized, has null-pointers and it's type system is not powerful enough, lacking generic types. And while Lua\cite{lua}, which embeds nicely in C, has coroutines that can be serialized using Pluto\cite{pluto}, it is dynamically typed and uses garbage collection. Rust\cite{rust} is similar in a lot of regards, though it too lacks in serialization, but it's no scripting language.
 	
-	So since I know of no such language, I've decided to work on one myself.
+	Thus Perseus aims to fill this niche.
 	
 	\section{Why a new virtual machine?}
 	
-	To compile a new language I need a new compiler. But do I also need a custom byte code and a custom virtual machine to run it? Why can't I target an existing virtual machine or native machine code?
-	
-	Again it boils down to existing solutions not satisfying all my requirements, in particular coroutine support and absence of garbage collection. For a more detailed analysis refer to the ``Requirements'' chapter.
-	
-	%TODO is it really the requirements chapter?
+	To compile a new language a new compiler is required. But why use custom byte code on a custom virtual machine? Because there are no suitable existing virtual machines without garbage collection that support coroutines and stack inspection, which are required by the language, as is further explained in the \nameref{requirements} chapter.
