@@ -98,7 +98,7 @@ int main( const int argc, const char* argv[] )
         else if( std::isprint( c ) )
           std::cout << c;
         else
-          std::cout << "\\x" << std::hex << static_cast< unsigned int >( c );
+          std::cout << "\\x" << std::hex << static_cast< unsigned int >( c ) << std::dec;
       }
       std::cout << "\"" << std::endl;
     }
