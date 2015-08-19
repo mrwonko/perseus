@@ -142,10 +142,13 @@
             that is, the need for pointers at some point, both to stacks and heap, and how to do that nicely, considering the stack may grow, i.e. relocate
     
     % do I talk about future requirements? Like Stack Unwinding?
+    %TODO yes, talk about serialization a little
+    
+    %TODO why this means existing VMs are unfit
 
-\chapter{Design} % TODO: better name?
+\chapter{Design} %TODO better name?
 % Ansatz, d.h. z.B. Architektur, Module und ihre Kommunikation
-    \section{Choice of programming language}
+    \section{Choice of implementation language}
         \subsection{Why C++?}
         \subsection{Why C++14?}
         %why MSVC2015RC?
@@ -194,6 +197,8 @@
             Why are pointers stack-relative?
             
             Why little metadata on stack? (except RTTI for yielding)
+            
+            %TODO how will serialization be realized one day?
             
             \subsubsection{code segment}
                 opcode encoding
