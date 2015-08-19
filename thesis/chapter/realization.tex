@@ -9,50 +9,22 @@
     	
 		Lexers and parsers are rarely hand-written any more, since there are plenty of tools to generate them using formal definitions. Let's compare some free and open source examples that can target C/C++ representing different approaches.
 		
-		\subsection{flex}
+		First of all there's flex\cite{flex}, a classic lexer generator that creates C code from a definition file describing the tokens using regular expressions and code to be executed upon their recognition, for example suspending scanning and returning a token. The generated C source code is then compiled to get an executable lexer. flex is often used together with bison.
 		
-			flex\cite{flex} generates lexers in C from a definition file describing the tokens using regular expressions and code to be executed upon their recognition, for example suspending scanning and returning a token. The generated C source code is then compiled to get an executable lexer. flex is often used together with bison.
-			
-			%TODO is one of the oldest (?)
+		bison\cite{bison} generates LALR and GLR Parsers in C, C++ and Java from a definition file describing the context-free grammar to be accepted. The generated source code is then compiled to get an executable parser.
 		
-		\subsection{bison}
-			
-			bison\cite{bison} generates LALR and GLR Parsers in C, C++ and Java from a definition file describing the context-free grammar to be accepted. The generated source code is then compiled to get an executable parser.
+		Boost.Spirit\cite{spirit} is a C++ parser and lexer library. (It also has a module for generator definitions, but that is of no interest here.) It's different from flex and bison (and most other compiler generators) in that it doesn't have a separate generation step; the definitions are made in standard C++.
 		
-		\subsection{Boost.Spirit}
-			
-			Boost.Spirit\cite{spirit} is a C++ parser and lexer library. (It also has a module for generator definitions, but that is of no interest here.) It's different from flex and bison (and most other compiler generators) in that it doesn't have a separate generation step; the definitions are made in standard C++.
-			
-			Boost.Spirit.Lex, the lexer component, lets you define the tokens using strings containing regular expressions. These are parsed and used to generate a deterministic finite automaton at run time, which has the downside that the computations will be repeated at each execution and syntactic errors in the regular expressions can't be detected during compilation. To offset this there's the option to generate equivalent static C++ source code for the calculated automaton on execution, which can then be used in place of the run time version for improved performance. Besides requiring no external tools for compilation it's also very easy to integrate with Boost.Spirit.Qi.
-			
-			Boost.Spirit.Qi is the parser component. Making heavy use of templates it allows for the definition of the grammar using overloaded operators, creating a recursive descent parser. Instead of calculating a parsing table it uses backtracking, removing the need for a separate tool prior to compilation. It avoids ambiguity through its operator definitions: An alternative $a|b$ is defined as ``if $a$ matches, use that; only try $b$ if it does not,'' while repetitions (including optional symbols) are greedy, matching as much as possible.
+		Boost.Spirit.Lex, the lexer component, lets you define the tokens using strings containing regular expressions. These are parsed and used to generate a deterministic finite automaton at run time, which has the downside that the computations will be repeated at each execution and syntactic errors in the regular expressions can't be detected during compilation. To offset this there's the option to generate equivalent static C++ source code for the calculated automaton on execution, which can then be used in place of the run time version for improved performance. Besides requiring no external tools for compilation it's also very easy to integrate with Boost.Spirit.Qi.
+		
+		Boost.Spirit.Qi is the parser component. Making heavy use of templates it allows for the definition of the grammar using overloaded operators, creating a recursive descent parser. Instead of calculating a parsing table it uses backtracking, removing the need for a separate tool prior to compilation. It avoids ambiguity through its operator definitions: An alternative $a|b$ is defined as ``if $a$ matches, use that; only try $b$ if it does not,'' while repetitions (including optional symbols) are greedy, matching as much as possible.
 
 	\section{Common Virtual Machines}
 		% Stand der Technik, insb. bzgl. VMs / Einordnung
 		
-		There are numerous virtual machines a compiler may target. Let's look at some interesting ones.
+		There are numerous virtual machines a compiler may target. One common example is the Java Virtual Machine (JVM), which was initially created for Java, but has since been targeted by other languages as well. It is stack-based and uses garbage collection to manage its memory.
 		
-		%TODO wording?
-		
-		\subsection{Java Virtual Machine}
-		
-			The Java Virtual Machine (JVM) was initially created for Java, but has since been targeted by other languages as well. It is stack-based and uses garbage collection to manage its memory.
-			
-			%TODO more?
-		
-		%TODO is Node.js really worth mentioning? It doesn't quite fit?
-		%\subsection{Node.js}
-			
-		%	Node.js is a JavaScript runtime environment with a focus on asynchronous execution. It doesn't execute any kind of byte code, it executes JavaScript, and may not completely fit the definition of a virtual machine.
-		
-		\subsection{LLVM}
-		
-		%TODO
-		intermediate representation, compiler \& interpreter, no coroutines, optional gc
-		
-		%\subsection{Weitere?}
-		
-		%Lua VM, C\# VM (CLR - Common Language Runtime, for CIL - Common Intermediate Language), CPython, ...?
+		Another example, the LLVM is not just a virtual machine. It defines an Intermediate Representation for program code that compilers can target, much like byte code. It is then capable of optimizing it, compiling it to various machine code formats or executing it using on-demand compilation (JIT/Just In Time). It is register-based and supports both manual memory management and garbage collection, but no coroutines.
 
 % Anforderungsanalyse / Requirements
 \chapter{Requirements}\label{requirements}
