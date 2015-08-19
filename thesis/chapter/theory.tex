@@ -6,50 +6,63 @@
 
     \section{Designing programming languages}
     
-        simplicity and power
-        
-        static vs dynamic typing
-        
-        paradigms
-        
-        type inference
-        
-        constness
-        
-        purity
-        
-        serialization(!)
-    
-    \section{Compilers}
-    
-        Chomsky hierarchy
-        
-        Lexer
-        
-        Parser -- LL, (LA)LR, GLR, ...
-        
-        Code generation: tail recursion? separate optimization subsection?
-    
-    \section{Virtual Machines}
-    
-        VM vs Native code
-        
-        Existing machines?
-        
-        \subsection{Details} % TODO: name
-            fetch \& execute
-            
-            stack based vs registers
-            
-            garbage collection
-            
-            opcodes \& choosing them
-            
-            coroutines % allgemein einführen
-            
-            error handling
-            
-            stack unwinding?
+    	%TODO
+    	\todo[inline]{To what degree do I need references here?}
+		
+		There are many different kinds of programming languages. They can vary in many aspects, from the general approach to small details. What are some important aspects?
+		
+		%\subsection{Domain}
+		%simplicity and power
+		Firstly there's the matter of what the language is trying to achieve. Is it supposed to be a generalist programming language, suitable for writing any kind of software? Or is it a domain specific language, built to solve a specific problem elegantly? In the latter case, the language will likely be a lot simpler due to its reduced scope.
+		
+		\subsection{Programming paradigms}
+		Then there are different approaches to programming -- programming paradigms. The reader is likely familiar with imperative programming, which describes programs in terms of statements being executed to change state, and object-oriented programming, which models problems as interacting objects consisting of data and methods of working with it. Another example is functional programming, which includes no mutable state and where the results of functions are purely defined in terms of their parameters, and there are numerous other paradigms. A programming language may only follow one or be multi-paradigm, mixing them.
+		
+		\subsection{Type system}
+		%static vs dynamic typing
+		Its type system is another important aspect of a programming language, and an essential characteristic of a type system is whether it has dynamic or static typing: Values have a type, for example integral, boolean or array types. In static typing these types are resolved at compile time; variables and parameters have a well-defined type, either explicitly stated or inferred, and trying to use a value of incompatible type results in a compile error.
+		%TODO mention how that encourages complex type systems?
+		Dynamic type systems annotate values with their type at run time, and only then do type errors occur. This can make it easier to write generic code, but mistakes also go unnoticed more easily with the decrease in compile time errors.
+		
+		In some programming languages variables, which can usually change their value, can be marked as immutable -- or constant, as it is sometimes called in this context. The value of these variables may no longer be changed after their initial assignment. This allows for better expression of intent, preventing accidental misuse. One useful application for this is marking by-reference parameters as read-only.
+		
+		%TODO phrasing?
+		Another concept is that of a pure function, which is one whose output depends solely on its parameters and which has no side effects. So it doesn't depend on any global state and doesn't change it. This makes it easier to reason about and test since it will always behave the same way given the same parameters. Some functional languages require all functions to be pure, while some other languages let the programmer explicitly mark the function as pure/impure, again preventing them from taking unintended actions.
+		
+		\subsection{Coroutines}
+		
+		%TODO
+		
+		\subsection{Serialization}
+		
+		%TODO
+	
+	\section{Compilers}
+
+		Chomsky hierarchy
+		
+		Lexer
+		
+		Parser -- LL, (LA)LR, GLR, ...
+		
+		Code generation: tail recursion? separate optimization subsection?
+
+	\section{Virtual Machines}
+
+		VM vs Native code
+		
+		\subsection{Details} % TODO: name
+			fetch \& execute
+			
+			stack based vs registers
+			
+			garbage collection
+			
+			opcodes \& choosing them
+			
+			error handling
+			
+			stack unwinding?
     
     \section{Patterns and features used}
     
