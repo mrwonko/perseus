@@ -46,24 +46,66 @@ function print_nodes( tree ):
     for node in yield_nodes( tree ):
         print( node )
 		\end{codelisting}
-		
-		\subsection{Serialization}
-		%TODO is this the right section for this?
-		
-		%TODO
 	
 	\section{Compilers}
+	
+		\todo[inline]{This chapter needs references.}
+	
+		Compilers translate one language -- the source language -- to another -- the target language. The Java compiler for example translates Java source code to Java Byte Code. This translation consists of multiple steps: First the input, which is essentially treated as a long sentence, is split into tokens, which can be thought of as words, by the lexer. The parser then performs a syntactical analysis on these words, creating a syntax tree. Semantic analysis then verifies this tree makes sense: Where are the referenced variables and functions? In the case of statically typed languages, do the types match? During this process, the syntax tree may be transformed and annotated it with additional information. Next, optimization may take place, transforming the syntax tree into an equivalent but in some way better version, before finally the target code is generated.
 
-		Chomsky hierarchy
+		\subsection{Chomsky hierarchy}
+			
+			Formal languages can be derived from formal grammars, and the Chomsky hierarchy ranks these grammars by how difficult they are to parse, with Type-0 grammars being the most difficult and Type-3 grammars the easiest. Of particular interest for compiler construction are the two easiest types, Type-3 and Type-2 grammars.
+			
+			\subsubsection{Regular languages}
+			
+			Type-3 grammars describe regular languages and can be expressed as regular expressions. Regular expressions consist of terminal symbols -- characters in the alphabet of the language -- and operations combining them, as well as $\epsilon$, the empty word, which is not usually explicitly used outside of formal definitions but implied in absence of a character. These are the core operations:
+			
+			 %The first operation is concatenation, and is simply written as such: $ab$ means expression $a$ followed by expression $b$. The alternative operator $|$ is usually understood to have a lower precedence than concatenation, so $ab|cd$ means $(ab)|(cd)$ and explicit parentheses are required if the intended meaning is $a(b|c)d$. The operation with the highest precedence is the unary Kleene star, which is defined as any number of concatenations, including none, i.e. the empty word; it's written as $a*$, which 
+			
+			\begin{center}
+			\begin{tabular}{ l l p{10cm} }
+			\toprule
+			Name         & Syntax & Description \\
+			\midrule
+			Concatenation & $ab$  & Expression $a$ followed by expression $b$. \\
+			Alternative   & $a|b$ & Either expression $a$ or expression $b$; lower precedence than concatenation, so $ab|cd$ means $(ab)|(cd)$ and explicit parentheses are required if $a(b|c)d$ is the intention. \\
+			Kleene Star   & $a*$  & Any number of repetitions of expression $a$, including none, i.e. $\epsilon|a|aa|aaa|\ldots$; highest precedence, so $ab*c$ means $a(b*)c$. \\
+			\bottomrule
+			\end{tabular}
+			\end{center}
+			
+			Some auxiliary operators are often defined in terms of them, like $a+ = aa*$ and $a? = a|\epsilon$, but those are merely substitutions, they don't add any capabilities, and thus don't require further investigation.
+			
+			%TODO
+			\todo[inline]{I suppose I should mention [a-z]-style character classes at some point?}
+			
+			Regular languages can be recognized by finite automatons. There are two kinds of finite automatons: deterministic and non-deterministic finite automatons. The more practical one to build is the deterministic one. It has a finite set of states, one of which is the start state and some of which are accept states, an input alphabet and a transition function which defines the resulting state for each pair of current state and input character. Initially, the automaton is in its start state; the input is then processed one character at a time: the current state changes according to the transition function given the current input character, until all input characters have been processed and a certain state has been reached. If this state is an accept state, the input is accepted, i.e. it is part of the regular language.
+			
+			The transition function can be partial; if it is not defined for a given state-character-pair, the input is not accepted. This simplifies its definition. If a total definition is preferred, a fail-state to which all formerly undefined transitions lead can be introduced.
+			
+			Non-deterministic finite automatons are mostly the same, only the transition function works differently: Firstly, it does not define a single resulting state for any given input, but a set of possible resulting states, any of which may be entered. Secondly, it is not just defined for input characters, but also $\epsilon$ inputs, i.e. spontaneous $\epsilon$-transitions that consume no input are possible. An input is thus considered accepted if its processing \textit{may} end in an accept state.
+			
+			Finite automatons can be represented as directed graphs, with states being the nodes and transitions being the edges, annotated with the input. By convention, accept states are encircled and the start state is indicated by an arrow pointing to it. This notation will be used frequently throughout this chapter due to its simplicity.
+			
+			\subsubsection{Context-free languages}
 		
-		Lexer
+		\subsection{Lexer}
 		
-		Parser -- LL, (LA)LR, GLR, ...
+		\subsection{Parser}
+			
+			LL, (LA)LR, GLR, ...
+			
+		\subsection{Semantic Analysis}
 		
-		Code generation: tail calls? separate optimization subsection?
+		\subsection{Optimization}
+		
+			tail calls?
+		
+		\subsection{Code generation}
 
 	\section{Virtual Machines}
-
+	
 		VM vs Native code
 		
 		\subsection{Details} % TODO: name
@@ -78,21 +120,23 @@ function print_nodes( tree ):
 			error handling
 			
 			stack unwinding?
-    
-    \section{Relevant software patterns and language features}
-    
-        RAII
-        
-        Sum Types
-        
-        Optional
-        
-        Iterators
-        
-        Visitor
-        
-        Templates
-        
-        (Macros)
-        
-        Operator overloading
+	
+	\section{Relevant software patterns and language features}
+	
+		RAII
+		
+		Sum Types
+		
+		Optional
+		
+		Iterators
+		
+		Visitor
+		
+		Templates
+		
+		(Macros)
+		
+		Operator overloading
+		
+		Serialization
