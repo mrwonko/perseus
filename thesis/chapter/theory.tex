@@ -31,9 +31,24 @@
 		
 		\subsection{Coroutines}
 		
-		%TODO
+		A coroutine is a strand of execution with its own (call) stack. When the program starts, there's a single coroutine starting execution at the entry point. This coroutine may then launch new coroutines, at which point its execution is halted and the new coroutine starts its execution. They don't run in parallel, there's exactly one active coroutine (per thread) at any point. Only when this new coroutine stops its execution -- either permanently, by returning, or temporarily, by yielding; in either case a value may be passed back to the previous coroutine -- does the previous one resume its execution. A paused coroutine -- one that yielded -- may later be resumed, possibly passing in a new value.
+		
+		One example where coroutines are useful is iterating through recursive data structures like a binary tree. A coroutine can recurse through the tree, yielding every node it visits, which to the caller of the coroutine looks much like a function that yields the next node each time it's called.
+		
+		\begin{codelisting}[caption={Pseudocode of tree iteration using coroutines}]
+function yield_nodes( tree ):
+    if tree:
+        yield tree.value
+        yield_nodes( tree.left_subtree )
+        yield_nodes( tree.right_subtree )
+
+function print_nodes( tree ):
+    for node in yield_nodes( tree ):
+        print( node )
+		\end{codelisting}
 		
 		\subsection{Serialization}
+		%TODO is this the right section for this?
 		
 		%TODO
 	
@@ -45,7 +60,7 @@
 		
 		Parser -- LL, (LA)LR, GLR, ...
 		
-		Code generation: tail recursion? separate optimization subsection?
+		Code generation: tail calls? separate optimization subsection?
 
 	\section{Virtual Machines}
 
@@ -64,7 +79,7 @@
 			
 			stack unwinding?
     
-    \section{Patterns and features used}
+    \section{Relevant software patterns and language features}
     
         RAII
         
