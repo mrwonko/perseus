@@ -80,13 +80,69 @@ function print_nodes( tree ):
 			%TODO
 			\todo[inline]{I suppose I should mention [a-z]-style character classes at some point?}
 			
-			Regular languages can be recognized by finite automatons. There are two kinds of finite automatons: deterministic and non-deterministic finite automatons. The more practical one to build is the deterministic one. It has a finite set of states, one of which is the start state and some of which are accept states, an input alphabet and a transition function which defines the resulting state for each pair of current state and input character. Initially, the automaton is in its start state; the input is then processed one character at a time: the current state changes according to the transition function given the current input character, until all input characters have been processed and a certain state has been reached. If this state is an accept state, the input is accepted, i.e. it is part of the regular language.
+			Regular languages can be recognized by finite automatons. There are two kinds of finite automatons: deterministic and non-deterministic finite automatons. The more practical one to build is the deterministic finite automaton (DFA). It has a finite set of states, one of which is the start state and some of which are accept states, an input alphabet and a transition function which defines the resulting state for each pair of current state and input character. Initially, the automaton is in its start state; the input is then processed one character at a time: the current state changes according to the transition function given the current input character, until all input characters have been processed and a certain state has been reached. If this state is an accept state, the input is accepted, i.e. it is part of the regular language.
 			
 			The transition function can be partial; if it is not defined for a given state-character-pair, the input is not accepted. This simplifies its definition. If a total definition is preferred, a fail-state to which all formerly undefined transitions lead can be introduced.
 			
-			Non-deterministic finite automatons are mostly the same, only the transition function works differently: Firstly, it does not define a single resulting state for any given input, but a set of possible resulting states, any of which may be entered. Secondly, it is not just defined for input characters, but also $\epsilon$ inputs, i.e. spontaneous $\epsilon$-transitions that consume no input are possible. An input is thus considered accepted if its processing \textit{may} end in an accept state.
+			Non-deterministic finite automatons (NFAs) are mostly the same, only the transition function works differently: Firstly, it does not define a single resulting state for any given input, but a set of possible resulting states, any of which may be entered. Secondly, it is not just defined for input characters, but also $\epsilon$ inputs, i.e. spontaneous $\epsilon$-transitions that consume no input are possible. An input is thus considered accepted if its processing \textit{may} end in an accept state. Due to their non-deterministic nature DFAs are impractical to build, but as an intermediate model they are useful, as will become apparent shortly.
 			
-			Finite automatons can be represented as directed graphs, with states being the nodes and transitions being the edges, annotated with the input. By convention, accept states are encircled and the start state is indicated by an arrow pointing to it. This notation will be used frequently throughout this chapter due to its simplicity.
+			Finite automatons can be represented as directed graphs, with states being the nodes and transitions being the edges, annotated with the input. By convention, accept states are encircled and the start state is indicated by an arrow pointing to it. This notation will be used frequently throughout this chapter due to its simplicity and brevity.
+			
+			NFAs are so useful in the context of compilers because regular expressions can be directly translated to them. Only a handful of rules have to be applied recursively, as outlined in figures \ref{fig:re_nfa_char}--\ref{fig:re_nfa_kleene}\footnote{To understand the need for states 1 and 4 in figure \ref{fig:re_nfa_kleene} think about the translation of $a*b*$.}. A simple example of this is given in figure \ref{fig:re_nfa_example}.
+			
+			
+			\begin{figure}
+			\centering
+			\includegraphics{figures/re_char}
+			\caption{NFA for the regular expression ``$a$'' -- i.e. a single character}
+			\label{fig:re_nfa_char}
+			\end{figure}
+			
+			\begin{figure}
+			\centering
+			\includegraphics{figures/re_epsilon}
+			\caption{NFA for the regular expression ``'' -- i.e. the empty string}
+			\label{fig:re_nfa_epsilon}
+			\end{figure}
+			
+			\begin{figure}
+			\centering
+			\includegraphics{figures/re_sequence}
+			\caption{NFA for the regular expression ``$ab$'' -- i.e. a concatenation}
+			\label{fig:re_nfa_concatenation}
+			\end{figure}
+			
+			\begin{figure}
+			\centering
+			\includegraphics{figures/re_alternative}
+			\caption{NFA for the regular expression ``$a|b$'' -- i.e. an alternative}
+			\label{fig:re_nfa_alternative}
+			\end{figure}
+			
+			\begin{figure}
+			\centering
+			\includegraphics[width=\textwidth]{figures/re_kleene}
+			\caption{NFA for the regular expression ``$a*$'' -- i.e. a repetition}
+			\label{fig:re_nfa_kleene}
+			\end{figure}
+			
+			\begin{figure}
+			\centering
+			\includegraphics[width=\textwidth]{figures/re_example}
+			\caption{NFA for the regular expression ``$ab|c*$''}
+			\label{fig:re_nfa_example}
+			\end{figure}
+			
+			NFAs may be impractical to build, but any NFA can be converted into a (practical) DFA accepting the same language. This DFA has as its states sets of states from the NFA: The initial state is the set containing the NFA's initial state and any state reachable from it using $\epsilon$-transitions. For each character there's a transition to the set of NFA states reachable from any of the states in the previous set using this character and any number of $\epsilon$-transitions. Accept states are all sets containing NFA accept states.
+			
+			By way of an example, figure \ref{fig:re_dfa_example} shows the DFA equivalent of the NFA in figure \ref{fig:re_nfa_example}.
+			
+			\begin{figure}
+			\centering
+			\includegraphics[width=\textwidth]{figures/re_example_dfa}
+			\caption{DFA equivalent of the NFA in figure \ref{fig:re_nfa_example}}
+			\label{fig:re_dfa_example}
+			\end{figure}
 			
 			\subsubsection{Context-free languages}
 		
