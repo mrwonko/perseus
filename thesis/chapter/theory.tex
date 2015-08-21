@@ -49,7 +49,8 @@ function print_nodes( tree ):
 	
 	\section{Compilers}
 	
-		\todo[inline]{This chapter needs references.}
+		%TODO
+		\todo[inline]{This chapter needs references. How do I cite lectures and/or their slides, which are not publicly accessible?}
 	
 		Compilers translate one language -- the source language -- to another -- the target language. The Java compiler for example translates Java source code to Java Byte Code. This translation consists of multiple steps: First the input, which is essentially treated as a long sentence, is split into tokens, which can be thought of as words, by the lexer. The parser then performs a syntactical analysis on these words, creating a syntax tree. Semantic analysis then verifies this tree makes sense: Where are the referenced variables and functions? In the case of statically typed languages, do the types match? During this process, the syntax tree may be transformed and annotated it with additional information. Next, optimization may take place, transforming the syntax tree into an equivalent but in some way better version, before finally the target code is generated.
 
@@ -135,7 +136,7 @@ function print_nodes( tree ):
 			
 			NFAs may be impractical to build, but any NFA can be converted into a (practical) DFA accepting the same language. This DFA has as its states sets of states from the NFA: The initial state is the set containing the NFA's initial state and any state reachable from it using $\epsilon$-transitions. For each character there's a transition to the set of NFA states reachable from any of the states in the previous set using this character and any number of $\epsilon$-transitions. Accept states are all sets containing NFA accept states.
 			
-			By way of an example, figure \ref{fig:re_dfa_example} shows the DFA equivalent of the NFA in figure \ref{fig:re_nfa_example}.
+			By way of an example, figure \ref{fig:re_dfa_example} shows the DFA equivalent of the NFA in figure \ref{fig:re_nfa_example}, constructed according to these rules.
 			
 			\begin{figure}
 			\centering
@@ -143,6 +144,8 @@ function print_nodes( tree ):
 			\caption{DFA equivalent of the NFA in figure \ref{fig:re_nfa_example}}
 			\label{fig:re_dfa_example}
 			\end{figure}
+			
+			Large DFAs can often be simplified, eventually resulting in a minimal DFA. One way of finding it is the table-filling algorithm, in which equivalent states are determined and merged: Any two states are distinguishable if one of them is an accept state and the other one is not, so that is the initial set of demonstrably different state pairs. An any two states that given the same input transition into distinguishable states are also distinguishable, so those are added to the set as well. This is repeated until a fixed point is found, i.e. until no more distinguishable pairs are found. All the remaining pairs are equivalent and can be merged without affecting the language accepted by the DFA. Assuming there are no unreachable states, which should have already been eliminated during the transformation from NFA to DFA, this is now the minimal DFA.
 			
 			\subsubsection{Context-free languages}
 		
