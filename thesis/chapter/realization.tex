@@ -17,6 +17,7 @@
 		
 		Boost.Spirit.Lex, the lexer component, lets you define the tokens using strings containing regular expressions. These are parsed and used to generate a deterministic finite automaton at run time, which has the downside that the computations will be repeated at each execution and syntactic errors in the regular expressions can't be detected during compilation. To offset this there's the option to generate equivalent static C++ source code for the calculated automaton on execution, which can then be used in place of the run time version for improved performance. Besides requiring no external tools for compilation it's also very easy to integrate with Boost.Spirit.Qi.
 		
+		%TODO refer to PEG theory instead of explaining this
 		Boost.Spirit.Qi is the parser component. Making heavy use of templates it allows for the definition of the grammar using overloaded operators, creating a recursive descent parser. Instead of calculating a parsing table it uses backtracking, removing the need for a separate tool prior to compilation. It avoids ambiguity through its operator definitions: An alternative $a|b$ is defined as ``if $a$ matches, use that; only try $b$ if it does not,'' while repetitions (including optional symbols) are greedy, matching as much as possible.
 
 	\section{Common Virtual Machines}
@@ -289,6 +290,7 @@ Taking listing \ref{lst:result_language} as an example, what do the steps of com
 The parser builds the syntax tree shown in figure \ref{fig:result_language_parser_tree} from these tokens. This syntax tree is then transformed in various ways: Expressions are rearranged, variable references resolved, types checked etc. The result is the transformed syntax tree shown in figure \ref{fig:result_language_transformed_tree}. Based on that byte code is generated -- listing \ref{lst:result_bytecode} shows the generated ``fib'' function in humanly readable format.
 
 \begin{figure}
+\centering
 \begin{forest}
 [\textit{file}
 	[{fib() $\rightarrow$ i32}
@@ -378,6 +380,7 @@ The parser builds the syntax tree shown in figure \ref{fig:result_language_parse
 \end{figure}
 
 \begin{figure}
+\centering
 \begin{forest}
 [\textit{file}
 	[{fib() $\rightarrow$ i32}

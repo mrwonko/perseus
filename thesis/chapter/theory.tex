@@ -81,7 +81,11 @@ function print_nodes( tree ):
 			%TODO
 			\todo[inline]{I suppose I should mention [a-z]-style character classes at some point?}
 			
-			Regular languages can be recognized by finite automatons. There are two kinds of finite automatons: deterministic and non-deterministic finite automatons. The more practical one to build is the deterministic finite automaton (DFA). It has a finite set of states, one of which is the start state and some of which are accept states, an input alphabet and a transition function which defines the resulting state for each pair of current state and input character. Initially, the automaton is in its start state; the input is then processed one character at a time: the current state changes according to the transition function given the current input character, until all input characters have been processed and a certain state has been reached. If this state is an accept state, the input is accepted, i.e. it is part of the regular language.
+			Regular languages can be recognized by finite automatons in $\mathcal{O}(n)$ time where $n$ is the length of the input. That's as good as it gets with linear input: Each character has to be processed. So how does a finite automaton work?
+			
+			\todo[inline]{Do I need to use mathematical notations? I find precisely worded sentences to be easier to understand and write.}
+			
+			There are two kinds of finite automatons: deterministic and non-deterministic finite automatons. The more practical one to build is the deterministic finite automaton (DFA). It has a finite set of states, one of which is the start state and some of which are accept states; an input alphabet; and a transition function which defines the resulting state for a given current state and input character. Initially, the automaton is in its start state; the input is then processed one character at a time: the current state changes according to the transition function given the current input character, until all input characters have been processed and a certain state has been reached. If this state is an accept state, the input is accepted, i.e. it is part of the regular language.
 			
 			The transition function can be partial; if it is not defined for a given state-character-pair, the input is not accepted. This simplifies its definition. If a total definition is preferred, a fail-state to which all formerly undefined transitions lead can be introduced.
 			
@@ -147,13 +151,107 @@ function print_nodes( tree ):
 			
 			Large DFAs can often be simplified, eventually resulting in a minimal DFA. One way of finding it is the table-filling algorithm, in which equivalent states are determined and merged: Any two states are distinguishable if one of them is an accept state and the other one is not, so that is the initial set of demonstrably different state pairs. An any two states that given the same input transition into distinguishable states are also distinguishable, so those are added to the set as well. This is repeated until a fixed point is found, i.e. until no more distinguishable pairs are found. All the remaining pairs are equivalent and can be merged without affecting the language accepted by the DFA. Assuming there are no unreachable states, which should have already been eliminated during the transformation from NFA to DFA, this is now the minimal DFA.
 			
+			%TODO
+			\todo[inline]{Do I need some kind of conclusion here?}
+			
 			\subsubsection{Context-free languages}
+			
+			Regular expressions have the aforementioned desirable property of processing input in $\mathcal{O}(n)$ time; but they are limited in the kinds of languages they can express. In particular, they lack recursion, which prevents them from expressing matching parentheses, for example; that's where Type-2 grammars come into play.
+			
+			Type-2 grammars describe context-free languages and are primarily defined by their productions, which are substitution rules that define how to derive valid words of the language from a start symbol. More specifically, a context-free grammar is defined by: Its terminal symbols, i.e. the alphabet of the language described by it; its non-terminal symbols, i.e. substitution placeholders in terms of which the language is defined, one of which is the start symbol; and the productions, which are the substitution rules of the non-terminal symbols.
+			
+			A production maps a non-terminal symbol to a sequence of terminal and non-terminal symbols; possibly to $\epsilon$, the empty sequence. Here's a an example of the productions for a grammar describing sum expressions, with the terminal symbols ``+'' and ``number'' and the non-terminal symbol Expression, which is also the start symbol:
+			
+			Expression $\rightarrow$ Expression ``+'' Expression\\
+			Expression $\rightarrow$ ``number''
+			
+			Words can be derived by repeatedly applying these productions until only terminal symbols remain. This process can be visualized using trees; figure \ref{fig:derivation_tree_exp_1} shows a possible derivation yielding ``number+number+number.'' The inner nodes are the non-terminal symbols, the leafs the terminal symbols; concatenating the leafs in order yields the word.
+			
+			\begin{figure}
+			\centering
+			\begin{forest}
+			[Expression
+				[Expression
+					[``number'']
+				]
+				[``+'']
+				[Expression
+					[Expression
+						[``number'']
+					]
+					[``+'']
+					[Expression
+						[``number'']
+					]
+				]
+			]
+			\end{forest}
+			\caption{Deriving ``number+number+number''}
+			\label{fig:derivation_tree_exp_1}
+			\end{figure}
+			
+			However that's not the only way to derive ``number+number+number'' using those productions; figure \ref{fig:derivation_tree_exp_2} shows a different way. There are multiple ways of deriving the same word -- the grammar is ambiguous. Some context free grammars are inherently ambiguous, but often ambiguous grammars can be transformed into non-ambiguous grammars corresponding to the same language.
+			
+			\begin{figure}
+			\centering
+			\begin{forest}
+			[Expression
+				[Expression
+					[Expression
+						[``number'']
+					]
+					[``+'']
+					[Expression
+						[``number'']
+					]
+				]
+				[``+'']
+				[Expression
+					[``number'']
+				]
+			]
+			\end{forest}
+			\caption{Deriving ``number+number+number'' a different way}
+			\label{fig:derivation_tree_exp_2}
+			\end{figure}
+			
+			A non-ambiguous version of the sum expression grammar above could have these productions:
+			
+			Expression $\rightarrow$ Expression ``+'' ``number''\\
+			Expression $\rightarrow$ ``number''
+			
+			This grammar has what is called a left-recursion: The right side of the first Expression production starts with Expression. This is of interest when generating parsers and will be brought up again later. The resulting derivation tree is shown in figure \ref{fig:derivation_tree_exp_3} -- note how the left-recursion results in it growing towards the left.
+			
+			\begin{figure}
+			\centering
+			\begin{forest}
+			[Expression
+				[Expression
+					[Expression
+						[``number'']
+					]
+					[``+'']
+					[``number'']
+				]
+				[``+'']
+				[``number'']
+			]
+			\end{forest}
+			\caption{Deriving ``number+number+number'' using an unambiguous grammar}
+			\label{fig:derivation_tree_exp_3}
+			\end{figure}
+			
+			\todo[inline]{This is a very abrupt end?}
 		
 		\subsection{Lexer}
 		
 		\subsection{Parser}
 			
-			LL, (LA)LR, GLR, ...
+			LL
+			
+			PEG
+			
+			\todo[inline]{Should I briefly mention LR and possibly GLR grammars/parsers? I don't use any, but they are also commonly used, so they may be worth mentioning?}
 			
 		\subsection{Semantic Analysis}
 		
