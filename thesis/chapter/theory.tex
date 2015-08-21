@@ -76,10 +76,7 @@ function print_nodes( tree ):
 			\end{tabular}
 			\end{center}
 			
-			Some auxiliary operators are often defined in terms of them, like $a+ = aa*$ and $a? = a|\epsilon$, but those are merely substitutions, they don't add any capabilities, and thus don't require further investigation.
-			
-			%TODO
-			\todo[inline]{I suppose I should mention [a-z]-style character classes at some point?}
+			Some auxiliary operators are often defined in terms of them, like $a+ = aa*$ and $a? = a|\epsilon$, but those are merely substitutions, they don't add any capabilities, and thus don't require further investigation. Other useful shorthands are bracket expressions like [$a$--$d$0--3\_] $= a|b|c|d|0|1|2|3|\_$, which allow for the compact definition of large alternatives, the dot (.), which matches any one character, and [\^{}$a$--$c$], which matches any one character except [$a$--$c$].
 			
 			Regular languages can be recognized by finite automatons in $\mathcal{O}(n)$ time where $n$ is the length of the input. That's as good as it gets with linear input: Each character has to be processed. So how does a finite automaton work?
 			
