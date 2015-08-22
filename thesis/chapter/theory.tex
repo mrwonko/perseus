@@ -242,15 +242,37 @@ function print_nodes( tree ):
 		
 		\subsection{Lexer}
 		
+			In the interest of simplifying the file to be compiled it is usually first split into logical pieces called tokens; for example numbers, comments, operators, whitespace or identifiers. This so-called lexical analysis is done by a lexer, also known as a scanner or tokenizer.
+			
+			The tokens are defined through regular expressions; they are ranked, usually implicitly by order of definition; and then the longest prefix match of the input is consumed, breaking ties using the ranking. This yields a single token, which is annotated with the input it matched in case that is later needed. (Take for example a ``number'' token, which uses the regular expression [$0$--$9$]$+$: in order to be able to tell which number was matched, the matched string is required.) Then, a new token is consumed from the remaining input and so on until none is left or until there is no match, in which case the input is invalid.
+			
+			This is achieved by determining the NFAs corresponding to the tokens' regular expressions, annotating their accept states with the corresponding token names and merging them by creating a new initial state with $\epsilon$-transitions to all their (former) initial states. The result is an NFA accepting all tokens, which is then converted to a DFA and minimized. During minimization accept states annotated with different tokens may be merged; in this case the token with the highest ranking is kept.
+			
+			The lexer then stores the input location when the DFA was last in an accept state, as well as the corresponding token. When the DFA reaches an invalid state (i.e. the transition function is undefined for the current character, if it is partial, or an explicit fail-state is entered) or the end of input, the lexer goes back to this location and emits or ignores the stored token. The DFA is then reset to its initial state the next token is parsed. Due to this backtracking the time complexity is no longer $\mathcal{O}(n)$; in the worst case it is $\mathcal{O}(n^2)$, but given typical token definitions and inputs it will usually still be close to $\mathcal{O}(n)$.
+			
+			Undesired tokens can be filtered at this point; whitespace and comments are usually irrelevant, for example, and can be omitted from the output, potentially simplifying the grammar significantly.
+		
 		\subsection{Parser}
 			
-			LL
+			Next is the syntactical analysis or parsing, which aims to turn the tokens into a syntax tree according to the language's grammar. The syntax is typically defined in terms of an unambiguous context-free grammar and the challenge is to create an efficient parser based on that.
 			
-			PEG
+			\subsubsection{LL Grammars}
+			
+			One approach to parsing is using recursive descent, which starts with the start symbol, the root of the syntax tree, and recursively builds it top-down. In this case there is a parsing function for each symbol and applying a production translates to sequentially calling all the according symbol functions.
+			
+			So when there are multiple productions for a given non-terminal symbol, which one is chosen? In LL($k$) parsing the production is chosen based on the next $k$ tokens; to this end a table is calculated, with the row corresponding to the non-terminal symbol being parsed and each column a $k$-token sequence; the cells contain the production to be used under those conditions. Since the number of $k$-token sequences grows exponentially, $k$ is usually just $1$, i.e. the production is chosen based on the next token.
+			
+			That's one reason why using tokens is useful: Knowing that the next character is ``i'' is much less useful than knowing the next token is ``if'' or ``int.''
+			
+			For many grammars the choice of production is ambiguous. Grammars in which it is not are called LL($k$) grammars, and many context-free grammars can be transformed into LL($k$) grammars. One property that keeps grammars from being LL($k$) is containing left-recursions, in which case the depth of the recursion can't be determined from the first $k$ tokens. this can be fixed by transforming the grammar into a right-recursive one, although this changes the semantic: Left-associative operators become right-associative, $a-b-c$ is interpreted as $a-(b-c)$ instead of $(a-b)-c$. If this is undesirable, a post processing step is required.
 			
 			\todo[inline]{Should I briefly mention LR and possibly GLR grammars/parsers? I don't use any, but they are also commonly used, so they may be worth mentioning?}
 			
+			\subsubsection{Parsing Expression Grammars}
+			
 		\subsection{Semantic Analysis}
+		
+		%register allocation?
 		
 		\subsection{Optimization}
 		
