@@ -322,20 +322,23 @@ function print_nodes( tree ):
 
 	\section{Virtual Machines}
 	
-		VM vs Native code
+		Compilers can target actual processors and generate native machine code for them to execute, and that is the fastest method since there are no additional abstraction layers; but sometimes it is desirable to run the code on a simulated computer in a so-called virtual machine, or VM for short. This can be for security reasons -- a VM can be ``sandboxed,'' preventing code executed in it from accessing other parts of the host system; because a machine with different properties than the host machine is desired; to have a unified execution environment across different types of machines; or for various other reasons.
 		
-		\subsection{Details} % TODO: name
-			fetch \& execute
-			
-			stack based vs registers
-			
-			garbage collection
-			
-			opcodes \& choosing them
-			
-			error handling
-			
-			stack unwinding?
+		As the name implies a virtual machine simulates an actual machine; so it typically repeatedly fetches an instruction from the machine code and executes it. The Instruction Pointer (IP) keeps track of the current location in the code and automatically increments past the current instruction upon fetching it. An instruction consists of an opcode (short for operation code) defining the operation to be performed and possibly various operands, if the operation calls for them; the exact encoding of these is machine-specific.
+		
+		Common instructions include various kinds of jumps and calls that move the instruction pointer, allowing for loops and branches in the execution; instructions for reading from and writing to memory; arithmetic instructions for integer and floating point calculations; and boolean operations. Additional instructions are included as necessary.
+		
+		To realize function calls, a call stack is used. It is used to pass parameters to functions and store local variables -- these vary between calls, and since functions can be called recursively there may be multiple calls to a function simultaneously, hence a stack. It is also used to store the return address: upon calling a function, the address where execution is to be resumed upon return from the function is stored on the stack in addition to the parameters. The sum of this per-call data -- parameters, local variables and return address -- is called a stack frame; it can either just be an implicit interpretation of the data on the stack or an explicit data structure stored on the stack.
+		
+		Intermediate results of the evaluation of expressions can also be stored on a stack -- the top values are then implicitly the operands for arithmetic instructions. So to calculate \lstinline$2+(x*3)$ the code first pushes \lstinline$2$ onto the stack, then the value of \lstinline$x$, finally \lstinline$3$ before first doing a multiplication and then an addition.
+		
+		The alternative to using such an evaluation stack is the usage of registers to store values; in this case the aforementioned register allocation is required. Here the machine has a number of registers and an instruction explicitly names the operand and target registers. This is similar to how many real machines, such as x86 processors, work and thus simplifies Just-In-Time (JIT) compilation, which is the translation of parts of the VM byte code that have been determined to be performance critical to native machine code at run time.
+		
+		Coroutines require explicit support in the VM -- they essentially need their own call stack and instruction pointer (and possibly evaluation stack or registers), and there need to be instructions to create, pause and resume them.
+		
+		VMs also have the option of managing their memory differently; instead of making heap allocations and manually freeing them later, they can use garbage collection. There are various types of garbage collection, but the general idea is to check for memory that is no longer in use, usually periodically; to this end the VM needs to be able to interpret the memory and recognize pointers. Garbage collection relieves the programmer of memory management but introduces overhead; periodic garbage collection can take significant time, resulting in brief unresponsiveness when it runs.
+		
+		For a program to be able to cleanly shut down in case of an error the VM also needs to be capable of stack unwinding, which is the proper cleanup of stack frames e.g. due to an exception. This may include running the destructors\footnote{In certain object-oriented programming languages a class may define a special destructor method to be run when an object is destroyed, which usually takes care of cleaning up resources.} of local objects, special deferred cleanup statements\footnote{Some languages have a \lstinline$defer$ keyword to define statements to be executed once the current scope is left.} or similar. This too requires the VM to be aware of the types of values on the stack.
 	
 	\section{Relevant software patterns and language features}
 	
