@@ -300,17 +300,25 @@ function print_nodes( tree ):
 			
 			A typical example of ambiguous context-free grammars is the dangling else: In if-statements with an optional else, nesting can lead to ambiguity: \lstinline$if(x) if(y) a() else b()$ could be parsed as \lstinline$if(x){ if(y) a() else b() }$ or \lstinline$if(x){ if(y) a() } else b()$, but with a greedy optional operator it will always parse as the former.
 			
-			Like LL grammars, PEGs can be parsed using recursive descent. Instead of predicting which branches to take as with LL grammars, multiple may be tried and subsequently discarded until a match is found. This backtracking can lead to exponential runtime, but that can be avoided: The packrat algorithm allows for parsing PEGs in $\mathcal{O}(n)$ through the use of memoization\cite{packrat}. However the overhead introduced by memoization may still make this slower than a naive backtracking algorithm in practice in a given implementation for typical inputs; few practical PEG implementations use packrat parsers.
+			Like LL grammars, PEGs can be parsed using recursive descent. Instead of predicting which branches to take as with LL grammars, multiple may be tried and subsequently discarded until a match is found. This backtracking can lead to exponential runtime, but that can be avoided: The packrat algorithm\cite{packrat} allows for parsing PEGs in $\mathcal{O}(n)$ through the use of memoization. However the overhead introduced by memoization may still make this slower than a naive backtracking algorithm in practice in a given implementation for typical inputs; few practical PEG implementations use packrat parsers.
 			
 		\subsection{Semantic Analysis}
 		
+		Once the source code has been parsed into a syntax tree, further analysis calculates node attributes and possibly transforms it. Nodes might need to be rearranged to achieve left-associative operators in the case of a grammar free of left-recursions, for example.
+		
+		Unlike the parser, the semantic analysis is not context-free: During the traversal of the tree information can be collected for later use. For example this usually includes variables: They typically need to be defined first and can from then on be referred to within the same scope. This is also where it can be ensured that immutable variables aren't changed. And in statically typed languages this is where type checks happen; to this end all (sub-)expressions can be annotated with their type. And this is also where function calls are usually resolved, possibly determining which overload to call based on the calculated argument types.
+		
+		Since the semantics of different languages vary, so does their semantic analysis. What exactly happens at this point is largely up to the language designer.
+		
 		%register allocation?
 		
-		\subsection{Optimization}
-		
-			tail calls?
-		
 		\subsection{Code generation}
+		
+		Finally, the machine code to be executed is generated based on the annotated syntax tree. How exactly this happens largely depends on the machine being targeted and there may actually be multiple code generators for different targets if the code is supposed to run on various machines.
+		
+		When generating code for a register-based machine (which will be further examined in the section on virtual machines), one part of the process is register allocation: It has to be determined which values are stored in which register, since their number may be limited. On a stack-based machine, on the other hand, all values are kept on a stack and register allocation is not required.
+		
+		The code may also be subject to further optimization: It may be possible to determine that some code will never be executed -- this so called ``dead code'' may be removed; tail call optimization can turn function calls at the end of a function into unconditional jumps, keeping the call stack smaller; and various other techniques.
 
 	\section{Virtual Machines}
 	
