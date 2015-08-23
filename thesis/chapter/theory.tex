@@ -341,21 +341,44 @@ function print_nodes( tree ):
 		For a program to be able to cleanly shut down in case of an error the VM also needs to be capable of stack unwinding, which is the proper cleanup of stack frames e.g. due to an exception. This may include running the destructors\footnote{In certain object-oriented programming languages a class may define a special destructor method to be run when an object is destroyed, which usually takes care of cleaning up resources.} of local objects, special deferred cleanup statements\footnote{Some languages have a \lstinline$defer$ keyword to define statements to be executed once the current scope is left.} or similar. This too requires the VM to be aware of the types of values on the stack.
 	
 	\section{Relevant software patterns and language features}
-	
-		RAII
 		
-		Sum Types
+		A grasp of a couple of concepts is required for understanding the coming chapters; these are explained in this section.		
+		%TODO why C++14?
 		
-		Optional
+		\subsection{Resource Acquisition Is Initialization (RAII)}
 		
-		Iterators
+		RAII is the idea that object lifetime should represent resource lifetime. Resources are acquired during object construction and released upon destruction.
 		
-		Visitor
+		Take for example C++'s string class, \lstinline$std::string$. In its constructor it allocates the memory required to hold its content, in its destructor the memory is freed. Since stack unwinding ensures the destructor will be called upon object destruction, memory leaks are impossible.
 		
-		Templates
+		Closely related to this are move mechanics: Resources can be moved from one object into another if they no longer need to be available in the original object. To this end C++ allows for the explicit definition of move constructors -- for constructing a new object by moving the resources of another into it -- and move assignment -- for moving the contents of one existing object into another.
 		
-		(Macros)
+		\subsection{Templates}
 		
-		Operator overloading
+		C++ allows to parameterize functions or classes with types using templates. This allows you to define e.g. a set of elements of a given type, as long as comparison for elements of that type is defined, using \lstinline$std::set<T>$, where \lstinline$T$ is the type of choice. It's also possible to define types with an arbitrary number of template parameters, for example a tuple, in which case algorithms are defined recursively.
+		%TODO elaborate?
 		
-		Serialization
+		\subsection{Function Overloading}
+		
+		Function overloading allows multiple functions may have the same name as long as their parameters vary in type. The function to call is then determined based on the type of the supplied parameters. C++ also allows for the overloading of operators, allowing programmers to define e.g. \lstinline$+$ for their own types.
+		
+		\subsection{Sum Types}
+		
+		A sum type is much like a union in C in that in can hold different types, except it knows which one it currently holds. \lstinline$boost::variant$ is one C++ implementation of a sum type which also supports recursive variants.
+		%TODO elaborate?
+		
+		\lstinline$boost::variant$ allows for the selection of how to handle a given variant object through the use of a visitor object which defines different overloads of a function for each possible variant type, of which the one corresponding to the actual type of the variant is then called.
+		
+		\subsection{Optional Types}
+		
+		\lstinline$boost::optional$ represents a value that may be omitted. In this it is much like a null-pointer, which allows for omission of a valid pointer, but without requiring the use of pointers and the dynamic memory usage that may come with it.
+		
+		\subsection{Iterators}
+		
+		Traversal of containers in C++ is usually done using iterators, which hide the implementation details of the container from the user, who just get an interface for moving through the elements in the container and accessing them. Depending on the kind of object being traversed, iterators may just be able to move forwards in single step increments, or may also be able to move backwards or by a certain distance, and may or may not be copyable.
+		
+		\subsection{Serialization}
+		
+		The act of transforming an object into a stream of bytes representing it is called serialization. The inverse act of recreating the object is called de-serialization. They are commonly used to save objects to a file or send them over a network.
+		
+		How and if an object is serialized varies. It's analogous to copying in a lot of ways, and like the differentiation into deep and shallow copies nested objects can either be serialized as well or just stored as some kind of reference which is then looked up during de-serialization. And since it's essentially a form of copying the object, uncopyable objects can't be serialized either; like for example file handles.
