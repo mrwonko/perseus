@@ -61,10 +61,11 @@ function print_nodes( tree ):
 			
 			\subsubsection{Regular languages}
 			
-			Type-3 grammars describe regular languages and can be expressed as regular expressions. Regular expressions consist of terminal symbols -- characters in the alphabet of the language -- and operations combining them, as well as $\epsilon$, the empty word, which is not usually explicitly used outside of formal definitions but implied in absence of a character. These are the core operations:
+			Type-3 grammars describe regular languages and can be expressed as regular expressions. Regular expressions consist of terminal symbols -- characters in the alphabet of the language -- and operations combining them, as well as $\epsilon$, the empty word, which is not usually explicitly used outside of formal definitions but implied in absence of a character. The core operations are given in table \ref{tab:re_ops}.
 			
 			 %The first operation is concatenation, and is simply written as such: $ab$ means expression $a$ followed by expression $b$. The alternative operator $|$ is usually understood to have a lower precedence than concatenation, so $ab|cd$ means $(ab)|(cd)$ and explicit parentheses are required if the intended meaning is $a(b|c)d$. The operation with the highest precedence is the unary Kleene star, which is defined as any number of concatenations, including none, i.e. the empty word; it's written as $a*$, which 
 			
+			\begin{table}
 			\begin{center}
 			\begin{tabular}{ l l p{10cm} }
 			\toprule
@@ -75,7 +76,9 @@ function print_nodes( tree ):
 			Kleene Star   & \lstinline$a*$  & Any number of repetitions of expression \lstinline$a$, including none, i.e. $\epsilon$\lstinline$|a|aa|aaa|$$\ldots$; highest precedence, so \lstinline$ab*c$ means \lstinline$a(b*)c$. \\
 			\bottomrule
 			\end{tabular}
+			\caption{Regular expression operators}\label{tab:re_ops}
 			\end{center}
+			\end{table}
 			
 			Some auxiliary operators are often defined in terms of them, like \lstinline$a+ = aa*$ and \lstinline$a? = a|$$\epsilon$, but those are merely substitutions, they don't add any capabilities, and thus don't require further investigation. Other useful shorthands are bracket expressions like \lstinline$[a-d0-3_] = a|b|c|d|0|1|2|3|_$, which allow for the compact definition of large alternatives, the dot (\lstinline$.$), which matches any one character, and \lstinline$[^a-c]$, which matches any one character except \lstinline$[a-c]$.
 			
@@ -279,8 +282,9 @@ function print_nodes( tree ):
 			
 			\subsubsection{Parsing Expression Grammars}
 			
-			Parsing expression grammars (PEGs) are an alternative to context-free grammars for defining syntax\cite{peg}. While context-free grammars describe how to generate a language, PEGs describe how to parse a language into a syntax tree. To this end they use the following operators:
+			Parsing expression grammars (PEGs) are an alternative to context-free grammars for defining syntax\cite{peg}. While context-free grammars describe how to generate a language, PEGs describe how to parse a language into a syntax tree. To this end they use the operators given in table \ref{tab:peg_ops}.
 			
+			\begin{table}
 			\begin{center}
 			\begin{tabular}{ l l p{10cm} }
 			\toprule
@@ -295,7 +299,9 @@ function print_nodes( tree ):
 			Not-predicate      & \lstinline$!a$  & Like \lstinline$&a$, but fail if and only if \lstinline$a$ matches. \\
 			\bottomrule
 			\end{tabular}
+			\caption{PEG operations}\label{tab:peg_ops}
 			\end{center}
+			\end{table}
 			
 			Some of these operators (\lstinline$*$, \lstinline$+$ and \lstinline$?$) are reminiscent of regular expressions; but unlike their regular expression counterparts, they are not non-deterministic but greedy, i.e. they will match as much as possible. This, along with the prioritized choice, makes PEGs inherently unambiguous.
 			
