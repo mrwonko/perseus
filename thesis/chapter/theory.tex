@@ -69,14 +69,14 @@ function print_nodes( tree ):
 			\toprule
 			Name         & Syntax & Description \\
 			\midrule
-			Concatenation & $ab$  & Expression $a$ followed by expression $b$. \\
-			Alternative   & $a|b$ & Either expression $a$ or expression $b$; lower precedence than concatenation, so $ab|cd$ means $(ab)|(cd)$ and explicit parentheses are required if $a(b|c)d$ is the intention. \\
-			Kleene Star   & $a*$  & Any number of repetitions of expression $a$, including none, i.e. $\epsilon|a|aa|aaa|\ldots$; highest precedence, so $ab*c$ means $a(b*)c$. \\
+			Concatenation & \lstinline$ab$  & Expression \lstinline$a$ followed by expression \lstinline$b$. \\
+			Alternative   & \lstinline$a|b$ & Either expression \lstinline$a$ or expression \lstinline$b$; lower precedence than concatenation, so \lstinline$ab|cd$ means \lstinline$(ab)|(cd)$ and explicit parentheses are required if \lstinline$a(b|c)d$ is the intention. \\
+			Kleene Star   & \lstinline$a*$  & Any number of repetitions of expression \lstinline$a$, including none, i.e. $\epsilon$\lstinline$|a|aa|aaa|$$\ldots$; highest precedence, so \lstinline$ab*c$ means \lstinline$a(b*)c$. \\
 			\bottomrule
 			\end{tabular}
 			\end{center}
 			
-			Some auxiliary operators are often defined in terms of them, like $a+ = aa*$ and $a? = a|\epsilon$, but those are merely substitutions, they don't add any capabilities, and thus don't require further investigation. Other useful shorthands are bracket expressions like [$a$--$d$0--3\_] $= a|b|c|d|0|1|2|3|\_$, which allow for the compact definition of large alternatives, the dot (.), which matches any one character, and [\^{}$a$--$c$], which matches any one character except [$a$--$c$].
+			Some auxiliary operators are often defined in terms of them, like \lstinline$a+ = aa*$ and \lstinline$a? = a|$$\epsilon$, but those are merely substitutions, they don't add any capabilities, and thus don't require further investigation. Other useful shorthands are bracket expressions like \lstinline$[a-d0-3_] = a|b|c|d|0|1|2|3|_$, which allow for the compact definition of large alternatives, the dot (\lstinline$.$), which matches any one character, and \lstinline$[^a-c]$, which matches any one character except \lstinline$[a-c]$.
 			
 			Regular languages can be recognized by finite automatons in $\mathcal{O}(n)$ time where $n$ is the length of the input. That's as good as it gets with linear input: Each character has to be processed. So how does a finite automaton work?
 			
@@ -90,13 +90,13 @@ function print_nodes( tree ):
 			
 			Finite automatons can be represented as directed graphs, with states being the nodes and transitions being the edges, annotated with the input. By convention, accept states are encircled and the start state is indicated by an arrow pointing to it. This notation will be used frequently throughout this chapter due to its simplicity and brevity.
 			
-			NFAs are so useful in the context of compilers because regular expressions can be directly translated to them. Only a handful of rules have to be applied recursively, as outlined in figures \ref{fig:re_nfa_char}--\ref{fig:re_nfa_kleene}\footnote{To understand the need for states 1 and 4 in figure \ref{fig:re_nfa_kleene} think about the translation of $a*b*$.}. A simple example of this is given in figure \ref{fig:re_nfa_example}.
+			NFAs are so useful in the context of compilers because regular expressions can be directly translated to them. Only a handful of rules have to be applied recursively, as outlined in figures \ref{fig:re_nfa_char}--\ref{fig:re_nfa_kleene}\footnote{To understand the need for states 1 and 4 in figure \ref{fig:re_nfa_kleene} think about the translation of \lstinline$a*b*$.}. A simple example of this is given in figure \ref{fig:re_nfa_example}.
 			
 			
 			\begin{figure}
 			\centering
 			\includegraphics{figures/re_char}
-			\caption{NFA for the regular expression ``$a$'' -- i.e. a single character}
+			\caption{NFA for the regular expression ``\lstinline$a$'' -- i.e. a single character}
 			\label{fig:re_nfa_char}
 			\end{figure}
 			
@@ -110,28 +110,28 @@ function print_nodes( tree ):
 			\begin{figure}
 			\centering
 			\includegraphics{figures/re_sequence}
-			\caption{NFA for the regular expression ``$ab$'' -- i.e. a concatenation}
+			\caption{NFA for the regular expression ``\lstinline$ab$'' -- i.e. a concatenation}
 			\label{fig:re_nfa_concatenation}
 			\end{figure}
 			
 			\begin{figure}
 			\centering
 			\includegraphics{figures/re_alternative}
-			\caption{NFA for the regular expression ``$a|b$'' -- i.e. an alternative}
+			\caption{NFA for the regular expression ``\lstinline$a|b$'' -- i.e. an alternative}
 			\label{fig:re_nfa_alternative}
 			\end{figure}
 			
 			\begin{figure}
 			\centering
 			\includegraphics[width=\textwidth]{figures/re_kleene}
-			\caption{NFA for the regular expression ``$a*$'' -- i.e. a repetition}
+			\caption{NFA for the regular expression ``\lstinline$a*$'' -- i.e. a repetition}
 			\label{fig:re_nfa_kleene}
 			\end{figure}
 			
 			\begin{figure}
 			\centering
 			\includegraphics[width=\textwidth]{figures/re_example}
-			\caption{NFA for the regular expression ``$ab|c*$''}
+			\caption{NFA for the regular expression ``\lstinline$ab|c*$''}
 			\label{fig:re_nfa_example}
 			\end{figure}
 			
@@ -244,7 +244,7 @@ function print_nodes( tree ):
 		
 			In the interest of simplifying the file to be compiled it is usually first split into logical pieces called tokens; for example numbers, comments, operators, whitespace or identifiers. This so-called lexical analysis is done by a lexer, also known as a scanner or tokenizer.
 			
-			The tokens are defined through regular expressions; they are ranked, usually implicitly by order of definition; and then the longest prefix match of the input is consumed, breaking ties using the ranking. This yields a single token, which is annotated with the input it matched in case that is later needed. (Take for example a ``number'' token, which uses the regular expression [$0$--$9$]$+$: in order to be able to tell which number was matched, the matched string is required.) Then, a new token is consumed from the remaining input and so on until none is left or until there is no match, in which case the input is invalid.
+			The tokens are defined through regular expressions; they are ranked, usually implicitly by order of definition; and then the longest prefix match of the input is consumed, breaking ties using the ranking. This yields a single token, which is annotated with the input it matched in case that is later needed. (Take for example a ``number'' token, which uses the regular expression \lstinline$[0-9]+$: in order to be able to tell which number was matched, the matched string is required.) Then, a new token is consumed from the remaining input and so on until none is left or until there is no match, in which case the input is invalid.
 			
 			This is achieved by determining the NFAs corresponding to the tokens' regular expressions, annotating their accept states with the corresponding token names and merging them by creating a new initial state with $\epsilon$-transitions to all their (former) initial states. The result is an NFA accepting all tokens, which is then converted to a DFA and minimized. During minimization accept states annotated with different tokens may be merged; in this case the token with the highest ranking is kept.
 			
@@ -262,13 +262,45 @@ function print_nodes( tree ):
 			
 			So when there are multiple productions for a given non-terminal symbol, which one is chosen? In LL($k$) parsing the production is chosen based on the next $k$ tokens; to this end a table is calculated, with the row corresponding to the non-terminal symbol being parsed and each column a $k$-token sequence; the cells contain the production to be used under those conditions. Since the number of $k$-token sequences grows exponentially, $k$ is usually just $1$, i.e. the production is chosen based on the next token.
 			
-			That's one reason why using tokens is useful: Knowing that the next character is ``i'' is much less useful than knowing the next token is ``if'' or ``int.''
+			That's one reason why using a lexer is useful: Knowing that the next character is ``i'' is much less useful than knowing the next token is ``if.''
 			
-			For many grammars the choice of production is ambiguous. Grammars in which it is not are called LL($k$) grammars, and many context-free grammars can be transformed into LL($k$) grammars. One property that keeps grammars from being LL($k$) is containing left-recursions, in which case the depth of the recursion can't be determined from the first $k$ tokens. this can be fixed by transforming the grammar into a right-recursive one, although this changes the semantic: Left-associative operators become right-associative, $a-b-c$ is interpreted as $a-(b-c)$ instead of $(a-b)-c$. If this is undesirable, a post processing step is required.
+			For many grammars the choice of production is ambiguous. Grammars in which it is not are called LL($k$) grammars, and many context-free grammars can be transformed into LL($k$) grammars. One property that keeps grammars from being LL($k$) is containing left-recursions, in which case the depth of the recursion can't be determined from the first $k$ tokens. this can be fixed by transforming the grammar into a right-recursive one, although this changes the semantic: Left-associative operators become right-associative, \lstinline$a-b-c$ is interpreted as \lstinline$a-(b-c)$ instead of \lstinline$(a-b)-c$. If this is undesirable, a post processing step is required.
 			
-			\todo[inline]{Should I briefly mention LR and possibly GLR grammars/parsers? I don't use any, but they are also commonly used, so they may be worth mentioning?}
+			\subsubsection{LR Grammars}
+			
+			A different approach, LR parsing, is similar to LL parsing in a lot of ways. It's also a predictive parser for a certain class of context-free grammars that determines the next step based on $k$ tokens lookahead (also typically 1) based on a parse table. However, unlike LL, it doesn't work top-down, starting with the root of the parse tree and expanding the left-most non-terminal symbol, it's a bottom-up parser starting at the leafs, the terminal symbols, combining them into non-terminal symbols as it goes along.
+			
+			To this end processed terminals and non-terminals are kept on a stack and the decision to be made is whether to shift -- i.e. read and push the next terminal symbol onto the stack -- or reduce -- i.e. combine the symbols on the top of the stack into a non-terminal symbol. As with the LL parser this decision is made based on the next token(s).
+			
+			And just like LL parsing LR parsing needs a certain type of grammar to be able to unambiguously determine the next action, an LR grammar. Each LL grammar can be converted to an LR grammar, but some LR grammars have no LL equivalent.
+			
+			LR parsing, like LL parsing, by virtue of making a final parse decision is $\mathcal{O}(n)$.
 			
 			\subsubsection{Parsing Expression Grammars}
+			
+			Parsing expression grammars (PEGs) are an alternative to context-free grammars for defining syntax\cite{peg}. While context-free grammars describe how to generate a language, PEGs describe how to parse a language into a syntax tree. To this end they use the following operators:
+			
+			\begin{center}
+			\begin{tabular}{ l l p{10cm} }
+			\toprule
+			Name               & Syntax          & Description \\
+			\midrule
+			Sequence           & \lstinline$ab$  & Expression \lstinline$a$ followed by expression \lstinline$b$. \\
+			Prioritized Choice & \lstinline$a/b$ & If it parses, \lstinline$a$; (only) if it doesn't, \lstinline$b$. \\
+			Zero-or-more       & \lstinline$a*$  & Greedily parse as many \lstinline$a$ as possible. \\
+			One-or-more        & \lstinline$a+$  & Greedily parse as many \lstinline$a$ as possible, at least one. \\
+			Optional           & \lstinline$a?$  & If it parses, \lstinline$a$. \\
+			And-predicate      & \lstinline$&a$  & Match \lstinline$a$, then backtrack, i.e. fail if \lstinline$a$ does not match, but don't consume it if it does. \\
+			Not-predicate      & \lstinline$!a$  & Like \lstinline$&a$, but fail if and only if \lstinline$a$ matches. \\
+			\bottomrule
+			\end{tabular}
+			\end{center}
+			
+			Some of these operators (\lstinline$*$, \lstinline$+$ and \lstinline$?$) are reminiscent of regular expressions; but unlike their regular expression counterparts, they are not non-deterministic but greedy, i.e. they will match as much as possible. This, along with the prioritized choice, makes PEGs inherently unambiguous.
+			
+			A typical example of ambiguous context-free grammars is the dangling else: In if-statements with an optional else, nesting can lead to ambiguity: \lstinline$if(x) if(y) a() else b()$ could be parsed as \lstinline$if(x){ if(y) a() else b() }$ or \lstinline$if(x){ if(y) a() } else b()$, but with a greedy optional operator it will always parse as the former.
+			
+			Like LL grammars, PEGs can be parsed using recursive descent. Instead of predicting which branches to take as with LL grammars, multiple may be tried and subsequently discarded until a match is found. This backtracking can lead to exponential runtime, but that can be avoided: The packrat algorithm allows for parsing PEGs in $\mathcal{O}(n)$ through the use of memoization\cite{packrat}. However the overhead introduced by memoization may still make this slower than a naive backtracking algorithm in practice in a given implementation for typical inputs; few practical PEG implementations use packrat parsers.
 			
 		\subsection{Semantic Analysis}
 		
