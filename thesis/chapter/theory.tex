@@ -20,7 +20,7 @@
 		
 		\subsection{Type system}
 		%static vs dynamic typing
-		Its type system is another important aspect of a programming language, and an essential characteristic of a type system is whether it has dynamic or static typing: Values have a type, for example integral, boolean or array types. In static typing these types are resolved at compile time; variables and parameters have a well-defined type, either explicitly stated or inferred, and trying to use a value of incompatible type results in a compile error.
+		Its type system is another important aspect of a programming language, and an essential characteristic of a type system is whether it has dynamic or static typing: Values have a type, which is the set of their possible values, for example integral, boolean or array types. In static typing these types are resolved at compile time; variables and parameters have a well-defined type, either explicitly stated or inferred, and trying to use a value of incompatible type results in a compile error.
 		%TODO mention how that encourages complex type systems?
 		Dynamic type systems annotate values with their type at run time, and only then do type errors occur. This can make it easier to write generic code, but mistakes also go unnoticed more easily with the decrease in compile time errors.
 		
@@ -35,7 +35,8 @@
 		
 		One example where coroutines are useful is iterating through recursive data structures like a binary tree. A coroutine can recurse through the tree, yielding every node it visits, which to the caller of the coroutine looks much like a function that yields the next node each time it's called.
 		
-		\begin{codelisting}[caption={Pseudocode of tree iteration using coroutines}]
+		%TODO Syntax highlighting
+		\begin{codelisting}[caption={Pseudocode of tree iteration using coroutines},morekeywords={function,if,for,in}]
 function yield_nodes( tree ):
     if tree:
         yield tree.value
@@ -351,9 +352,9 @@ function print_nodes( tree ):
 		
 		Take for example C++'s string class, \lstinline$std::string$. In its constructor it allocates the memory required to hold its content, in its destructor the memory is freed. Since stack unwinding ensures the destructor will be called upon object destruction, memory leaks are impossible.
 		
-		Closely related to this are move mechanics: Resources can be moved from one object into another if they no longer need to be available in the original object. To this end C++ allows for the explicit definition of move constructors -- for constructing a new object by moving the resources of another into it -- and move assignment -- for moving the contents of one existing object into another.
+		Closely related to this are move mechanics: Resources can be moved from one object into another if they no longer need to be available in the original object. To this end C++ allows for the explicit definition of move constructors -- for constructing a new object by moving the resources of another into it -- and move assignment -- for moving the contents of one existing object into another. Moving is usually preferable to copying since it's faster, but occasionally a copy is desired.
 		
-		\subsection{Templates}
+		\subsection{Type Parameters}
 		
 		C++ allows to parameterize functions or classes with types using templates. This allows you to define e.g. a set of elements of a given type, as long as comparison for elements of that type is defined, using \lstinline$std::set<T>$, where \lstinline$T$ is the type of choice. It's also possible to define types with an arbitrary number of template parameters, for example a tuple, in which case algorithms are defined recursively.
 		%TODO elaborate?
@@ -376,6 +377,8 @@ function print_nodes( tree ):
 		\subsection{Iterators}
 		
 		Traversal of containers in C++ is usually done using iterators, which hide the implementation details of the container from the user, who just get an interface for moving through the elements in the container and accessing them. Depending on the kind of object being traversed, iterators may just be able to move forwards in single step increments, or may also be able to move backwards or by a certain distance, and may or may not be copyable.
+		
+		Depending on the container, certain operations may invalidate iterators; always the deletion of the element it points to, for example, and usually the relocation of elements as well.
 		
 		\subsection{Serialization}
 		
