@@ -33,11 +33,60 @@
 	%TODO where does this go? requirements? 
 	%Native machine code would require porting work for each new platform. By using a virtual machine, any platform that's capable of running it is supported. My virtual machine requirements are mainly support for coroutines and stack inspection/unwinding, so coroutines can be serialized and aborted properly, and the ability to embed it in C++.
 	
-	% LLVM: no coroutines, no stack inspection(?)
-	% JVM/CLR: garbage collected
-	% maybe use a table?
+	Eventually the overall goal is the creation of a new programming language named Perseus to fill a certain niche. That's a huge project, so the current goal is the implementation of a compiler and a virtual machine for a small core of the language, as described in detail in this chapter.
 
     \section{Target Language}
+    
+    	Eventually Perseus will be used as an embedded language, supplied as a library with functions to compile Perseus source code and execute functions in it. Initially that doesn't matter as much, just having some environment to execute Perseus scripts in is currently sufficient.
+    	
+    	\subsection{Initial Feature-Set}
+    	
+			A Perseus program is made up of function definitions, one of which is called \lstinline$main()$ and is the entry point, for the time being. It has no parameters, but generally functions can have them and may be overloaded on them. The number and types of parameters are fixed, and functions are annotated with whether they are pure, i.e. side-effect free. Pure functions may only call other pure functions.
+			
+			Perseus scripts can also call native functions which have previously been registered. As a proof of concept an impure \lstinline$print(value)$ function will suffice initially; as the name suggests, it writes its single parameter to the standard output.
+			
+			The types initially supported are \lstinline$i32$, a 32 bit signed integer type, and \lstinline$bool$, a boolean type stored as a character since that is the smallest addressable unit. There's also a void type, \lstinline$()$, for statements. Arrays and record types are not initially supported, but will be added at a later time.
+	    	
+	    	The simplest expressions are literals: Constant values written directly the code. Integer literals can be written in decimal (default), hexadecimal (prefix \lstinline$0x$) or binary (prefix \lstinline$0b$), with the option of using \lstinline$'$ as a separator, as in \lstinline$1'000'000$ or \lstinline$0b0010'1010$.
+	    	
+	    	Expressions can be combined using operators. In the future users will be able to define their own operators, including their associativity and precedence, so those should not be defined through the grammar but resolved at a later time. The predefined operators are given in table \ref{tab:perseus_operators}. Operators of same precedence with no associativity need explicit parentheses -- e.g. \lstinline$a==b==c$ is illegal.
+	    	
+	    	\begin{table}
+			\begin{center}
+			\begin{tabular}{ l l l l l }
+			\toprule
+			Symbol & Operands & Associativity & Precedence & Name \\
+			\midrule
+			\lstinline$*$ & \lstinline$i32, i32$ & left & 7 & integer multiplication \\
+			\lstinline$/$ & \lstinline$i32, i32$ & left & 7 & integer division \\
+			\lstinline$%$ & \lstinline$i32, i32$ & left & 7 & integer modulo \\
+			\lstinline$+$ & \lstinline$i32, i32$ & left & 6 & integer addition \\
+			\lstinline$-$ & \lstinline$i32, i32$ & left & 6 & integer subtraction \\
+			
+			\lstinline$==$ & \lstinline$i32, i32$ & none & 4 & integer equality \\
+			\lstinline$!=$ & \lstinline$i32, i32$ & none & 4 & integer inequality \\
+			\lstinline$<$  & \lstinline$i32, i32$ & none & 4 & less than \\
+			\lstinline$<=$ & \lstinline$i32, i32$ & none & 4 & less than or equals \\
+			\lstinline$>$  & \lstinline$i32, i32$ & none & 4 & greater than \\
+			\lstinline$>=$ & \lstinline$i32, i32$ & none & 4 & greater than or equals \\
+			
+			\lstinline$==$ & \lstinline$bool, bool$ & none  & 4 & boolean equality \\
+			\lstinline$!=$ & \lstinline$bool, bool$ & none  & 4 & boolean inequality \\
+			\lstinline$&&$ & \lstinline$bool, bool$ & right & 3 & boolean and \\
+			\lstinline$||$ & \lstinline$bool, bool$ & right & 2 & boolean or \\
+			
+			\lstinline$-$ & \lstinline$i32$  & & & integer negation \\
+			\lstinline$!$ & \lstinline$bool$ & & & boolean negation \\
+			\bottomrule
+			\end{tabular}
+			\caption{Predefined operators}\label{tab:perseus_operators}
+			\end{center}
+			\end{table}
+			
+			In the absence of error handling divide by zero leads to termination of the execution. There is no short-circuit evaluation for \lstinline$&&$ and \lstinline$||$\footnote{The absence of short-circuit evaluation means both operands are always evaluated, even if evaluating the left one suffices to determine the result.}. (For simplicity's sake; this may change in the future.)
+			
+    	
+    	\subsection{Expression-oriented}
     
         \subsection{Integral and boolean types}
     
@@ -118,6 +167,9 @@
     %TODO yes, talk about serialization a little
     
     %TODO why this means existing VMs are unfit
+	% LLVM: no coroutines, no stack inspection(?)
+	% JVM/CLR: garbage collected
+	% maybe use a table?
 
 \chapter{Design} %TODO better name?
 % Ansatz, d.h. z.B. Architektur, Module und ihre Kommunikation
@@ -504,7 +556,7 @@ myFunction() + 1
 		
 		\subsection{Cleaner API}
 		
-		The header files are not currently sufficiently separated into interface and implementation; it should be made clearer to the user what he is supposed to include by having those headers in a separate directory.
+		The header files are not currently sufficiently separated into interface and implementation; it should be made clearer to the user what they are supposed to include by having those headers in a separate directory.
 	
 	\section{Complex changes}
 		
