@@ -45,9 +45,11 @@
 			
 			Perseus scripts can also call native functions which have previously been registered. As a proof of concept an impure \lstinline$print(value)$ function will suffice initially; as the name suggests, it writes its single parameter to the standard output.
 			
+			To document Perseus scripts single- and multiline comments can be used. Multiline comments need not support nesting.
+			
 			The types initially supported are \lstinline$i32$, a 32 bit signed integer type, and \lstinline$bool$, a boolean type stored as a character since that is the smallest addressable unit. There's also a void type, \lstinline$()$, for statements. Arrays and record types are not initially supported, but will be added at a later time.
 	    	
-	    	The simplest expressions are literals: Constant values written directly the code. Integer literals can be written in decimal (default), hexadecimal (prefix \lstinline$0x$) or binary (prefix \lstinline$0b$), with the option of using \lstinline$'$ as a separator, as in \lstinline$1'000'000$ or \lstinline$0b0010'1010$.
+	    	The simplest expressions are literals: Constant values written directly the code. Integer literals can be written in decimal (default), hexadecimal (prefix \lstinline$0x$) or binary (prefix \lstinline$0b$), with the option of using \lstinline$'$ as a separator, as in \lstinline$1'000'000$ or \lstinline$0b0010'1010$. Boolean literals are \lstinline$true$ and \lstinline$false$.
 	    	
 	    	Expressions can be combined using operators. In the future users will be able to define their own operators, including their associativity and precedence, so those should not be defined through the grammar but resolved at a later time. The predefined operators are given in table \ref{tab:perseus_operators}. Operators of same precedence with no associativity need explicit parentheses -- e.g. \lstinline$a==b==c$ is illegal.
 	    	
@@ -83,71 +85,42 @@
 			\end{center}
 			\end{table}
 			
-			In the absence of error handling divide by zero leads to termination of the execution. There is no short-circuit evaluation for \lstinline$&&$ and \lstinline$||$\footnote{The absence of short-circuit evaluation means both operands are always evaluated, even if evaluating the left one suffices to determine the result.}. (For simplicity's sake; this may change in the future.)
+			In the absence of error handling divide by zero currently leads to termination of the execution. There is no short-circuit evaluation for \lstinline$&&$ and \lstinline$||$\footnote{The absence of short-circuit evaluation means both operands are always evaluated, even if evaluating the left one suffices to determine the result.}. (For simplicity's sake; this may change in the future.)
 			
-    	
-    	\subsection{Expression-oriented}
-    
-        \subsection{Integral and boolean types}
-    
-        \subsection{Arithmetic Expressions}
-        
-            Literals
-            
-            Operator precedence
-            
-            Can't mix left \& right of same precedence
-            
-            Can't mix non-associative of same precedence ($a==b==c$)
-        
-        \subsection{Variables}
-            
-            no assignments yet
-        
-        \subsection{Functions}
-        
-            with parameters, importantly
-        
-        \subsection{Conditional Expressions}
-        
-        \subsection{Comments}
+			``Block'' expressions contain multiple expressions to be executed serially; they may include variable definitions, which must include the initial value; its type can optionally be deduced from this. A variable is usable until the end of the block it was defined in. A block evaluates to the last expression in it.
+			
+			``If'' expressions evaluate to either their ``then'' expression or their ``else'' expression, depending on their condition, so both of those must have the same type. If the ``then'' expression is of type void, the ``else'' expression can be omitted.
         
         \subsection{Future features}
+        	
+        	Some future features should be kept in mind during implementation to ease their future addition. Besides the aforementioned user-defined types and operators, these are as follows:
+        	
+        	A UTF-32 string type. String literals will be UTF-8 encoded; scripts may therefore start with a UTF-8 Byte Order Mark\footnote{A special UTF-8 character signifying that the file in question is encoded in UTF-8.}.
+        	
+        	Coroutine support.
+        	
+        	\todo[inline]{Not much to say about coroutines? But they need to be mentioned...}
+        	
+        	Pointer types of some sort. Regardless of how exactly they look syntactically, there will at some point be a way to reference memory locations. This includes both the heap -- there will also be dynamic memory at some point -- and the stacks -- plural, since there's one for each coroutine.
+        	
+        	Serialization. There will be built-in support for serialization, with type annotations of some kind. Critically this will also include the ability to serialize paused coroutines (if the variables on their stack are serializable) so they can be resumed at a later date, possibly on a different computer. The use-case is a video game using Perseus scripts for its logic while allowing the player to save at any time, at which point a running script may need to be saved as well.
             
-            \subsubsection{Persistence}
-                
-            \subsubsection{Custom operators}
-                
-                so precedence can't be inherent in the grammar
-                
-            \subsubsection{Native functions}
-                
-            \subsubsection{Pointers \& Dynamic Memory}
-                
-                including function pointers
-                
-                e.g. used for strings
-                
-            \subsubsection{Coroutines}
-            	
-            	yield etc.
-            
-            \subsubsection{Tail Calls}
-            
-    
-    \section{Compiler}
-        
-        \subsection{Errors}
-            
-            include file location
-            
-        \subsection{UTF-8 string literals}
-            
-        \subsection{Probably more...}
-            
-            But what?
-            
-            Speed?
+	
+	\section{Compiler}
+	
+		\subsection{Errors}
+		
+			include file location
+		
+		\subsection{UTF-8 string literals}
+		    
+		\subsection{Probably more...}
+		
+			But what?
+			
+			Speed?
+			
+			Tail calls
         
     \section{VM}
         
