@@ -4,10 +4,11 @@
 % Detailgrad so hoch, wie für Verständnis nötig (Leser ist anonymer Informatiker)
 % >= 25%
 
+This chapter goes into the theory behind programming languages, compilers and virtual machines and details numerous concepts used in the implementation. Noteworthy parts include explanations of coroutines and serialization and an overview of Parsing Expression Grammars.
+
     \section{Designing programming languages}
     
-    	%TODO
-    	\todo[inline]{To what degree do I need references here?}
+    	%TODO references?
 		
 		There are many different kinds of programming languages. They can vary in many aspects, from the general approach to small details. What are some important aspects?
 		
@@ -53,10 +54,7 @@ function print_nodes( tree ):
 	
 	\section{Compilers}
 	
-		%TODO
-		\todo[inline]{This chapter needs references. How do I cite lectures and/or their slides, which are not publicly accessible?}
-	
-		Compilers translate one language -- the source language -- to another -- the target language. The Java compiler for example translates Java source code to Java Byte Code. This translation consists of multiple steps: First the input, which is essentially treated as a long sentence, is split into tokens, which can be thought of as words, by the lexer. The parser then performs a syntactical analysis on these words, creating a syntax tree. Semantic analysis then verifies this tree makes sense: Where are the referenced variables and functions? In the case of statically typed languages, do the types match? During this process, the syntax tree may be transformed and annotated with additional information. Next, optimization may take place, transforming the syntax tree into an equivalent but in some way better version, before finally the target code is generated.
+		Compilers translate one language -- the source language -- to another -- the target language\cite{compilerbau}. The Java compiler for example translates Java source code to Java Byte Code. This translation consists of multiple steps: First the input, which is essentially treated as a long sentence, is split into tokens, which can be thought of as words, by the lexer. The parser then performs a syntactical analysis on these words, creating a syntax tree. Semantic analysis then verifies this tree makes sense: Where are the referenced variables and functions? In the case of statically typed languages, do the types match? During this process, the syntax tree may be transformed and annotated with additional information. Next, optimization may take place, transforming the syntax tree into an equivalent but in some way better version, before finally the target code is generated.
 
 		\subsection{Chomsky hierarchy}
 			
@@ -86,8 +84,6 @@ function print_nodes( tree ):
 			Some auxiliary operators are often defined in terms of them, like \lstinline$a+ = aa*$ and \lstinline$a? = a|$$\epsilon$, but those are merely substitutions, they don't add any capabilities, and thus don't require further investigation. Other useful shorthands are bracket expressions like \lstinline$[a-d0-3_] = a|b|c|d|0|1|2|3|_$, which allow for the compact definition of large alternatives, the dot (\lstinline$.$), which matches any one character, and \lstinline$[^a-c]$, which matches any one character except \lstinline$[a-c]$.
 			
 			Regular languages can be recognized by finite automatons in $\mathcal{O}(n)$ time where $n$ is the length of the input. That's as good as it gets with linear input: Each character has to be processed. So how does a finite automaton work?
-			
-			\todo[inline]{Do I need to use mathematical notations? I find precisely worded sentences to be easier to understand and write.}
 			
 			There are two kinds of finite automatons: deterministic and non-deterministic finite automatons. The more practical one to build is the deterministic finite automaton (DFA). It has a finite set of states, one of which is the start state and some of which are accept states; an input alphabet; and a transition function which defines the resulting state for a given current state and input character. Initially, the automaton is in its start state; the input is then processed one character at a time: the current state changes according to the transition function given the current input character, until all input characters have been processed and a certain state has been reached. If this state is an accept state, the input is accepted, i.e. it is part of the regular language.
 			
@@ -155,8 +151,7 @@ function print_nodes( tree ):
 			
 			Large DFAs can often be simplified, eventually resulting in a minimal DFA. One way of finding it is the table-filling algorithm, in which equivalent states are determined and merged: Any two states are distinguishable if one of them is an accept state and the other one is not, so that is the initial set of demonstrably different state pairs. An any two states that given the same input transition into distinguishable states are also distinguishable, so those are added to the set as well. This is repeated until a fixed point is found, i.e. until no more distinguishable pairs are found. All the remaining pairs are equivalent and can be merged without affecting the language accepted by the DFA. Assuming there are no unreachable states, which should have already been eliminated during the transformation from NFA to DFA, this is now the minimal DFA.
 			
-			%TODO
-			\todo[inline]{Do I need some kind of conclusion here?}
+			%TODO \todo[inline]{Do I need some kind of conclusion here?}
 			
 			\subsubsection{Context-free languages}
 			
@@ -245,7 +240,7 @@ function print_nodes( tree ):
 			\label{fig:derivation_tree_exp_3}
 			\end{figure}
 			
-			\todo[inline]{This is a very abrupt end?}
+			%TODO \todo[inline]{This is a very abrupt end?}
 		
 		\subsection{Lexer}
 		
@@ -328,11 +323,15 @@ function print_nodes( tree ):
 		
 		When generating code for a register-based machine (which will be further examined in the section on virtual machines), one part of the process is register allocation: It has to be determined which values are stored in which register, since their number may be limited. On a stack-based machine, on the other hand, all values are kept on a stack and register allocation is not required.
 		
+		\subsection{Optimization}
+		
 		The code may also be subject to further optimization: It may be possible to determine that some code will never be executed -- this so called ``dead code'' may be removed; tail call optimization can turn function calls at the end of a function into unconditional jumps, keeping the call stack smaller; and various other techniques.
+		
+		This optimization may happen both before the code generation in the form of transformations of the syntax tree and afterwards by selectively changing the instructions, depending on the kind of optimization being carried out. Since it is of limited interest to this thesis, it is not explained in detail here, but further information is available for example in the ``dragon book\cite{dragon-book}.''
 
 	\section{Virtual Machines}
 	
-		Compilers can target actual processors and generate native machine code for them to execute, and that is the fastest method since there are no additional abstraction layers; but sometimes it is desirable to run the code on a simulated computer in a so-called virtual machine, or VM for short. This can be for security reasons -- a VM can be ``sandboxed,'' preventing code executed in it from accessing other parts of the host system; because a machine with different properties than the host machine is desired; to have a unified execution environment across different types of machines; or for various other reasons.
+		Compilers can target actual processors and generate native machine code for them to execute, and that is the fastest method since there are no additional abstraction layers; but sometimes it is desirable to run the code on a simulated computer in a so-called virtual machine, or VM for short. This can be for security reasons -- a VM can be ``sandboxed,'' preventing code executed in it from accessing other parts of the host system; because a machine with different properties than the host machine is desired; to have a unified execution environment across different types of machines; or for various other reasons\cite{compilerbau}.
 		
 		As the name implies a virtual machine simulates an actual machine; so it typically repeatedly fetches an instruction from the machine code and executes it. The Instruction Pointer (IP) keeps track of the current location in the code and automatically increments past the current instruction upon fetching it. An instruction consists of an opcode (short for operation code) defining the operation to be performed and possibly various operands, if the operation calls for them; the exact encoding of these is machine-specific.
 		
@@ -351,6 +350,8 @@ function print_nodes( tree ):
 		For a program to be able to cleanly shut down in case of an error the VM also needs to be capable of stack unwinding, which is the proper cleanup of stack frames e.g. due to an exception. This may include running the destructors\footnote{In certain object-oriented programming languages a class may define a special destructor method to be run when an object is destroyed, which usually takes care of cleaning up resources.} of local objects, special deferred cleanup statements\footnote{Some languages have a \lstinline$defer$ keyword to define statements to be executed once the current scope is left.} or similar. This too requires the VM to be aware of the types of values on the stack.
 	
 	\section{Relevant software patterns and language features}
+		
+		%TODO More references
 		
 		A grasp of a couple of concepts is required for understanding the coming chapters; these are explained in this section.		
 		%TODO why C++14?

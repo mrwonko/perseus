@@ -2,9 +2,11 @@
 
 % (Ist-Analyse)
 \chapter{State of the art}
-        
-    % immer erwähnen, was man nutzt, und nie nur das
-        
+	
+	% immer erwähnen, was man nutzt, und nie nur das
+	
+	This chapter examines noteworthy compiler generators as well as virtual machines and programming languages that influenced the design of the Perseus language and VM.
+	
 	\section{Common Compiler Generators}
     	
 		Lexers and parsers are rarely hand-written any more, since there are plenty of tools to generate them using formal definitions. Let's compare some free and open source examples that can target C/C++ representing different approaches.
@@ -25,6 +27,10 @@
 		There are numerous virtual machines a compiler may target. One common example is the Java Virtual Machine (JVM), which was initially created for Java, but has since been targeted by other languages as well. It is stack-based and uses garbage collection to manage its memory.
 		
 		Another example, the LLVM is not just a virtual machine. It defines an Intermediate Representation for program code that compilers can target, much like byte code. It is then capable of optimizing it, compiling it to various machine code formats or executing it using on-demand compilation (JIT/Just In Time). It is register-based and supports both manual memory management and garbage collection, but no coroutines.
+	
+	\section{Selected Programming Languages}
+		
+		%TODO
 
 % Anforderungsanalyse / Requirements
 \chapter{Requirements}\label{requirements}
@@ -32,7 +38,7 @@
 	%TODO where does this go? requirements? 
 	%Native machine code would require porting work for each new platform. By using a virtual machine, any platform that's capable of running it is supported. My virtual machine requirements are mainly support for coroutines and stack inspection/unwinding, so coroutines can be serialized and aborted properly, and the ability to embed it in C++.
 	
-	Eventually the overall goal is the creation of a new programming language named Perseus to fill a certain niche. That's a huge project, so the current goal is the implementation of a compiler and a virtual machine for a small core of the language, as described in detail in this chapter.
+	This chapter lays down the precise requirements for the compiler and the VM in the context of this thesis. Notably this includes the initial features of Perseus, the language to be compiled. It also explains why existing VMs don't fulfill these requirements, motivating the creation of a custom VM.
 
     \section{Target Language}
     
@@ -145,6 +151,9 @@
 
 \chapter{Design} %TODO better name?
 % Ansatz, d.h. z.B. Architektur, Module und ihre Kommunikation
+
+What is this chapter? %TODO
+
     \section{Choice of implementation language}
         \subsection{Why C++?}
         \subsection{Why C++14?}
@@ -209,8 +218,9 @@
 % Entwicklungsanalyse
 \chapter{Implementation}
 
-    % Umsetzung wesentlicher Module, ggf. Quellcode-Ebene
-    
+	% Umsetzung wesentlicher Module, ggf. Quellcode-Ebene
+	What is this chapter? %TODO
+	
     \section{Coming to terms with Boost}
     
         Trouble finding information in the documentation -- it's there, just hard to find.
@@ -264,6 +274,7 @@
 % What did I achieve?
 % Ergebnisse zusammenfassen, bewerten bzgl. Zielsetzung, Perspektiven
 % lessons learned
+This chapter examines the resulting compiler and VM: Do they fulfill the requirements? What does a Perseus program look like and how does the compiler translate it into executable byte code?
 
 The goal was mostly reached: A small core of Perseus can be compiled and executed. Compared to the desired target language example (Listing~\ref{lst:target_language}), this is what the actual syntax looks like:
 
@@ -497,10 +508,11 @@ return parameter_size=4
 \chapter{Future prospects}
 % Ausblick
 %*  [Future plans/possibilities]
+This chapter details possible future changes to the compiler and VM, explaining how the Perseus language might change.
 
 As mentioned only a very simple core of the language has been implemented; there is a lot of room for improvement. There are a couple of comparatively simple features that can be added immediately, but few of them make the language any more powerful. Such changes are for the most part larger in nature, requiring more work, but they are required for the language to become viable.
 
-    \section{Simple additions}
+    \section{Simple changes}
     
     	\subsection{Operator precedence resolution}
     	
@@ -534,7 +546,7 @@ myFunction() + 1
 		
 		\subsection{Upgrade to Boost.Spirit 3}
 		
-		Version 2 of Boost.Spirit is used, which was the latest stable version when development started. The next version has since been released, with potential improvements in compile time, speed and ease of use. An upgrade should be considered while the code base is still relatively small, before adding many new features.
+		Version 2 of Boost.Spirit is used, which was the latest stable version when development started. The next version has since been released, with potential improvements in compile time, speed and ease of use. An upgrade should be considered while the code base is still relatively small, before adding many new features, because the new version is incompatible with the current one due to changed syntax.
 		
 		\subsection{New language features}
 		
