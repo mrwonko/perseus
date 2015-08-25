@@ -29,13 +29,16 @@
 		%TODO phrasing?
 		Another concept is that of a pure function, which is one whose output depends solely on its parameters and which has no side effects. So it doesn't depend on any global state and doesn't change it. This makes it easier to reason about and test since it will always behave the same way given the same parameters. Some functional languages require all functions to be pure, while some other languages let the programmer explicitly mark the function as pure/impure, again preventing them from taking unintended actions.
 		
-		\subsection{Coroutines}
+		\subsection{Concurrency}
+		
+		Concurrency is the simultaneous execution of multiple computations. Well-known ways of achieving it are threads and processes, but somewhat lesser known are coroutines, a form of cooperative multitasking.
+		
+		\subsubsection{Coroutines}
 		
 		A coroutine is a strand of execution with its own (call) stack. When the program starts, there's a single coroutine starting execution at the entry point. This coroutine may then launch new coroutines, at which point its execution is halted and the new coroutine starts its execution. They don't run in parallel, there's exactly one active coroutine (per thread) at any point. Only when this new coroutine stops its execution -- either permanently, by returning, or temporarily, by yielding; in either case a value may be passed back to the previous coroutine -- does the previous one resume its execution. A paused coroutine -- one that yielded -- may later be resumed, possibly passing in a new value.
 		
 		One example where coroutines are useful is iterating through recursive data structures like a binary tree. A coroutine can recurse through the tree, yielding every node it visits, which to the caller of the coroutine looks much like a function that yields the next node each time it's called.
 		
-		%TODO Syntax highlighting
 		\begin{codelisting}[caption={Pseudocode of tree iteration using coroutines},morekeywords={function,if,for,in}]
 function yield_nodes( tree ):
     if tree:
