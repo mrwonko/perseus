@@ -4,7 +4,7 @@ namespace perseus
 {
   namespace detail
   {
-    void code_segment::pushOpcode( const opcode& code )
+    void code_segment::push_opcode( const opcode& code )
     {
       typedef std::underlying_type_t< opcode > type;
       type value = static_cast< type >( code );

@@ -51,7 +51,7 @@ namespace perseus
       template<>
       void push< opcode >( const opcode& code )
       {
-        pushOpcode( code );
+        push_opcode( code );
       }
 
       /**
@@ -76,7 +76,7 @@ namespace perseus
 
     private:
       /// implementation of push<opcode>()
-      void pushOpcode( const opcode& code );
+      void push_opcode( const opcode& code );
     };
   }
 }
