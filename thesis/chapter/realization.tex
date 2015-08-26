@@ -136,68 +136,73 @@
 \chapter{Design} %TODO better name?
 % Ansatz, d.h. z.B. Architektur, Module und ihre Kommunikation
 
-What is this chapter? %TODO
+	This chapter describes the design of the compiler and the VM: How were they supposed to fulfill the requirements?
 
 	\section{Choice of implementation language}
-		\subsection{Why C++?}
-		\subsection{Why C++14?}
-		%why MSVC2015RC?
+	
+		When it came to choosing a language to implement the compiler and VM in, there were multiple considerations.
+		
+		First of all the language should be widely available. Since Perseus will only ever run on a system supported by its host language, a mainstream language should be used.
+		
+		Perseus will at some point be usable as an embedded language, i.e. as a library. So it should be implemented in a language that can create widely usable libraries.
+		
+		And the language should make writing correct code easy while being powerful enough to write a useful compiler in it.
+		
+		With that in mind C++ was chosen. It is widely supported and compiles to native code; it supports and encourages the use of RAII to prevent resource leaks; and modern features introduced in C++11 and C++14 further simplify the writing of fast, correct code. It is also reasonably simple to write a C binding in it, and C libraries are widely supported.
+		%TODO citations?
+		
+		%TODO (why MSVC2015RC?)
 	
 	\section{Choice of libraries}
-		\subsection{Why Boost.Spirit?}
-			no separate generation step, uses C++ templates instead (at the cost of compile time - lots of it)
-			
-			header-only
-			
-			recursive descent parser $\rightarrow$ no left recursions
-			\subsubsection{Choice of version}
-				why v2 and not x3?
-				
-				released May 15th
-				
-				see http://boost-spirit.com/home/2015/05/16/spirit-3-0-0/
-		\subsection{Why Boost.Test?}
 	
-	% TODO: should I talk about coding standards at all?
+		Parsers are not typically hand-written, since there are plenty of generators that create them based on a formal grammar. Out of them Boost.Spirit was chosen to implement the Perseus compiler. Boost.Spirit is a part of Boost, a set of C++ libraries covering many areas.
+		
+		There were multiple reasons for choosing Boost.Spirit: Firstly, the generator needed to work with C++, the implementation language; all Boost libraries are strictly for C++. Its use of Parsing Expression Grammars instead of LL or LR grammars simplifies the grammar definitions, thanks to being inherently unambiguous. And it doesn't require a separate generation step for the parser, relying instead on C++ templates resolved during normal compilation.
+		
+		So since there was thus already a dependence on Boost, it was obvious to use Boost.Test for unit testing. Not only is Boost.Test capable of running a wide range of user-defined checks and reporting failures, it also detects memory leaks.
 	
-	\section{Opcodes}
+	%TODO Namespaces - perseus / perseus::detail (?)
 	
-	
-	% Namespaces - perseus / perseus::detail
-	% Generally: why bytecode?
 	\section{Modules}
 	
 		% I suppose a diagram would be useful here?
 		
+		There are two distinct components: The compiler and the VM. The interface between the two is the byte code which the compiler generates and the VM executes.
+		
+		\subsection{Byte code}
+			
+			The byte code contains a sequence of instructions, which consist of an opcode and possibly one or more operands. Instructions thus vary in length, so the byte code is stored in an dynamic array of bytes; essentially raw memory, pieces of which are then interpreted as instructions. While this has the potential for misinterpretation when the piece of memory in question is mid-instruction, a correct compiler will only ever create valid byte code that never jumps into the middle of an instruction.
+			
+			This has the advantage of being very compact; equally sized instructions would usually be much larger than necessary to accommodate for the largest ones. In an effort to further reduce byte code size, opcodes are of various length as well. To this end they are encoded such that the number of consecutive 1-bits in the first byte indicates the number of additional bytes of the opcode. So if the most significant bit is 0, it's a single-byte opcode; there are 128 of those, due to the 7 remaining bits. For example \lstinline$0010'1010 = 42$ and \lstinline$1000'0101 0011'1001 = 1337$.
+			
+			Stack-based instructions are used instead of register-based ones because they're simpler; they implicitly operate on the values on top of the stack, making them well suited for evaluating expressions without the need for register allocation. They tend to require more copies to get the necessary values on top of the stack, but that's an acceptable price for simplicity.
+			
+			The essential initial instructions are integer arithmetic and boolean operations (one instruction for each of the operations defined in table \ref{tab:perseus_operators}), instructions for pushing integer and boolean constants, popping memory and copying values from and into the stack, as well as various types of jumps (including conditional jumps for branching) and call and return instructions.
+		
 		\subsection{Compiler}
-		
-			\subsubsection{Lexer}
-			Line numbers for error messages (\& Token attributes vs iterator ranges)
 			
-			utf-32 input preprocessing and how Spirit doesn't like that, but how it's only of interest in string literals anyway
+			The first steps of compilation are an ordinary lexer and parser. The following semantic analysis is done in two passes: First the function signatures are extracted to allow for forward references; in the second pass variable and function usages are resolved, types determined and the syntax tree is generally transformed as necessary. Finally code generation traverses this transformed syntax tree and writes the byte code.
 			
-			\subsubsection{Parser}
+		\subsection{Virtual Machine}
 			
-			\subsubsection{Code Generation}
+			At its core the VM has a simple fetch \& execute loop: Read the next instruction, act accordingly, repeat.
 			
-			\subsection{Virtual Machines}
+			What instruction is read depends on the location of the instruction pointer, which points into the code segment containing the byte code and is advanced whenever it is read from.
 			
-			Error handling - C++ exceptions etc.
+			Since multiple coroutines will be required in the future, they are already modeled in the VM, although there is only one at the moment. They are tracked by a coroutine manager. A coroutine has its own instruction pointer and stack; together those represent the current state of a coroutine and will be serializable in the future. There is no type information on the stack; in the future it will be precomputed for yielding functions, but since it will be required so infrequently it is not part of the stack.
 			
-			Why are pointers stack-relative?
+			The size requirements of those stacks vary wildly: Complex coroutines might need a lot of stack to do large computations, but there can also be many simple coroutines which just need a little. In the interest of only using as much memory as necessary stacks are thus implemented as dynamic arrays. Since those may move in memory when they are reallocated with a larger size, a level of indirection will be required for stack pointers once those are added; but they are not yet required, since memory currently only needs to be accessed relative to the top of the current stack -- to access function parameters, local variables and set the return value.
 			
-			Why little metadata on stack? (except RTTI for yielding)
+			The instruction pointers point into the code segment, which encapsulates the byte code generated by the compiler.
 			
-			%TODO how will serialization be realized one day?
+			All these elements are modeled as classes. Their general relationships are shown in the class diagram in figure \ref{fig:vm_class_diagram}; it also shows the processor class which contains the fetch \& execute loop that (directly or indirectly) has ownership of objects of the other classes.
 			
-			\subsubsection{code segment}
-				opcode encoding
-			\subsubsection{coroutine}
-			\subsubsection{stack}
-			\subsubsection{processor}
-		
-		\subsection{Unit Tests}
-		
+			\begin{figure}
+			\centering
+			\includegraphics[width=\textwidth]{figures/vm_classes_cropped}
+			\caption{VM class diagram (planned)}
+			\label{fig:vm_class_diagram}
+			\end{figure}
 
 % Entwicklungsanalyse
 \chapter{Implementation}
@@ -532,7 +537,7 @@ myFunction() + 1
 		
 		\subsection{Upgrade to Boost.Spirit 3}
 		
-		Version 2 of Boost.Spirit is used, which was the latest stable version when development started. The next version has since been released, with potential improvements in compile time, speed and ease of use. An upgrade should be considered while the code base is still relatively small, before adding many new features, because the new version is incompatible with the current one due to changed syntax.
+		The compiler currently uses version 2 of Boost.Spirit, which was the latest stable version when development started. The next version has since been released, with potential improvements in compile time, speed and ease of use. An upgrade should be considered while the code base is still relatively small, before adding many new features, because the new version is incompatible with the current one due to changed syntax.
 		
 		\subsection{New language features}
 		
