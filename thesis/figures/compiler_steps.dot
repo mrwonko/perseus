@@ -1,0 +1,13 @@
+digraph
+{
+    node [shape=rect];
+    start [shape=point, style=invis];
+    sem [label="semantic analysis"]
+    gen [label="code generation"]
+    
+    start -> lexer [label="source code"];
+    lexer -> parser [label="token stream"];
+    parser -> sem [label="syntax tree"];
+    sem -> gen [label="annotated\ntransformed\nsyntax tree"];
+    gen -> VM [label="byte code"];
+}
