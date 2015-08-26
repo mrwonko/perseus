@@ -5,7 +5,11 @@
 	
 	% immer erwähnen, was man nutzt, und nie nur das
 	
-	This chapter examines noteworthy compiler generators as well as virtual machines and programming languages that influenced the design of the Perseus language and VM.
+	This chapter examines noteworthy compiler generators as well as virtual machines
+	%TODO and programming languages
+	that influenced the design of the Perseus
+	%TODO language and
+	VM.
 	
 	\section{Common Compiler Generators}
     	
@@ -28,9 +32,7 @@
 		
 		Another example, the LLVM is not just a virtual machine. It defines an Intermediate Representation for program code that compilers can target, much like byte code. It is then capable of optimizing it, compiling it to various machine code formats or executing it using on-demand compilation (JIT/Just In Time). It is register-based and supports both manual memory management and garbage collection, but no coroutines.
 	
-	\section{Selected Programming Languages}
-		
-		%TODO
+	%TODO \section{Selected Programming Languages}
 
 % Anforderungsanalyse / Requirements
 \chapter{Requirements}\label{requirements}
@@ -43,6 +45,8 @@
     \section{Target Language}
     
     	Eventually Perseus will be used as an embedded language, supplied as a library with functions to compile Perseus source code and execute functions in it. Initially that doesn't matter as much, just having some environment to execute Perseus scripts in is currently sufficient.
+    	
+    	The syntax should generally be based on Rust\cite{rust}, though only roughly; differences are acceptable. With that in mind, the following is what the language should be capable of initially.
     	
     	\subsection{Initial Feature-Set}
     	
@@ -102,9 +106,7 @@
         	
         	A UTF-32 string type. String literals will be UTF-8 encoded; scripts may therefore start with a UTF-8 Byte Order Mark\footnote{A special UTF-8 character signifying that the file in question is encoded in UTF-8.}.
         	
-        	Coroutine support.
-        	
-        	\todo[inline]{Not much to say about coroutines? But they need to be mentioned...}
+        	Coroutine support. %TODO say more here?
         	
         	Pointer types of some sort. Regardless of how exactly they look syntactically, there will at some point be a way to reference memory locations. This includes both the heap -- there will also be dynamic memory at some point -- and the stacks -- plural, since there's one for each coroutine.
         	
@@ -112,108 +114,90 @@
             
 	
 	\section{Compiler}
+		
+		The compiler is responsible for compiling Perseus scripts (as described above) into executable byte code for the VM. The input can be a file or a string from memory.
+		
+		It is important that the compiler tracks the current file location (at least the line, possibly also the column) so that error messages can include a location. It is acceptable for compilation to stop at the first error.
 	
-		\subsection{Errors}
+	\section{VM}
+	
+		The compiled byte code is run by a virtual machine so it can easily be executed on different machines.
 		
-			include file location
+		This VM needs to allow for manual memory management, since that will be added to Perseus in the future; it must not require garbage collection of dynamic memory.
 		
-		\subsection{UTF-8 string literals}
-		    
-		\subsection{Probably more...}
+		It also needs to support coroutines. While not part of this thesis they too will be added to the language at a later point, so the VM must not prohibit that.
 		
-			But what?
-			
-			Speed?
-			
-			Tail calls
-        
-    \section{VM}
-        
-        \subsection{Fetch and Execute}
-            
-        \subsection{Coroutines}
-            
-            \subsubsection{Stack}
-                
-                grow arbitrarily
-            
-        \subsection{Memory Management}
-            
-            that is, the need for pointers at some point, both to stacks and heap, and how to do that nicely, considering the stack may grow, i.e. relocate
-    
-    % do I talk about future requirements? Like Stack Unwinding?
-    %TODO yes, talk about serialization a little
-    
-    %TODO why this means existing VMs are unfit
-	% LLVM: no coroutines, no stack inspection(?)
-	% JVM/CLR: garbage collected
-	% maybe use a table?
+		And lastly it must allow for stack inspection so coroutines can be serialized and safely aborted. Serialization will be one of the main features of Perseus in the future, so it's imperative that it can be implemented.
+		
+		\subsection{Suitability of existing VMs}
+		
+			I am not aware of any mainstream VMs that fulfill these requirements. The JVM and the Common Language Runtime\footnote{The VM targeted by C\#} are unsuitable because they force the use of garbage collection, while LLVM has no support for coroutines.
 
 \chapter{Design} %TODO better name?
 % Ansatz, d.h. z.B. Architektur, Module und ihre Kommunikation
 
 What is this chapter? %TODO
 
-    \section{Choice of implementation language}
-        \subsection{Why C++?}
-        \subsection{Why C++14?}
-        %why MSVC2015RC?
-    
-    \section{Choice of libraries}
-        \subsection{Why Boost.Spirit?}
-            no separate generation step, uses C++ templates instead (at the cost of compile time - lots of it)
-            
-            header-only
-            
-            recursive descent parser $\rightarrow$ no left recursions
-            \subsubsection{Choice of version}
-                why v2 and not x3?
-                
-                released May 15th
-                
-                see http://boost-spirit.com/home/2015/05/16/spirit-3-0-0/
-        \subsection{Why Boost.Test?}
-    
-    % TODO: should I talk about coding standards at all?
-    
-    \section{Opcodes}
-    
-    
-    % Namespaces - perseus / perseus::detail
-    % Generally: why bytecode?
-    \section{Modules}
-    
-        % I suppose a diagram would be useful here?
-    
-        \subsection{Compiler}
-        
-            \subsubsection{Lexer}
-            Line numbers for error messages (\& Token attributes vs iterator ranges)
-            
-            utf-32 input preprocessing and how Spirit doesn't like that, but how it's only of interest in string literals anyway
-            
-            \subsubsection{Parser}
-            
-            \subsubsection{Code Generation}
-            
-        \subsection{Virtual Machines}
-        
-            Error handling - C++ exceptions etc.
-            
-            Why are pointers stack-relative?
-            
-            Why little metadata on stack? (except RTTI for yielding)
-            
-            %TODO how will serialization be realized one day?
-            
-            \subsubsection{code segment}
-                opcode encoding
-            \subsubsection{coroutine}
-            \subsubsection{stack}
-            \subsubsection{processor}
-        
-        \subsection{Unit Tests}
-
+	\section{Choice of implementation language}
+		\subsection{Why C++?}
+		\subsection{Why C++14?}
+		%why MSVC2015RC?
+	
+	\section{Choice of libraries}
+		\subsection{Why Boost.Spirit?}
+			no separate generation step, uses C++ templates instead (at the cost of compile time - lots of it)
+			
+			header-only
+			
+			recursive descent parser $\rightarrow$ no left recursions
+			\subsubsection{Choice of version}
+				why v2 and not x3?
+				
+				released May 15th
+				
+				see http://boost-spirit.com/home/2015/05/16/spirit-3-0-0/
+		\subsection{Why Boost.Test?}
+	
+	% TODO: should I talk about coding standards at all?
+	
+	\section{Opcodes}
+	
+	
+	% Namespaces - perseus / perseus::detail
+	% Generally: why bytecode?
+	\section{Modules}
+	
+		% I suppose a diagram would be useful here?
+		
+		\subsection{Compiler}
+		
+			\subsubsection{Lexer}
+			Line numbers for error messages (\& Token attributes vs iterator ranges)
+			
+			utf-32 input preprocessing and how Spirit doesn't like that, but how it's only of interest in string literals anyway
+			
+			\subsubsection{Parser}
+			
+			\subsubsection{Code Generation}
+			
+			\subsection{Virtual Machines}
+			
+			Error handling - C++ exceptions etc.
+			
+			Why are pointers stack-relative?
+			
+			Why little metadata on stack? (except RTTI for yielding)
+			
+			%TODO how will serialization be realized one day?
+			
+			\subsubsection{code segment}
+				opcode encoding
+			\subsubsection{coroutine}
+			\subsubsection{stack}
+			\subsubsection{processor}
+		
+		\subsection{Unit Tests}
+		
 
 % Entwicklungsanalyse
 \chapter{Implementation}
@@ -221,49 +205,51 @@ What is this chapter? %TODO
 	% Umsetzung wesentlicher Module, ggf. Quellcode-Ebene
 	What is this chapter? %TODO
 	
-    \section{Coming to terms with Boost}
-    
-        Trouble finding information in the documentation -- it's there, just hard to find.
-        
-        Accidental left-recursion leading to infinite loops, resulting in stack overflows.
-    
-    \section{Grammar definition}
-    
-        Sourcecode sample: this is what the definition looks like.
-        
-        Here's how the results are combined to create the syntax tree.
-        
-        Explain expectations.
-        
-        Operation-List in lieu of left-recursion, and how that needs to be post-processed to take care of precedences. And why those are not coded into the grammar. And how it also contains calls and indexing, making the lack of precedence resolution slightly more awkward.
-    
-    \section{Types}
-        
-        Represented as enum, only int, bool and void.
-    
-    \section{Function Manager}
-    
-        %Iterators to entries in AST, how that crashed for no apparent reason, how I'm now using pointers and unhappy about it but how it's just as legal.
-        
-        \subsection{Iterator Bug}
-            
-            is it of any interest to talk about a compiler bug I stumbled upon, couldn't quite identify (and thus did not know if it actually was a bug in the compiler and not in my code), and worked around, but that disappeared upon compiler update?
-    
-    \section{Code Generation}
-    
-        transformation from parser tree into clean tree
-    
-        placeholders for jump offsets
-        
-    \section{Code Segment}
-        
-        opcode encoding/decoding
-        
-    \section{Virtual Machine}
-        
-        switch-statement for opcode execution
-        
-        \subsection{Aggregate return bug}
+	\section{Coming to terms with Boost}
+	
+		Trouble finding information in the documentation -- it's there, just hard to find.
+		
+		Accidental left-recursion leading to infinite loops, resulting in stack overflows.
+	
+	\section{Grammar definition}
+	
+		Sourcecode sample: this is what the definition looks like.
+		
+		Here's how the results are combined to create the syntax tree.
+		
+		Explain expectations.
+		
+		Operation-List in lieu of left-recursion, and how that needs to be post-processed to take care of precedences. And why those are not coded into the grammar. And how it also contains calls and indexing, making the lack of precedence resolution slightly more awkward.
+	
+	\section{Types}
+	
+		Represented as enum, only int, bool and void.
+	
+	\section{Function Manager}
+	
+		%Iterators to entries in AST, how that crashed for no apparent reason, how I'm now using pointers and unhappy about it but how it's just as legal.
+		
+		\subsection{Iterator Bug}
+		
+			is it of any interest to talk about a compiler bug I stumbled upon, couldn't quite identify (and thus did not know if it actually was a bug in the compiler and not in my code), and worked around, but that disappeared upon compiler update?
+	
+	\section{Code Generation}
+	
+		transformation from parser tree into clean tree
+		
+		placeholders for jump offsets
+	
+	\section{Code Segment}
+		
+		opcode encoding/decoding
+	
+	\section{Opcode documentation}
+	
+	\section{Virtual Machine}
+	
+		switch-statement for opcode execution
+		
+		\subsection{Aggregate return bug}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Schluss: Wichtigster Teil (zusammen mit Einführung) %
