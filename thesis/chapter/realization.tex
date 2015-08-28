@@ -151,7 +151,7 @@
 		With that in mind C++ was chosen. It is widely supported and compiles to native code; it supports and encourages the use of RAII to prevent resource leaks; and modern features introduced in C++11 and C++14 further simplify the writing of fast, correct code. It is also reasonably simple to write a C binding in it, and C libraries are widely supported.
 		%TODO citations?
 		
-		%TODO (why MSVC2015RC?)
+		Since the author of this thesis primarily uses Windows for development, the compiler of choice was the release candidate of the Microsoft Visual C++ Compiler 2015. The previous 2013 version was still severely lacking in C++11 and C++14 support, much of which was added for the 2015 version. Yet the final product was not yet released when development began, so it started on the release candidate, which was the latest available version at the time, although there was an upgrade to the final version after it was released later during development.
 	
 	\section{Choice of libraries}
 	
@@ -236,31 +236,41 @@
 		
 		\cppinclude[caption={Combining non-terminal symbols in the grammar},label={lst:sequence_alternative}]{listings/grammar_sequence_alternative.cpp}
 		
-		Accidental left-recursion leading to infinite loops, resulting in stack overflows.
-	
-		Sourcecode sample: this is what the definition looks like.
+		Initially expressions were accidentally defined using left-recursion, i.e. one of its alternatives was akin to \lstinline$expression >> operator >> expression$. In the recursive descent parser this lead to infinite recursion, eventually causing a stack overflow. The chosen fix to this is outlined in listing \ref{lst:expression}; \lstinline$*$ is the Kleene star operator (used as a prefix due to C++ syntax), which yields a container (\lstinline$std::vector$ in this case) and \lstinline$operation$ may be \lstinline$operator >> operand$. This results in a flat list of operations with no precedence resolution, which can't happen before the semantic analysis to support future user-defined operators with custom precedence.
 		
-		Here's how the results are combined to create the syntax tree.
+		\cppinclude[caption={Defining expressions using operands and repetition},label={lst:expression}]{listings/grammar_expression.cpp}
 		
-		Explain expectations.
+		The whole grammar is described in this fashion. The result of parsing is a single syntax tree, which is then processed in the semantic analysis.
+	
+	\section{Semantic analysis}
 		
-		Operation-List in lieu of left-recursion, and how that needs to be post-processed to take care of precedences. And why those are not coded into the grammar. And how it also contains calls and indexing, making the lack of precedence resolution slightly more awkward.
-	
-	\section{Types}
-	
-		Represented as enum, only int, bool and void.
-	
-	\section{Function Manager}
-	
-		%Iterators to entries in AST, how that crashed for no apparent reason, how I'm now using pointers and unhappy about it but how it's just as legal.
+		The semantic analysis visits the syntax tree, processing and transforming nodes. This is done under consideration of the context; what variables have been defined? Are there any restrictions on the type of variable allowed here? (If conditions must be of type \lstinline$bool$, for example.) What functions are available? And so on. This information is therefore supplied 
 		
-		\subsection{Iterator Bug}
+		Of particular interest are \lstinline$boost::variant$ nodes, since they represent one of multiple possible types. They are processed using a visitor as outlined in listing \ref{lst:visitor}; types are distinguished through overloading.
 		
-			is it of any interest to talk about a compiler bug I stumbled upon, couldn't quite identify (and thus did not know if it actually was a bug in the compiler and not in my code), and worked around, but that disappeared upon compiler update?
-	
+		\cppinclude[caption={Visitor for the \lstinline$boost::variant$ defined in listing \ref{lst:sequence_alternative}},label={lst:visitor}]{listings/visitor.cpp}
+		
+		These transforming functions return a different type because the transformed syntax tree has different nodes; one example are operations: originally they're in a flat list (see listing \ref{lst:expression}) but for proper code generation binary operations are required. This leads to different nodes, as well as additional annotations like types.
+		
+		Types are still pretty simple. While eventually user-defined types will be introduced, for the moment there are only \lstinline$i32$, a 32 bit signed integer; \lstinline$bool$, a boolean type; and \lstinline$void$/\lstinline$()$. Those are simply implemented as an \lstinline$enum$.
+		
+		\subsection{Function Manager}
+			
+			One interesting part of the semantic analysis is the function manager, which keeps track of all the function definitions. In this context operators are treated as functions, because they are: functions with two parameters (or one) that may be overloaded, like \lstinline$==$, which is defined for both integer and boolean values.
+			
+			In a first pass through the syntax tree all function definitions are collected and stored in the function manager; this allows for forward references. A second pass then does most of the transformations and checks.
+			
+			A function is identified by its signature, which is its name and the types of its parameters. This allows for overloading. The functions are therefore stored as \lstinline$std::map< function_signature, function_info >$ -- a map from signature to function info. Function info includes its return type, whether it's a pure function (i.e. free from side effects), its operator precedence and its address as well as a list of address requests.
+			
+			The address is the location of the function in the byte code: What address do you call to run this function? Since in the case of forward references a function is be called before its code has been written (and thus its address determined), such calls use a placeholder while their address is stored in the request list. That way once the address is known all previous placeholders can be replaced.
+			
+			Functions are looked up based on their signature during the semantic analysis. The result is cached so no additional lookup is required during code generation; the function call node is annotated with the function's entry. Entries in an \lstinline$std::map$ are usually referred to by an iterator, which is used much like a pointer but is capable of advancing to the next element of a container, which pointers can only do in arrays. In debug builds iterators often also perform various checks; it is illegal to use an iterator after the object it points into has been destroyed, for example, and a debug container might keep track of its iterators and invalidate them upon its destruction, causing them to fail blatantly in case of future use, instead of potentially undefined behavior.
+			
+			So naturally iterators were initially used to refer to entries in the function map. Surprisingly this lead to crashes at runtime; more surprisingly these were caused by the code checking for invalidated iterators, yet they were not due to those checks catching errors, the error appeared to be within the checks themselves. But a fix could not be found and time was running out, so as a last resort pointers were used in lieu of iterators. This was technically still valid code; it no longer had the presumably broken correctness checks, but it didn't crash any more and appeared to be working correctly.
+			
+			Later the compiler was updated; the final version of Visual Studio 2015 was released and replaced the previously used release candidate. Now the original iterator code worked again; apparently the issues were indeed caused by an error in the compiler.
+		
 	\section{Code Generation}
-	
-		transformation from parser tree into clean tree
 		
 		placeholders for jump offsets
 	
@@ -527,15 +537,7 @@ As mentioned only a very simple core of the language has been implemented; there
     
     	\subsection{Operator precedence resolution}
     	
-    	The most important change at the moment is probably the resolution of operator precedence. Having to manually define precedence using parentheses is inconvenient at best and downright ridiculous in the case of function calls; having to write
-		\begin{perseuslisting}
-(myFunction()) + 1
-		\end{perseuslisting}
-		instead of
-		\begin{perseuslisting}
-myFunction() + 1
-		\end{perseuslisting}
-		is not acceptable in any way.
+    	The most important change at the moment is probably the resolution of operator precedence. Having to manually define precedence using parentheses is inconvenient at best and downright ridiculous in the case of function calls; having to write \lstinline$(myFunction()) + 1$ instead of \lstinline$myFunction() + 1$ is not acceptable in any way, although in that particular case changes to the grammar may a better solution.
 		
 		\subsection{Variable assignments}
 		
