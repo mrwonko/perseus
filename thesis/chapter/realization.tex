@@ -208,15 +208,35 @@
 \chapter{Implementation}
 
 	% Umsetzung wesentlicher Module, ggf. Quellcode-Ebene
-	What is this chapter? %TODO
+	This chapter selectively highlights the actual implementation: What difficulties came up? How are the libraries used? What interesting decisions were made?
 	
-	\section{Coming to terms with Boost}
-	
-		Trouble finding information in the documentation -- it's there, just hard to find.
+	\section{Lexer \& parser}
+		
+		As mentioned Boost.Spirit was used to implement both the parser and the lexer. Figuring out how exactly to use it was slightly troublesome because its documentation is mediocre. While it contains most important information somewhere, it's often difficult to find the relevant pieces; and most examples don't use a lexer but define the grammar directly in terms of characters. Luckily there are various examples in addition to the documentation which show most features in action.
+		
+		Incorrect usage usually results in compile errors though, so it is at least obvious that there is a problem. While the errors tend to be heavy in templates and many lines long, making them hard to understand, Boost.Spirit makes an effort to help, providing comments with explanations at common error sources.
+		
+		\subsection{Lexer}
+				
+		For the lexer token names are defined using an enumeration, which is supplied to the lexer as a template parameter. Their regular expressions are then defined as shown in listing \ref{lst:impl_lexer}, with the order implying their precedence. So while ``let'' also matches the \lstinline$identifier$ pattern, the \lstinline$let_$ pattern is chosen because it is defined first.
+		
+		\cppinclude[caption={Token definitions in Boost.Spirit.Lex},label={lst:impl_lexer}]{listings/tokens.cpp}
+		
+		%TODO UTF-8/UTF-32?
+		
+		\subsection{Parser}
+		
+		Grammar definitions are more complex, since they may yield\footnote{Not yield in the coroutine sense; but these results are passed using reference parameters, so ``return'' is inappropriate.} nodes of the syntax tree. To this end the rules describing the non-terminal symbols have a template parameter defining the type to be yielded. Keywords for example carry no further information, as exemplified by the \lstinline$let$ keyword in listing \ref{lst:token}, while a constant yields a leaf node containing its value.
+		
+		\cppinclude[caption={Using tokens (terminal symbols) in the grammar},label={lst:token}]{listings/grammar_token.cpp}
+		
+		Leaf nodes are of limited use, nodes need to be combined to get useful syntax trees. The two most common operators to this end are the sequence and the alternative. Generally an alternative yields a \lstinline$boost::variant$ and a sequence yields a tuple. But these results are collapsed according to various rules\cite{spirit_attributes}; for example any symbol that yields no result is omitted, and if both alternatives yield the same type of result, there's no need for a \lstinline$variant$. It is also possible to define conversions from tuples to structs, making them much easier to handle.
+		
+		This is exemplified in listing \ref{lst:sequence_alternative}. \lstinline$attr( x )$ is a parser that consumes no input and yields its parameter \lstinline$x$; it is used in the \lstinline$optional_mutable$ rule to yield \lstinline$true$ in presence of a \lstinline$mutable_$ token and \lstinline$false$ otherwise. Since \lstinline$mutable_$ yields no result(see listing \ref{lst:token}), the result from the sequence of it and \lstinline$attr( true )$ is solely \lstinline$true$ -- if the parse is successful. Meanwhile \lstinline$deduced_variable_declaration$ is an example of a tuple being converted to a struct and \lstinline$block_member$ is an example for an alternative yielding a \lstinline$variant$.
+		
+		\cppinclude[caption={Combining non-terminal symbols in the grammar},label={lst:sequence_alternative}]{listings/grammar_sequence_alternative.cpp}
 		
 		Accidental left-recursion leading to infinite loops, resulting in stack overflows.
-	
-	\section{Grammar definition}
 	
 		Sourcecode sample: this is what the definition looks like.
 		

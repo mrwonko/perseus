@@ -143,6 +143,10 @@
 	}
 	{}
 
+\newcommand{\cppinclude}[2][]{
+	\lstinputlisting[language=C++,keywordstyle={\underbar},frame=lines,#1]{#2}
+}
+
 \lstnewenvironment{codelisting}[1][]
 	{
 		\lstset{
