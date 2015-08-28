@@ -137,8 +137,8 @@ namespace perseus
         };
 
         typedef boost::variant<
-          boost::recursive_wrapper< deduced_variable_declaration >,
-          boost::recursive_wrapper< explicit_variable_declaration >,
+          deduced_variable_declaration,
+          explicit_variable_declaration,
           expression
         > block_member;
 
