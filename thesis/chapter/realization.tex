@@ -301,6 +301,10 @@
 		The loop's basic structure is shown in listing \ref{lst:vm}: An instruction is read from the instruction pointer -- reading from it works much like writing to the code segment, in that there's a general function for arbitrary trivially copyable types and a specialization for opcodes, which need to be decoded -- and handled according to a huge switch statement, which is probably optimized using a jump table by the compiler to execute very quickly.
 		
 		\cppinclude[caption={VM execution loop (excerpts)},label={lst:vm}]{listings/vm.cpp}
+		
+		%\subsection{Native functions}
+		
+		Native functions are implemented using the \lstinline$syscall$ opcode. It has as its parameter an index into an array of native functions; the appropriate one is called with the current stack as the parameter so it can access the parameters and write the result. The appropriate function entry is then manually added in the function manager and a small function containing the syscall written to the code segment. The native function is responsible for keeping the stack intact and writing its results to the right place; eventually there will be a type-safe wrapper for this.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Schluss: Wichtigster Teil (zusammen mit Einführung) %
