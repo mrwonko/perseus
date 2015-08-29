@@ -1,14 +1,7 @@
-struct coroutine
-{
-  instruction_pointer instruction_pointer;
-  stack stack;
-  // ...
-}
-
-coroutine& co = /* ... */;
-instruction_pointer& ip = co.instruction_pointer;
 while( true )
 {
+  coroutine& co = /* ... */;
+  instruction_pointer& ip = co.instruction_pointer;
   switch( ip.read< opcode >() )
   {
     case opcode::push_8:

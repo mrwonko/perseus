@@ -21,7 +21,7 @@
 		
 		Boost.Spirit\cite{spirit} is a C++ parser and lexer library. (It also has a module for generator definitions, but that is of no interest here.) It's different from flex and bison (and most other compiler generators) in that it doesn't have a separate generation step; the definitions are made in standard C++.
 		
-		Boost.Spirit.Lex, the lexer component, lets you define the tokens using strings containing regular expressions. These are parsed and used to generate a deterministic finite automaton at run time, which has the downside that the computations will be repeated at each execution and syntactic errors in the regular expressions can't be detected during compilation. To offset this there's the option to generate equivalent static C++ source code for the calculated automaton on execution, which can then be used in place of the run time version for improved performance. Besides requiring no external tools for compilation it's also very easy to integrate with Boost.Spirit.Qi.
+		Boost.Spirit.Lex, its lexer component, lets you define the tokens using strings containing regular expressions. These are parsed and used to generate a deterministic finite automaton at run time, which has the downside that the computations will be repeated at each execution and syntactic errors in the regular expressions can't be detected during compilation. To offset this there's the option to generate equivalent static C++ source code for the calculated automaton on execution, which can then be used in place of the run time version for improved performance. Besides requiring no external tools for compilation it's also very easy to integrate with Boost.Spirit.Qi.
 		
 		Boost.Spirit.Qi is the parser component. Making heavy use of templates it allows for the definition of a parsing expression grammar using overloaded operators, creating a recursive descent parser. It eschews the packrat algorithm in favor of simple backtracking.
 
@@ -40,7 +40,7 @@
 	%TODO where does this go? requirements? 
 	%Native machine code would require porting work for each new platform. By using a virtual machine, any platform that's capable of running it is supported. My virtual machine requirements are mainly support for coroutines and stack inspection/unwinding, so coroutines can be serialized and aborted properly, and the ability to embed it in C++.
 	
-	This chapter lays down the precise requirements for the compiler and the VM in the context of this thesis. Notably this includes the initial features of Perseus, the language to be compiled. It also explains why existing VMs don't fulfill these requirements, motivating the creation of a custom VM.
+	This chapter lays down the precise requirements for the compiler and the VM\footnote{Those are the initial requirements for a first version, which can later be expanded; but that's outside of the scope of this thesis.}. Notably this includes the initial features of Perseus, the language to be compiled. It also explains why existing VMs don't fulfill these requirements, motivating the creation of a custom VM.
 
     \section{Target Language}
     
@@ -58,7 +58,7 @@
 			
 			The types initially supported are \lstinline$i32$, a 32 bit signed integer type, and \lstinline$bool$, a boolean type stored as a character since that is the smallest addressable unit. There's also a void type, \lstinline$()$, for statements. Arrays and record types are not initially supported, but will be added at a later time.
 	    	
-	    	The simplest expressions are literals: Constant values written directly the code. Integer literals can be written in decimal (default), hexadecimal (prefix \lstinline$0x$) or binary (prefix \lstinline$0b$), with the option of using \lstinline$'$ as a separator, as in \lstinline$1'000'000$ or \lstinline$0b0010'1010$. Boolean literals are \lstinline$true$ and \lstinline$false$.
+	    	The simplest expressions are literals: Constant values written directly in the code. Integer literals can be written in decimal (default), hexadecimal (prefix \lstinline$0x$) or binary (prefix \lstinline$0b$), with the option of using \lstinline$'$ as a separator, as in \lstinline$1'000'000$ or \lstinline$0b0010'1010$. Boolean literals are \lstinline$true$ and \lstinline$false$.
 	    	
 	    	Expressions can be combined using operators. In the future users will be able to define their own operators, including their associativity and precedence, so those should not be defined through the grammar but resolved at a later time. The predefined operators are given in table \ref{tab:perseus_operators}. Operators of same precedence with no associativity need explicit parentheses -- e.g. \lstinline$a==b==c$ is illegal.
 	    	
@@ -94,7 +94,7 @@
 			\end{center}
 			\end{table}
 			
-			In the absence of error handling divide by zero currently leads to termination of the execution. There is no short-circuit evaluation for \lstinline$&&$ and \lstinline$||$\footnote{The absence of short-circuit evaluation means both operands are always evaluated, even if evaluating the left one suffices to determine the result.}. (For simplicity's sake; this may change in the future.)
+			In the absence of error handling divide by zero currently leads to termination of the execution. For simplicity's sake there is initially no short-circuit evaluation for \lstinline$&&$ and \lstinline$||$\footnote{The absence of short-circuit evaluation means both operands are always evaluated, even if evaluating the left one suffices to determine the result.}; this may change in the future.
 			
 			``Block'' expressions contain multiple expressions to be executed serially; they may include variable definitions, which must include the initial value; its type can optionally be deduced from this. A variable is usable until the end of the block it was defined in. A block evaluates to the last expression in it.
 			
@@ -131,7 +131,7 @@
 		
 		\subsection{Suitability of existing VMs}
 		
-			I am not aware of any mainstream VMs that fulfill these requirements. The JVM and the Common Language Runtime\footnote{The VM targeted by C\#} are unsuitable because they force the use of garbage collection, while LLVM has no support for coroutines.
+			The author of this thesis is not aware of any mainstream VMs that fulfill these requirements. The JVM and the Common Language Runtime\footnote{The VM targeted by C\#} are unsuitable because they force the use of garbage collection, while LLVM has no support for coroutines.
 
 \chapter{Design} %TODO better name?
 % Ansatz, d.h. z.B. Architektur, Module und ihre Kommunikation
@@ -148,10 +148,9 @@
 		
 		And the language should make writing correct code easy while being powerful enough to write a useful compiler in it.
 		
-		With that in mind C++ was chosen. It is widely supported and compiles to native code; it supports and encourages the use of RAII to prevent resource leaks; and modern features introduced in C++11 and C++14 further simplify the writing of fast, correct code. It is also reasonably simple to write a C binding in it, and C libraries are widely supported.
-		%TODO citations?
+		With that in mind C++ was chosen. It is widely supported and compiles to native code; it supports and encourages the use of RAII to prevent resource leaks; and modern features introduced in C++11 and C++14 further simplify the writing of fast, correct code\cite{effective-modern-cpp}. It is also reasonably simple to write a C binding in it, and C libraries are widely supported.
 		
-		Since the author of this thesis primarily uses Windows for development, the compiler of choice was the release candidate of the Microsoft Visual C++ Compiler 2015. The previous 2013 version was still severely lacking in C++11 and C++14 support, much of which was added for the 2015 version. Yet the final product was not yet released when development began, so it started on the release candidate, which was the latest available version at the time, although there was an upgrade to the final version after it was released later during development.
+		Since the author of this thesis primarily uses Windows for development, the compiler of choice was the release candidate of the Microsoft Visual C++ Compiler 2015. The previous 2013 version is severely lacking in C++11 and C++14 support, much of which was added for the 2015 version. But the final version of that was not yet released when development began, so it started on the release candidate, which was the latest available version at the time, although there was an upgrade to the final version after it was released later during development.
 	
 	\section{Choice of libraries}
 	
@@ -171,13 +170,16 @@
 		
 		\subsection{Byte code}
 			
-			The byte code contains a sequence of instructions, which consist of an opcode and possibly one or more operands. Instructions thus vary in length, so the byte code is stored in an dynamic array of bytes; essentially raw memory, pieces of which are then interpreted as instructions. While this has the potential for misinterpretation when the piece of memory in question is mid-instruction, a correct compiler will only ever create valid byte code that never jumps into the middle of an instruction.
+			The byte code contains a sequence of instructions, which consist of an opcode and possibly one or more operands. Instructions thus vary in length, so the byte code is stored in a dynamic array of bytes; essentially raw memory, pieces of which are then interpreted as instructions. While this has the potential for misinterpretation when the piece of memory being interpreted is mid-instruction, a correct compiler will only ever create valid byte code that never jumps into the middle of an instruction.
 			
-			This has the advantage of being very compact; equally sized instructions would usually be much larger than necessary to accommodate for the largest ones. In an effort to further reduce byte code size, opcodes are of various length as well. To this end they are encoded such that the number of consecutive 1-bits in the first byte indicates the number of additional bytes of the opcode. So if the most significant bit is 0, it's a single-byte opcode; there are 128 of those, due to the 7 remaining bits. For example \lstinline$0010'1010 = 42$ and \lstinline$1000'0101 0011'1001 = 1337$.
+			This has the advantage of being very compact; equally sized instructions would usually be much larger than necessary to accommodate for the largest ones. In an effort to further reduce byte code size, opcodes are of varying length as well. To this end they are encoded such that the number of consecutive 1-bits in the first byte indicates the number of additional bytes of the opcode\footnote{This is much like the UTF-8 encoding, but unlike there continuation bytes are not explicitly marked here.}. So if the most significant bit is 0, it's a single-byte opcode; there are 128 of those, due to the 7 remaining bits. For example \lstinline$0010'1010 = 42$ and \lstinline$1000'0101 0011'1001 = 1337$.
 			
 			Stack-based instructions are used instead of register-based ones because they're simpler; they implicitly operate on the values on top of the stack, making them well suited for evaluating expressions without the need for register allocation. They tend to require more copies to get the necessary values on top of the stack, but that's an acceptable price for simplicity.
 			
 			The essential initial instructions are integer arithmetic and boolean operations (one instruction for each of the operations defined in table \ref{tab:perseus_operators}), instructions for pushing integer and boolean constants, popping memory and copying values from and into the stack, as well as various types of jumps (including conditional jumps for branching) and call and return instructions.
+			
+			% [Note: I can't actually write about the calling convention, because on second thought I should have probably used a different one...]
+			% Calls need a convention for their parameters and return values: How are they passed? A convention in keeping with the stack-based approach would be for the caller to push the parameters, then call the function; the function would then pop the parameters from the stack and leave the result in their place.
 		
 		\subsection{Compiler}
 			
@@ -195,7 +197,7 @@
 			
 			The instruction pointers point into the code segment, which encapsulates the byte code generated by the compiler.
 			
-			All these elements are modeled as classes. Their general relationships are shown in the class diagram in figure \ref{fig:vm_class_diagram}; it also shows the processor class which contains the fetch \& execute loop that (directly or indirectly) has ownership of objects of the other classes.
+			All these elements are modeled as classes. Their general relationships are shown in the class diagram in figure \ref{fig:vm_class_diagram}; it also shows the processor class which contains the fetch \& execute loop and that (directly or indirectly) has ownership of objects of the other classes.
 			
 			\begin{figure}
 			\centering
@@ -212,9 +214,11 @@
 	
 	\section{Lexer \& parser}
 		
-		As mentioned Boost.Spirit was used to implement both the parser and the lexer. Figuring out how exactly to use it was slightly troublesome because its documentation is mediocre. While it contains most important information somewhere, it's often difficult to find the relevant pieces; and most examples don't use a lexer but define the grammar directly in terms of characters. Luckily there are various examples in addition to the documentation which show most features in action.
+		As mentioned Boost.Spirit was used to implement both the parser and the lexer. Figuring out how exactly to use it was slightly troublesome because its documentation is mediocre. While it contains most important information somewhere, it's often difficult to find the relevant pieces; and usually no lexer is used, the grammar is instead defined directly in terms of characters. Luckily there are various examples in addition to the documentation which show most features in action.
 		
 		Incorrect usage usually results in compile errors though, so it is at least obvious that there is a problem. While the errors tend to be heavy in templates and many lines long, making them hard to understand, Boost.Spirit makes an effort to help, providing comments with explanations at common error sources.
+		
+		%TODO Iterators
 		
 		\subsection{Lexer}
 				
@@ -222,7 +226,7 @@
 		
 		\cppinclude[caption={Token definitions in Boost.Spirit.Lex},label={lst:impl_lexer}]{listings/tokens.cpp}
 		
-		%TODO UTF-8/UTF-32?
+		%TODO UTF-8/UTF-32? BOM at least?
 		
 		\subsection{Parser}
 		
@@ -236,7 +240,7 @@
 		
 		\cppinclude[caption={Combining non-terminal symbols in the grammar},label={lst:sequence_alternative}]{listings/grammar_sequence_alternative.cpp}
 		
-		Initially expressions were accidentally defined using left-recursion, i.e. one of its alternatives was akin to \lstinline$expression >> operator >> expression$. In the recursive descent parser this lead to infinite recursion, eventually causing a stack overflow. The chosen fix to this is outlined in listing \ref{lst:expression}; \lstinline$*$ is the Kleene star operator (used as a prefix due to C++ syntax), which yields a container (\lstinline$std::vector$ in this case) and \lstinline$operation$ may be \lstinline$operator >> operand$. This results in a flat list of operations with no precedence resolution, which can't happen before the semantic analysis to support future user-defined operators with custom precedence.
+		Initially expressions were accidentally defined using left-recursion, i.e. one of its alternatives was akin to \lstinline$expression >> operator >> expression$. In the recursive descent parser this lead to infinite recursion, eventually causing a stack overflow. The chosen fix to this is outlined in listing \ref{lst:expression}; \lstinline$*$ is the Kleene star operator (used as a prefix due to C++ syntax), which yields a container (\lstinline$std::vector$ in this case) and one definition of \lstinline$operation$ is \lstinline$operator >> operand$. This results in a flat list of operations with no precedence resolution, which must not happen before the semantic analysis to support future user-defined operators with custom precedence.
 		
 		\cppinclude[caption={Defining expressions using operands and repetition},label={lst:expression}]{listings/grammar_expression.cpp}
 		
@@ -244,13 +248,13 @@
 	
 	\section{Semantic analysis}
 		
-		The semantic analysis visits the syntax tree, processing and transforming nodes. This is done under consideration of the context; what variables have been defined? Are there any restrictions on the type of variable allowed here? (If conditions must be of type \lstinline$bool$, for example.) What functions are available? And so on. This information is therefore supplied in a context object, which can be adjusted as required.
+		The semantic analysis visits the syntax tree, processing and transforming nodes. This is done under consideration of the context; what variables have been defined? Are there any restrictions on the type of variable allowed here? (``If'' conditions must be of type \lstinline$bool$, for example.) What functions are available? And so on. This information is therefore supplied in a context object, which can be adjusted as required.
 		
-		Of particular interest are \lstinline$boost::variant$ nodes, since they represent one of multiple possible types. They are processed using a visitor as outlined in listing \ref{lst:visitor}; types are distinguished through overloading.
+		Of particular interest are \lstinline$boost::variant$ nodes, since they represent one of multiple possible types. They are processed using a visitor as outlined in listing \ref{lst:visitor}; types are distinguished through overloading of the call operator.
 		
 		\cppinclude[caption={Visitor for the \lstinline$boost::variant$ defined in listing \ref{lst:sequence_alternative}},label={lst:visitor}]{listings/visitor.cpp}
 		
-		These transforming functions return a different node type because the transformed syntax tree has different nodes; one example are operations: Initially they're in a flat list (see listing \ref{lst:expression}) but for proper code generation binary operations are required. This leads to different nodes, which also have additional annotations like types.
+		These transforming functions return a different node type because the transformed syntax tree has different nodes; one example are operations: Initially they're in a flat list (see listing \ref{lst:expression}) but for proper code generation binary operations are required. This requires different nodes, which also have additional annotations like types.
 		
 		Types are still pretty simple. While eventually user-defined types will be introduced, for the moment there are only \lstinline$i32$, a 32 bit signed integer; \lstinline$bool$, a boolean type; and \lstinline$void$/\lstinline$()$. Those are simply implemented as an \lstinline$enum$.
 		
@@ -258,27 +262,27 @@
 		
 		\subsection{Function Manager}
 			
-			One interesting part of the semantic analysis is the function manager, which keeps track of all the function definitions. In this context operators are treated as functions, because they are: functions with two parameters (or one) that may be overloaded, like \lstinline$==$, which is defined for both integer and boolean values.
+			One interesting part of the semantic analysis is the function manager, which keeps track of all the function definitions. In this context operators are treated as functions, because they are: functions with two parameters (or one) that may be overloaded, like \lstinline$==$, which is defined for both integer and boolean values. Only the syntax for calling them is different from normal functions.
 			
 			In a first pass through the syntax tree all function definitions are collected and stored in the function manager; this allows for forward references. A second pass then does most of the transformations and checks.
 			
-			A function is identified by its signature, which is its name and the types of its parameters. This allows for overloading. The functions are therefore stored as \lstinline$std::map<function_signature, function_info>$ -- a map from signature to function info. Function info includes its return type, whether it's a pure function (i.e. free from side effects), its operator precedence and its address as well as a list of address requests.
+			A function is identified by its signature, which is its name and the types of its parameters. This allows for overloading. The functions are therefore stored as \lstinline$std::map<function_signature, function_info>$: A map from signature to function info. Function info includes its return type, whether it's a pure function (i.e. free from side effects), its operator precedence and its address as well as a list of address requests.
 			
-			The address is the location of the function in the byte code: What address do you call to run this function? Since in the case of forward references a function is be called before its code has been written (and thus its address determined), such calls use a placeholder while their address is stored in the request list. That way once the address is known all previous placeholders can be replaced.
+			The address is the location of the function in the byte code: What address do you call to run this function? Since in the case of forward references a function is called before its code has been written (and thus its address determined), such calls use a placeholder while their address is stored in the request list. That way once the address is known all previous placeholders can be replaced.
 			
-			Functions are looked up based on their signature during the semantic analysis. The result is cached so no additional lookup is required during code generation; the function call node is annotated with the function's entry. Entries in an \lstinline$std::map$ are usually referred to by an iterator, which is used much like a pointer but is capable of advancing to the next element of a container, which pointers can only do in arrays. In debug builds iterators often also perform various checks; it is illegal to use an iterator after the object it points into has been destroyed, for example, and a debug container might keep track of its iterators and invalidate them upon its destruction, causing them to fail blatantly in case of future use, instead of potentially undefined behavior.
+			Functions are looked up based on their signature during the semantic analysis. The result is cached so no additional lookup is required during code generation; to this end the function call node is annotated with the function's entry. Entries in an \lstinline$std::map$ are usually referred to by an iterator, which is used much like a pointer but is capable of advancing to the next element of a container, which pointers can only do in arrays. In debug builds iterators often also perform various checks; it is illegal to use an iterator after the object it points into has been destroyed, for example, and a debug container might keep track of its iterators and invalidate them upon its destruction, causing them to fail blatantly in case of future use, instead of potentially undefined behavior.
 			
 			So naturally iterators were initially used to refer to entries in the function map. Surprisingly this lead to crashes at runtime; more surprisingly these were caused by the code checking for invalidated iterators, yet they were not due to those checks catching errors, the error appeared to be within the checks themselves. But a fix could not be found and time was running out, so as a last resort pointers were used in lieu of iterators. This was technically still valid code; it no longer had the presumably broken correctness checks, but it didn't crash any more and appeared to be working correctly.
 			
-			Later the compiler was updated; the final version of Visual Studio 2015 was released and replaced the previously used release candidate. Now the original iterator code worked again; apparently the issues were indeed caused by an error in the compiler.
+			Later the compiler was updated; the final version of Visual Studio 2015 was released and replaced the previously used release candidate for development. Now the original iterator code worked again; apparently the issues were indeed caused by an error in the compiler.
 		
 	\section{Code Generation}
 		
 		After the transformations are done, the new annotated syntax tree is traversed and its byte code is generated. Once again the necessary context is kept in an object; this includes the current size of the function's stack so the appropriate amount can be popped when writing a return, or at the end of a block when local variables go out of scope.
 		
-		The addresses for function calls are written using the function manager, which keeps tracks of forward references and writes the appropriate placeholders, overwriting them later as previously explained. In addition to this, there are occasionally relative jumps to unknown offsets, for example when jumping to the ``else'' branch of an ``if'' expression. This is handled very similarly to forward references in function calls: A placeholder is written, its address stored and its value replaced once it's known, e.g. after the ``then'' branch has been generated.
+		The addresses for function calls are written using the function manager, which keeps tracks of forward references and writes the appropriate placeholders, overwriting them later as previously explained. In addition to this, there are occasionally relative jumps to unknown offsets, for example when jumping to the ``else'' branch of an ``if'' expression. This is handled very similarly to forward references in function calls: A placeholder is written, its address stored and its value replaced once it's known, i.e. after the ``then'' branch has been generated in this example.
 		
-		The code segment that the byte code is written into is just a dynamically sized chunk of memory, based on \lstinline$std::vector<char>$. Generally values are copied byte-wise to append them to the code segment. In this case it must be guaranteed that this is valid for the given types; objects with a special copy constructor can't just be copied verbatim like this, for example. To this end a static assertion is used, which does the necessary check during compilation and causes an error if necessary.
+		The code segment that the byte code is written into is just a dynamically sized chunk of memory, based on \lstinline$std::vector<char>$. Generally values are copied byte-wise to append them to the code segment. In this case it must be guaranteed that this is valid for the given types; objects with a special copy constructor can't just be copied verbatim in this way, for example. To this end a static assertion is used, which does the necessary check during compilation and causes an error if necessary.
 		
 		Opcodes however are handled differently; as previously explained they get encoded to save space. To this end the function for appending values to the code segment is specialized for opcodes, using the encoding function in those cases. See listing \ref{lst:code_segment_push} for the code behind this.
 		
@@ -294,7 +298,7 @@
 		
 		Once the code segment has been generated it can be executed by the VM. This happens inside a loop which fetches the next instruction and executes it. To this end it uses an instruction pointer, which points inside the code segment at the next instruction to be interpreted and can be moved to implement jumps and calls. There's also the stack which is used for calculations; it too is implemented as a dynamic array so it can grow as necessary while being cache-friendly. In the interest of being future-proof the stack and the instruction pointer are part of a coroutine object. 
 		
-		The loops basic structure is exemplified by listing \ref{lst:vm}: An instruction is read from the instruction pointer -- reading from it works much like writing to the code segment, in that there's a general function for arbitrary trivially copyable types and a specialization for opcodes, which need to be decoded -- and handled according to a huge switch statement, which is probably optimized using a jump table to execute very quickly.
+		The loop's basic structure is shown in listing \ref{lst:vm}: An instruction is read from the instruction pointer -- reading from it works much like writing to the code segment, in that there's a general function for arbitrary trivially copyable types and a specialization for opcodes, which need to be decoded -- and handled according to a huge switch statement, which is probably optimized using a jump table by the compiler to execute very quickly.
 		
 		\cppinclude[caption={VM execution loop (excerpts)},label={lst:vm}]{listings/vm.cpp}
 
