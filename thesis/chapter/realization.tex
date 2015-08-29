@@ -244,15 +244,17 @@
 	
 	\section{Semantic analysis}
 		
-		The semantic analysis visits the syntax tree, processing and transforming nodes. This is done under consideration of the context; what variables have been defined? Are there any restrictions on the type of variable allowed here? (If conditions must be of type \lstinline$bool$, for example.) What functions are available? And so on. This information is therefore supplied 
+		The semantic analysis visits the syntax tree, processing and transforming nodes. This is done under consideration of the context; what variables have been defined? Are there any restrictions on the type of variable allowed here? (If conditions must be of type \lstinline$bool$, for example.) What functions are available? And so on. This information is therefore supplied in a context object, which can be adjusted as required.
 		
 		Of particular interest are \lstinline$boost::variant$ nodes, since they represent one of multiple possible types. They are processed using a visitor as outlined in listing \ref{lst:visitor}; types are distinguished through overloading.
 		
 		\cppinclude[caption={Visitor for the \lstinline$boost::variant$ defined in listing \ref{lst:sequence_alternative}},label={lst:visitor}]{listings/visitor.cpp}
 		
-		These transforming functions return a different type because the transformed syntax tree has different nodes; one example are operations: originally they're in a flat list (see listing \ref{lst:expression}) but for proper code generation binary operations are required. This leads to different nodes, as well as additional annotations like types.
+		These transforming functions return a different node type because the transformed syntax tree has different nodes; one example are operations: Initially they're in a flat list (see listing \ref{lst:expression}) but for proper code generation binary operations are required. This leads to different nodes, which also have additional annotations like types.
 		
 		Types are still pretty simple. While eventually user-defined types will be introduced, for the moment there are only \lstinline$i32$, a 32 bit signed integer; \lstinline$bool$, a boolean type; and \lstinline$void$/\lstinline$()$. Those are simply implemented as an \lstinline$enum$.
+		
+		Semantic analysis also resolves variable references. To this end the context contains the current scope, i.e. the variables that have been declared, mapping their name to their type and position in the stack. When a variable is referenced, its name is looked up in the scope and its offset calculated and stored in its node in the syntax tree.
 		
 		\subsection{Function Manager}
 			
@@ -260,7 +262,7 @@
 			
 			In a first pass through the syntax tree all function definitions are collected and stored in the function manager; this allows for forward references. A second pass then does most of the transformations and checks.
 			
-			A function is identified by its signature, which is its name and the types of its parameters. This allows for overloading. The functions are therefore stored as \lstinline$std::map< function_signature, function_info >$ -- a map from signature to function info. Function info includes its return type, whether it's a pure function (i.e. free from side effects), its operator precedence and its address as well as a list of address requests.
+			A function is identified by its signature, which is its name and the types of its parameters. This allows for overloading. The functions are therefore stored as \lstinline$std::map<function_signature, function_info>$ -- a map from signature to function info. Function info includes its return type, whether it's a pure function (i.e. free from side effects), its operator precedence and its address as well as a list of address requests.
 			
 			The address is the location of the function in the byte code: What address do you call to run this function? Since in the case of forward references a function is be called before its code has been written (and thus its address determined), such calls use a placeholder while their address is stored in the request list. That way once the address is known all previous placeholders can be replaced.
 			
@@ -272,19 +274,29 @@
 		
 	\section{Code Generation}
 		
-		placeholders for jump offsets
-	
-	\section{Code Segment}
+		After the transformations are done, the new annotated syntax tree is traversed and its byte code is generated. Once again the necessary context is kept in an object; this includes the current size of the function's stack so the appropriate amount can be popped when writing a return, or at the end of a block when local variables go out of scope.
 		
-		opcode encoding/decoding
-	
-	\section{Opcode documentation}
-	
-	\section{Virtual Machine}
-	
-		switch-statement for opcode execution
+		The addresses for function calls are written using the function manager, which keeps tracks of forward references and writes the appropriate placeholders, overwriting them later as previously explained. In addition to this, there are occasionally relative jumps to unknown offsets, for example when jumping to the ``else'' branch of an ``if'' expression. This is handled very similarly to forward references in function calls: A placeholder is written, its address stored and its value replaced once it's known, e.g. after the ``then'' branch has been generated.
 		
-		\subsection{Aggregate return bug}
+		The code segment that the byte code is written into is just a dynamically sized chunk of memory, based on \lstinline$std::vector<char>$. Generally values are copied byte-wise to append them to the code segment. In this case it must be guaranteed that this is valid for the given types; objects with a special copy constructor can't just be copied verbatim like this, for example. To this end a static assertion is used, which does the necessary check during compilation and causes an error if necessary.
+		
+		Opcodes however are handled differently; as previously explained they get encoded to save space. To this end the function for appending values to the code segment is specialized for opcodes, using the encoding function in those cases. See listing \ref{lst:code_segment_push} for the code behind this.
+		
+		\cppinclude[caption={Writing arbitrary values to the end of the code segment},label={lst:code_segment_push}]{listings/code_segment_push.cpp}
+		
+		\subsection{Opcodes}
+			
+			Opcodes are defined in a big enumeration, which also includes their documentation; for each instruction the behavior is defined, in particular what values are read from the code segment in addition to the opcode and what is read from or written to the stack. An example is given in listing \ref{lst:opcode}. The documentation uses Doxygen syntax so that it can be extracted automatically.
+			
+			\cppinclude[caption={Opcode documentation},label={lst:opcode}]{listings/opcode.cpp}
+	
+	\section{Virtual machine}
+		
+		Once the code segment has been generated it can be executed by the VM. This happens inside a loop which fetches the next instruction and executes it. To this end it uses an instruction pointer, which points inside the code segment at the next instruction to be interpreted and can be moved to implement jumps and calls. There's also the stack which is used for calculations; it too is implemented as a dynamic array so it can grow as necessary while being cache-friendly. In the interest of being future-proof the stack and the instruction pointer are part of a coroutine object. 
+		
+		The loops basic structure is exemplified by listing \ref{lst:vm}: An instruction is read from the instruction pointer -- reading from it works much like writing to the code segment, in that there's a general function for arbitrary trivially copyable types and a specialization for opcodes, which need to be decoded -- and handled according to a huge switch statement, which is probably optimized using a jump table to execute very quickly.
+		
+		\cppinclude[caption={VM execution loop (excerpts)},label={lst:vm}]{listings/vm.cpp}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Schluss: Wichtigster Teil (zusammen mit Einführung) %
