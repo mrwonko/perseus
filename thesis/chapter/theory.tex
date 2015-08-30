@@ -32,7 +32,7 @@ This chapter goes into the theory behind programming languages, compilers and vi
 		
 		\subsection{Concurrency}
 		
-		Concurrency is the simultaneous execution of multiple computations. Well-known ways of achieving it are threads and processes, but somewhat lesser known are coroutines, a form of cooperative multitasking.
+		Concurrency is the simultaneous execution of multiple computations, not necessarily in parallel. Well-known ways of achieving it are threads and processes, but somewhat lesser known are coroutines, a form of cooperative multitasking.
 		
 		\subsubsection{Coroutines}
 		
@@ -337,7 +337,7 @@ function print_nodes( tree ):
 		
 		Common instructions include various kinds of jumps and calls that move the instruction pointer, allowing for loops and branches in the execution; instructions for reading from and writing to memory; arithmetic instructions for integer and floating point calculations; and boolean operations. Additional instructions are included as necessary.
 		
-		To realize function calls, a call stack is used. It is used to pass parameters to functions and store local variables -- these vary between calls, and since functions can be called recursively there may be multiple calls to a function simultaneously, hence a stack. It is also used to store the return address: upon calling a function, the address where execution is to be resumed upon return from the function is stored on the stack in addition to the parameters. The sum of this per-call data -- parameters, local variables and return address -- is called a stack frame; it can either just be an implicit interpretation of the data on the stack or an explicit data structure stored on the stack.
+		To implement function calls a call stack is used. It is used to pass parameters to functions and store local variables -- these vary between calls, and since functions can be called recursively there may be multiple calls to a function simultaneously, hence a stack. It is also used to store the return address: upon calling a function, the address where execution is to be resumed upon return from the function is stored on the stack in addition to the parameters. The sum of this per-call data -- parameters, local variables and return address -- is called a stack frame; it can either just be an implicit interpretation of the data on the stack or an explicit data structure stored on the stack.
 		
 		Intermediate results of the evaluation of expressions can also be stored on a stack -- the top values are then implicitly the operands for arithmetic instructions. So to calculate \lstinline$2+(x*3)$ the code first pushes \lstinline$2$ onto the stack, then the value of \lstinline$x$, finally \lstinline$3$ before first doing a multiplication and then an addition.
 		
@@ -347,7 +347,7 @@ function print_nodes( tree ):
 		
 		VMs also have the option of managing their memory differently; instead of making heap allocations and manually freeing them later, they can use garbage collection. There are various types of garbage collection, but the general idea is to check for memory that is no longer in use, usually periodically; to this end the VM needs to be able to interpret the memory and recognize pointers. Garbage collection relieves the programmer of memory management but introduces overhead; periodic garbage collection can take significant time, resulting in brief unresponsiveness when it runs.
 		
-		For a program to be able to cleanly shut down in case of an error the VM also needs to be capable of stack unwinding, which is the proper cleanup of stack frames e.g. due to an exception. This may include running the destructors\footnote{In certain object-oriented programming languages a class may define a special destructor method to be run when an object is destroyed, which usually takes care of cleaning up resources.} of local objects, special deferred cleanup statements\footnote{Some languages have a \lstinline$defer$ keyword to define statements to be executed once the current scope is left.} or similar. This too requires the VM to be aware of the types of values on the stack.
+		For a program to be able to cleanly shut down in case of an error the VM also needs to be capable of stack unwinding, which is the proper cleanup of stack frames e.g. due to an exception. This may include running the destructors -- special class methods to be run upon destruction of an object which usually take care of cleaning up resources -- of local objects, special deferred cleanup statements\footnote{Some languages have a \lstinline$defer$ keyword to define statements to be executed once the current scope is left.} or similar. This too requires the VM to be aware of the types of values on the stack.
 	
 	\section{Relevant software patterns and language features}
 		
@@ -360,22 +360,22 @@ function print_nodes( tree ):
 		
 		RAII is the idea that object lifetime should represent resource lifetime. Resources are acquired during object construction and released upon destruction.
 		
-		Take for example C++'s string class, \lstinline$std::string$. In its constructor it allocates the memory required to hold its content, in its destructor the memory is freed. Since stack unwinding ensures the destructor will be called upon object destruction, memory leaks are impossible.
+		Take for example \CC's string class, \lstinline$std::string$. In its constructor it allocates the memory required to hold its content, in its destructor the memory is freed. Since stack unwinding ensures the destructor will be called upon object destruction, memory leaks are impossible.
 		
-		Closely related to this are move mechanics: Resources can be moved from one object into another if they no longer need to be available in the original object. To this end C++ allows for the explicit definition of move constructors -- for constructing a new object by moving the resources of another into it -- and move assignment -- for moving the contents of one existing object into another. Moving is usually preferable to copying since it's faster, but occasionally a copy is desired.
+		Closely related to this are move mechanics: Resources can be moved from one object into another if they no longer need to be available in the original object. To this end {\CC} allows for the explicit definition of move constructors -- for constructing a new object by moving the resources of another into it -- and move assignment -- for moving the contents of one existing object into another. Moving is usually preferable to copying since it's faster, but occasionally a copy is desired.
 		
 		\subsection{Type Parameters}
 		
-		C++ allows to parameterize functions or classes with types using templates. This allows you to define e.g. a set of elements of a given type, as long as comparison for elements of that type is defined, using \lstinline$std::set<T>$, where \lstinline$T$ is the type of choice. It's also possible to define types with an arbitrary number of template parameters, for example a tuple, in which case algorithms are defined recursively.
+		{\CC} allows to parameterize functions or classes with types using templates. This allows you to define e.g. a set of elements of a given type, as long as comparison for elements of that type is defined, using \lstinline$std::set<T>$, where \lstinline$T$ is the type of choice. It's also possible to define types with an arbitrary number of template parameters, for example a tuple, in which case algorithms are defined recursively.
 		%TODO elaborate?
 		
 		\subsection{Function Overloading}
 		
-		Function overloading allows multiple functions may have the same name as long as their parameters vary in type. The function to call is then determined based on the type of the supplied parameters. C++ also allows for the overloading of operators, allowing programmers to define e.g. \lstinline$+$ for their own types.
+		Function overloading allows multiple functions may have the same name as long as their parameters vary in type. The function to call is then determined based on the type of the supplied parameters. {\CC} also allows for the overloading of operators, allowing programmers to define e.g. \lstinline$+$ for their own types.
 		
 		\subsection{Sum Types}
 		
-		A sum type is much like a union in C in that in can hold different types, except it knows which one it currently holds. \lstinline$boost::variant$ is one C++ implementation of a sum type which also supports recursive variants.
+		A sum type is much like a union in C in that in can hold different types, except it knows which one it currently holds. \lstinline$boost::variant$ is one {\CC} implementation of a sum type which also supports recursive variants.
 		%TODO elaborate?
 		
 		\lstinline$boost::variant$ allows for the selection of how to handle a given variant object through the use of a visitor object which defines different overloads of a function for each possible variant type, of which the one corresponding to the actual type of the variant is then called.
@@ -386,7 +386,7 @@ function print_nodes( tree ):
 		
 		\subsection{Iterators}
 		
-		Traversal of containers in C++ is usually done using iterators, which hide the implementation details of the container from the user, who just get an interface for moving through the elements in the container and accessing them. Depending on the kind of object being traversed, iterators may just be able to move forwards in single step increments, or may also be able to move backwards or by a certain distance, and may or may not be copyable.
+		Traversal of containers in {\CC} is usually done using iterators, which hide the implementation details of the container from the user, who just get an interface for moving through the elements in the container and accessing them. Depending on the kind of object being traversed, iterators may just be able to move forwards in single step increments, or may also be able to move backwards or by a certain distance, and may or may not be copyable.
 		
 		Depending on the container, certain operations may invalidate iterators; always the deletion of the element it points to, for example, and usually the relocation of elements as well.
 		

@@ -5,6 +5,8 @@
 % Einleitung
 \chapter{Introduction}
 
+%TODO Marcus: Abstract?
+
 %TODO explain the language's name somewhere in this chapter?
     
     \section{Target audience}
@@ -58,9 +60,9 @@ impure function main()
 	% Motivation
 	% Einordnung der Thesis in allgemeinen Problemkontext -- diesen dazu kurz beschreiben (ca. 1--2 Seiten)
 	
-	There are plenty of programming languages to choose from -- why create yet another one? In short because there appears to be a niche that no language fills yet: A safe powerful strongly typed scripting language with elements from functional and object-oriented programming languages that has coroutines which can be serialized to a cross-platform binary format to be later resumed, possibly on a different computer. It should be easy to embed in C++ applications, have no garbage collection and avoid null- and dangling pointers.
+	There are plenty of programming languages to choose from -- why create yet another one? In short because there appears to be a niche that no language fills yet: A safe powerful strongly typed scripting language with elements from functional and object-oriented programming languages that has coroutines which can be serialized to a cross-platform binary format to be later resumed, possibly on a different computer. It should be easy to embed in {\CC} applications, have no garbage collection and avoid null- and dangling pointers.
 	
-	AngelScript\cite{angelscript} is an example of a statically typed scripting languages for embedding in C++, but it doesn't have coroutines that can be serialized, has null-pointers and it's type system is not powerful enough, lacking generic types. And while Lua\cite{lua}, which embeds nicely in C, has coroutines that can be serialized using Pluto\cite{pluto}, it is dynamically typed and uses garbage collection. Rust\cite{rust} is similar in a lot of regards, though it too lacks in serialization, but it's no scripting language.
+	AngelScript\cite{angelscript} is an example of a statically typed scripting languages for embedding in {\CC}, but it doesn't have coroutines that can be serialized, has null-pointers and it's type system is not powerful enough, lacking generic types. And while Lua\cite{lua}, which embeds nicely in C, has coroutines that can be serialized using Pluto\cite{pluto}, it is dynamically typed and uses garbage collection. Rust\cite{rust} is similar in a lot of regards, though it too lacks in serialization, but it's no scripting language.
 	
 	Thus Perseus aims to fill this niche.
 	
