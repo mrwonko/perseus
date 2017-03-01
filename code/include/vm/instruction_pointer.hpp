@@ -99,21 +99,6 @@ namespace perseus
         return *result;
       }
 
-      /**
-      @brief Read an @ref opcode from the @ref code_segment, incrementing the pointer by its size.
-
-      Opcodes have varying size (encoded); this specialization handles that.
-
-      @returns @ref opcode pointed to by this instruction_pointer, decoded.
-      @throws code_segmentation_fault if the read goes past the end of the @ref code_segment. The pointer will point past the last byte in the @ref code_segment.
-      @see code_segment::push<opcode>() for information on the encoding
-      */
-      template<>
-      opcode read< opcode >()
-      {
-        return readOpcode();
-      }
-
     private:
       /// implementation of read<opcode>()
       opcode readOpcode();
@@ -124,5 +109,17 @@ namespace perseus
       /// Offset into _code
       value_type _offset;
     };
+
+    /**
+    @brief Read an @ref opcode from the @ref code_segment, incrementing the pointer by its size.
+
+    Opcodes have varying size (encoded); this specialization handles that.
+
+    @returns @ref opcode pointed to by this instruction_pointer, decoded.
+    @throws code_segmentation_fault if the read goes past the end of the @ref code_segment. The pointer will point past the last byte in the @ref code_segment.
+    @see code_segment::push<opcode>() for information on the encoding
+    */
+    template<>
+    opcode instruction_pointer::read< opcode >();
   }
 }

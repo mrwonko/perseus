@@ -68,5 +68,11 @@ namespace perseus
 
       return static_cast< opcode >( value );
     }
+
+    template<>
+    opcode instruction_pointer::read< opcode >()
+    {
+      return readOpcode();
+    }
   }
 }

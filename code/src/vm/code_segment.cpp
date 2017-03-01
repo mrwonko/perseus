@@ -59,5 +59,11 @@ namespace perseus
       }
       throw std::domain_error( "opcode too large to encode" );
     }
+
+    template<>
+    void code_segment::push< opcode >( const opcode& code )
+    {
+      push_opcode( code );
+    }
   }
 }
