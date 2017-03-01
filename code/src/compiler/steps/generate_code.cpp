@@ -42,7 +42,7 @@ namespace perseus
     template< typename T >
     static value_placeholder< T > write_placeholder( code_segment& code )
     {
-      value_placeholder< T > placeholder{ code.size() };
+      value_placeholder< T > placeholder{ static_cast< instruction_pointer::value_type >( code.size() ) };
       code.push< T >( 0 );
       return placeholder;
     }
