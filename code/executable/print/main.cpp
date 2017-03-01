@@ -35,8 +35,8 @@ int main( const int argc, const char* argv[] )
 {
   if( argc < 2
     || argv[ 1 ] == "-h"s || argv[ 1 ] == "--help"s
-    || argv[ 1 ] != "-e"s && argc != 2
-    || argv[ 1 ] == "-e"s && argc != 3
+    || ( argv[ 1 ] != "-e"s && argc != 2 )
+    || ( argv[ 1 ] == "-e"s && argc != 3 )
     )
   {
     print_usage( argv[ 0 ] );

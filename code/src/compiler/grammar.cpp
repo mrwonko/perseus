@@ -94,7 +94,7 @@ namespace perseus
       // EOI = End of Input
       file = +function_definition > qi::eoi;
 
-      function_definition = optional_impure >> function_ > identifier > paren_open > -( function_argument % comma ) > paren_close > -( arrow_right > identifier ) > expression;
+      function_definition = (optional_impure >> function_) > identifier > paren_open > -( function_argument % comma ) > paren_close > -( arrow_right > identifier ) > expression;
       {
         optional_impure = ( impure_ >> qi::attr( false ) ) | qi::attr( true );
         function_argument = identifier > colon > identifier;
