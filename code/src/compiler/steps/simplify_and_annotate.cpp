@@ -189,7 +189,9 @@ namespace perseus
 
     static clean::block_member convert( parser::block_member&& member, context& context )
     {
-      return boost::apply_visitor( convert_block_member{ context }, std::move( member ) );
+      // this should really be std::move( member ), but apply_visitor does not support rvalues
+      // see https://svn.boost.org/trac/boost/ticket/6971
+      return boost::apply_visitor( convert_block_member{ context }, member );
     }
 
     //    Operand conversion (constants, variables, control structures etc.)
@@ -356,7 +358,9 @@ namespace perseus
 
     static clean::expression convert( parser::operand&& op, const context& context )
     {
-      return boost::apply_visitor( convert_operand{ context }, std::move( op ) );
+      // this should really be std::move( op ), but apply_visitor does not support rvalues
+      // see https://svn.boost.org/trac/boost/ticket/6971
+      return boost::apply_visitor( convert_operand{ context }, op );
     }
 
     //    Operation conversion
@@ -377,7 +381,7 @@ namespace perseus
     struct convert_operation
     {
 
-      clean::expression operator()( parser::binary_operation& bin )
+      clean::expression operator()( parser::binary_operation& bin ) const
       {
         return generate_call(
           context,
@@ -389,7 +393,7 @@ namespace perseus
           std::move( static_cast< file_position& >( bin.operation ) )
           );
       }
-      clean::expression operator()( parser::index_expression& exp )
+      clean::expression operator()( parser::index_expression& exp ) const
       {
         return generate_call(
           context,
@@ -398,7 +402,7 @@ namespace perseus
           lhs.position
           );
       }
-      clean::expression operator()( parser::call_expression& exp )
+      clean::expression operator()( parser::call_expression& exp ) const
       {
         throw std::logic_error( "Should have been handled separately!" );
       }
@@ -464,7 +468,9 @@ namespace perseus
         {
           clean::expression lhs = convert( std::move( exp.head ), context.expect( tag_not_void{} ) );
           const perseus::detail::context convert_context = context.push( get_size( lhs.type ) );
-          return boost::apply_visitor( convert_operation{ std::move( lhs ), convert_context }, std::move( exp.tail.front() ) );
+          // this should really be std::move( exp.tail.front() ), but apply_visitor does not support rvalues
+          // see https://svn.boost.org/trac/boost/ticket/6971
+          return boost::apply_visitor( convert_operation{ std::move( lhs ), convert_context }, exp.tail.front() );
         }
       }
       else
