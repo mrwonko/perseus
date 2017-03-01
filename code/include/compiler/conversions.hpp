@@ -14,6 +14,8 @@ namespace perseus
 {
   namespace detail
   {
+    using namespace std::string_literals;
+
     /**
     read one code point from a utf8 sequence
     @throws invalid_utf8 on stray or missing continuations
