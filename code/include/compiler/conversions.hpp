@@ -145,7 +145,7 @@ namespace perseus
           return false;
         }
         // T is an AST struct adding position information to a value
-        out_attribute = parse_integer_literal< typename T, base >(
+        out_attribute = parse_integer_literal< T, base >(
           t.value().begin(),
           t.value().end(),
           with_prefix ? consume_prefix< prefix, alt_prefix >( t.value().begin(), t.value().end() ) : t.value().begin()
