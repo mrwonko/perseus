@@ -2,6 +2,8 @@
 
 // std::istreambuf_iterator, std::iterator, iterator tags
 #include <iterator>
+// instanciating an istreambuf_iterator implicitly instantiates a basic_istream, which is defined here
+#include <istream>
 // tuple
 #include <tuple>
 // std::ostream
