@@ -31,7 +31,7 @@ BOOST_AUTO_TEST_SUITE( coroutines )
 
 BOOST_AUTO_TEST_CASE( root_yield )
 {
-  BOOST_MESSAGE( "The root coroutine must not yield." );
+  BOOST_TEST_MESSAGE( "The root coroutine must not yield." );
   auto code = create_code_segment( opcode::yield, std::uint32_t( 0 ) );
   processor proc( std::move( code ) );
   BOOST_CHECK_THROW( proc.execute(), perseus::no_coroutine );
@@ -39,7 +39,7 @@ BOOST_AUTO_TEST_CASE( root_yield )
 
 BOOST_AUTO_TEST_CASE( root_return )
 {
-  BOOST_MESSAGE( "The root coroutine must not return." );
+  BOOST_TEST_MESSAGE( "The root coroutine must not return." );
   auto code = create_code_segment( opcode::coroutine_return, std::uint32_t( 0 ) );
   processor proc( std::move( code ) );
   BOOST_CHECK_THROW( proc.execute(), perseus::no_coroutine );
@@ -51,7 +51,7 @@ static void leaky_coroutine()
 
 BOOST_AUTO_TEST_CASE( create_delete )
 {
-  BOOST_MESSAGE( "creating & deleting an unused coroutine" );
+  BOOST_TEST_MESSAGE( "creating & deleting an unused coroutine" );
   address del_adr;
   auto code = create_code_segment(
     opcode::absolute_coroutine, std::uint32_t( 0 ),

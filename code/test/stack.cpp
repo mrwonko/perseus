@@ -14,7 +14,7 @@ BOOST_AUTO_TEST_SUITE( stack )
 
 BOOST_AUTO_TEST_CASE( push_pop_test )
 {
-  BOOST_MESSAGE( "pushing and popping values on/off the stack" );
+  BOOST_TEST_MESSAGE( "pushing and popping values on/off the stack" );
   perseus::stack stack;
   stack.reserve( sizeof( int ) + 1 );
 
@@ -42,7 +42,7 @@ BOOST_AUTO_TEST_CASE( push_pop_test )
 
 BOOST_AUTO_TEST_CASE( move_test )
 {
-  BOOST_MESSAGE( "stack move constructor" );
+  BOOST_TEST_MESSAGE( "stack move constructor" );
   perseus::stack stack1;
   stack1.push< int >( 32 );
   // move constructor
@@ -58,7 +58,7 @@ BOOST_AUTO_TEST_CASE( move_test )
 
 BOOST_AUTO_TEST_CASE( append_test )
 {
-  BOOST_MESSAGE( "appending stacks to one another" );
+  BOOST_TEST_MESSAGE( "appending stacks to one another" );
   perseus::stack stack1, stack2;
 
   stack1.push< char >( 'a' );
@@ -75,7 +75,7 @@ BOOST_AUTO_TEST_CASE( append_test )
 
 BOOST_AUTO_TEST_CASE( split_test )
 {
-  BOOST_MESSAGE( "splitting a stack in two" );
+  BOOST_TEST_MESSAGE( "splitting a stack in two" );
   perseus::stack stack1;
   stack1.push< std::array< char, 4 > >( { 'a', 'b', 'c', 'd' } );
   perseus::stack stack2 = stack1.split( 3 );
@@ -92,7 +92,7 @@ BOOST_AUTO_TEST_CASE( split_test )
 
 BOOST_AUTO_TEST_CASE( split_0_test )
 {
-  BOOST_MESSAGE( "edge case: splitting nothing off an empty stack" );
+  BOOST_TEST_MESSAGE( "edge case: splitting nothing off an empty stack" );
   perseus::stack stack1;
   perseus::stack stack2 = stack1.split( 0 );
 
@@ -102,7 +102,7 @@ BOOST_AUTO_TEST_CASE( split_0_test )
 
 BOOST_AUTO_TEST_CASE( split_0_test_2 )
 {
-  BOOST_MESSAGE( "edge case: splitting nothing off a non-empty stack" );
+  BOOST_TEST_MESSAGE( "edge case: splitting nothing off a non-empty stack" );
   perseus::stack stack1;
   stack1.push< char >( 'a' );
   perseus::stack stack2 = stack1.split( 0 );

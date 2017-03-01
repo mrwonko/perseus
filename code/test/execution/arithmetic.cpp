@@ -150,7 +150,7 @@ BOOST_AUTO_TEST_CASE( int32_divide_no_remainder )
 
 BOOST_AUTO_TEST_CASE( int32_divide_round_down )
 {
-  BOOST_MESSAGE( "48/7 is closer to 7 than 6, but integer division is supposed to round down." );
+  BOOST_TEST_MESSAGE( "48/7 is closer to 7 than 6, but integer division is supposed to round down." );
   auto code = create_code_segment( opcode::divide_i32, opcode::exit );
   perseus::stack stack;
   stack.push< std::int32_t >( 48 );

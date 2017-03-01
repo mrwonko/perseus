@@ -18,7 +18,7 @@ struct instruction_pointer_fixture
 
 BOOST_FIXTURE_TEST_CASE( moving_test, instruction_pointer_fixture )
 {
-  BOOST_MESSAGE( "reading from and moving the instruction pointer" );
+  BOOST_TEST_MESSAGE( "reading from and moving the instruction pointer" );
   using perseus::detail::instruction_pointer;
   segment.push< char >( 'a' );
   segment.push< char >( 'b' );
@@ -50,7 +50,7 @@ BOOST_FIXTURE_TEST_CASE( moving_test, instruction_pointer_fixture )
 
 BOOST_FIXTURE_TEST_CASE( singlebyte_encoding_test, instruction_pointer_fixture )
 {
-  BOOST_MESSAGE( "opcode encoding - single-byte opcode" );
+  BOOST_TEST_MESSAGE( "opcode encoding - single-byte opcode" );
   using perseus::detail::opcode;
   opcode code = static_cast< opcode >( 42 ); // something that fits into a single byte
   segment.push< opcode >( code );
@@ -61,7 +61,7 @@ BOOST_FIXTURE_TEST_CASE( singlebyte_encoding_test, instruction_pointer_fixture )
 
 BOOST_FIXTURE_TEST_CASE( multibyte_encoding_test, instruction_pointer_fixture )
 {
-  BOOST_MESSAGE( "opcode encoding - multi-byte opcode" );
+  BOOST_TEST_MESSAGE( "opcode encoding - multi-byte opcode" );
   using perseus::detail::opcode;
   opcode code = static_cast< opcode >( 12345 ); // something that would not fit into a single byte
   segment.push< opcode >( code );
