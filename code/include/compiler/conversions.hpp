@@ -103,7 +103,7 @@ namespace perseus
       template< typename Context >
       boost::spirit::qi::info what( Context& )
       {
-        return{ "string literal" };
+        return boost::spirit::qi::info{ "string literal" };
       }
     };
 
@@ -157,7 +157,7 @@ namespace perseus
       template< typename Context >
       boost::spirit::qi::info what( Context& )
       {
-        return{ "integer literal" };
+        return boost::spirit::qi::info{ "integer literal" };
       }
     };
 
