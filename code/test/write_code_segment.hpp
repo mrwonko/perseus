@@ -5,6 +5,7 @@
 #include <string>
 #include <cstdint>
 #include <stdexcept>
+#include <type_traits>
 
 #include "vm/code_segment.hpp"
 #include "vm/instruction_pointer.hpp"
@@ -41,13 +42,25 @@ namespace detail
   static void add_code( perseus::detail::code_segment&, const label_map& )
   {
   }
+
+  // forward declarations
+  template< typename... Tail >
+  void add_code( perseus::detail::code_segment& out_code, const label_map& labels, const get_current_address& retriever, Tail... tail );
+  template< typename... Tail >
+  void add_code( perseus::detail::code_segment& out_code, const label_map& labels, const label_reference& reference, Tail... tail );
+  template< typename... Tail >
+  void add_code( perseus::detail::code_segment& out_code, const label_map& labels, const label_reference_offset& reference, Tail... tail );
+  template< typename... Tail >
+  void add_code( perseus::detail::code_segment& out_code, const label_map& labels, const label&, Tail... tail );
+
   /**
   @brief Add values to a code segment
   @param out_code[in,out] code to append onto
   @param head first value to append
   @param tail remaining values to append
+  @note the enable_if is necessary because otherwise this will get instantiated to participate in overload resolution (where it will be discarded in favor of better fits), triggering the static_assert in code.push() for e.g. label
   */
-  template< typename Head, typename... Tail >
+  template< typename Head, typename = typename std::enable_if< std::is_trivially_copyable< Head >::value >::type, typename... Tail >
   void add_code( perseus::detail::code_segment& out_code, const label_map& labels, const Head& head, Tail... tail )
   {
     out_code.push< Head >( head );
@@ -100,8 +113,19 @@ namespace detail
   {
   }
 
-  template< typename Head, typename... Tail >
-  static void calculate_labels( label_map& out_labels, const std::uint32_t address, const Head& head, Tail... tail )
+  // forward declarations
+  template< typename... Tail >
+  static void calculate_labels( label_map& out_labels, const std::uint32_t address, const get_current_address& retriever, const Tail&... tail );
+  template< typename... Tail >
+  static void calculate_labels( label_map& out_labels, const std::uint32_t address, const label_reference& reference, const Tail&... tail );
+  template< typename... Tail >
+  static void calculate_labels( label_map& out_labels, const std::uint32_t address, const label_reference_offset& reference, const Tail&... tail );
+  template< typename... Tail >
+  static void calculate_labels( label_map& out_labels, const std::uint32_t address, const label& lab, const Tail&... tail );
+
+  // the enable_if is necessary because otherwise this will get instantiated to participate in overload resolution (where it will be discarded in favor of better fits), triggering the static_assert in code.push() for e.g. label
+  template< typename Head, typename = typename std::enable_if< std::is_trivially_copyable< Head >::value >::type, typename... Tail >
+  static void calculate_labels( label_map& out_labels, const std::uint32_t address, const Head& head, const Tail&... tail )
   {
     perseus::detail::code_segment::size_type size = 0;
     {
@@ -113,30 +137,30 @@ namespace detail
     calculate_labels( out_labels, address + size, tail... );
   }
 
-  /// Specialization: retrieving current address (ignored)
+  /// special case: retrieving current address (ignored)
   template< typename... Tail >
-  static void calculate_labels( label_map& out_labels, const std::uint32_t address, const get_current_address& retriever, Tail... tail )
+  static void calculate_labels( label_map& out_labels, const std::uint32_t address, const get_current_address& retriever, const Tail&... tail )
   {
     calculate_labels( out_labels, address, tail... );
   }
 
-  /// Specialization: retrieving label address (ignored)
+  /// special case: retrieving label address (ignored)
   template< typename... Tail >
-  static void calculate_labels( label_map& out_labels, const std::uint32_t address, const label_reference& reference, Tail... tail )
+  static void calculate_labels( label_map& out_labels, const std::uint32_t address, const label_reference& reference, const Tail&... tail )
   {
     calculate_labels( out_labels, address + sizeof( std::uint32_t ), tail... );
   }
 
-  /// Specialization: retrieving label offset (ignored)
+  /// special case: retrieving label offset (ignored)
   template< typename... Tail >
-  static void calculate_labels( label_map& out_labels, const std::uint32_t address, const label_reference_offset& reference, Tail... tail )
+  static void calculate_labels( label_map& out_labels, const std::uint32_t address, const label_reference_offset& reference, const Tail&... tail )
   {
     calculate_labels( out_labels, address + sizeof( std::uint32_t ), tail... );
   }
 
-  /// Specialization: label
+  /// special case: label
   template< typename... Tail >
-  static void calculate_labels( label_map& out_labels, const std::uint32_t address, const label& lab, Tail... tail )
+  static void calculate_labels( label_map& out_labels, const std::uint32_t address, const label& lab, const Tail&... tail )
   {
     if( !out_labels.insert( { lab.name, address } ).second )
     {
@@ -147,7 +171,7 @@ namespace detail
 }
 
 template< typename... Args >
-perseus::detail::code_segment create_code_segment( Args... args )
+perseus::detail::code_segment create_code_segment( const Args&... args )
 {
   perseus::detail::code_segment code;
   label_map labels;
