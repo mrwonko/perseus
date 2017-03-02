@@ -34,7 +34,7 @@ BOOST_AUTO_TEST_SUITE( lexer )
 BOOST_AUTO_TEST_CASE( basic )
 {
   std::vector< perseus::detail::token > result;
-  bool success = tokenize( u8R"(// a cömment
+  bool success = tokenize( u8R"(// a c\u00D6mment
 	some identifiers/*
 and a long comment
 */)", result );
